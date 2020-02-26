@@ -1,0 +1,44 @@
+delete_box:      CNV_PRV_PREPADDR
+
+/* ----------------- CNV_PRV_PREPADDR ----------------- */
+
+insert_job:      CNV_PRV_PREPADDR
+job_type:        b
+description:     "Control the prv_prepaddr process"
+
+ /* ----------------- CNV_PRV_PREPADDR_S ----------------- */
+
+ insert_job:      CNV_PRV_PREPADDR_S
+ job_type:        c
+ box_name:        CNV_PRV_PREPADDR
+ command:         cnv_autojob.sh cnvs
+ description:     "Unload data for the prv_prepaddr process"
+
+ /* ----------------- CNV_PRV_PREPADDR_H ----------------- */
+
+ insert_job:      CNV_PRV_PREPADDR_H
+ job_type:        c
+ box_name:        CNV_PRV_PREPADDR
+ command:         cnv_autojob.sh cnvh
+ condition:       s(CNV_PRV_PREPADDR_S)
+ description:     "Create .out files for dataload.sh"
+
+ /* ----------------- CNV_PRV_PREPADDR_J ----------------- */
+
+ insert_job:      CNV_PRV_PREPADDR_J
+ job_type:        c
+ box_name:        CNV_PRV_PREPADDR
+ command:         cnv_autojob.sh cnvj RUNID
+ condition:       s(CNV_PRV_PREPADDR_H)
+ description:     "Perform the prv_prepaddr process"
+ auto_hold:        1
+
+ /* ----------------- CNV_PRV_PREPADDR_L_CUST ----------------- */
+
+ insert_job:      CNV_PRV_PREPADDR_L_CUST
+ job_type:        c
+ box_name:        CNV_PRV_PREPADDR
+ command:         cnv_autojob.sh cnvl RUNID CUST
+ condition:       s(CNV_PRV_PREPADDR_J)
+ description:     "Load the processed data to the cust database"
+

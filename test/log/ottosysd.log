@@ -1,0 +1,65 @@
+
+
+               Thu Feb 20 2020
+15:36:46 INFO: version: v2.0.0
+               initialized by: dhowell (dhowell)
+15:36:46 INFO: Command line:
+               ottosysd 
+15:36:46 INFO: Environment:
+               OTTOCFG=/home/dhowell/otto/test/ottocfg.txt
+               OTTOLOG=/home/dhowell/otto/test/log
+               OTTOENV=null
+               HOME=/home/dhowell
+               LOGNAME=dhowell
+               USER=dhowell
+               PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/usr/local/conv/opt/gitea/bin:/usr/local/conv/opt/ddi/bin:/usr/local/conv/gencode2/bin:/usr/local/conv/bin:../bin:.:/home/dhowell/bin:/home/dhowell/otto/bin:/home/dhowell/.local/bin:/home/dhowell/bin
+15:36:46 INFO: Configuration:
+               server_addr:        localhost
+               server_port:        23542
+               ottodb_version:         4
+               ottodb_maxjobs:      1000
+               pause:              false
+               verbose:             true
+               show_sofar:          true
+               debug:               true
+               envvar:      OTTOBIN=/usr/local/conv/opt/otto/bin
+15:36:46 INFO: Database structure:
+               job_id          at    0 for    2 type integer(4)  notnull
+               level           at    2 for    2 type integer(4)  notnull
+               parent          at    4 for    2 type integer(4)  notnull
+               head            at    6 for    2 type integer(4)  notnull
+               tail            at    8 for    2 type integer(4)  notnull
+               prev            at   10 for    2 type integer(4)  notnull
+               next            at   12 for    2 type integer(4)  notnull
+               name            at   14 for   65 type char        notnull
+               type            at   79 for    1 type char        notnull
+               box_name        at   80 for   65 type char        notnull
+               description     at  145 for 1025 type char        notnull
+               command         at 1170 for  513 type char        notnull
+               condition       at 1683 for 1025 type char        notnull
+               expression      at 2708 for 1025 type char        notnull
+               expr_fail       at 3733 for    1 type char        notnull
+               auto_hold       at 3734 for    1 type char        notnull
+               date_conditions at 3735 for    1 type char        notnull
+               days_of_week    at 3736 for    1 type char        notnull
+               start_mins      at 3737 for    8 type char        notnull
+               start_times     at 3745 for  192 type char        notnull
+               on_noexec       at 3937 for    1 type char        notnull
+               status          at 3938 for    1 type char        notnull
+               pid             at 3939 for    4 type integer(9)  notnull
+               exit_status     at 3943 for    4 type integer(9)  notnull
+               start           at 3947 for    8 type integer(10) notnull
+               finish          at 3955 for    8 type integer(10) notnull
+               duration        at 3963 for    8 type integer(10) notnull
+               print           at 3971 for    1 type char        notnull
+15:36:46 INFO: IPC bufferlen = 7950016
+15:36:46 INFO: msec to next minute 13570
+15:36:50 MAJR: Shutting down. Caught signal 2 (SIGINT).
+15:36:50 INFO: Backtrace:
+                 ottosysd() [0x40282c]
+                 /lib64/libc.so.6(+0x3c6b0) [0x7f1b94f8f6b0]
+                 /lib64/libc.so.6(__poll+0x17) [0x7f1b95049a37]
+                 ottosysd() [0x402aa8]
+                 ottosysd() [0x4027b9]
+                 /lib64/libc.so.6(__libc_start_main+0xf3) [0x7f1b94f7a1a3]
+                 ottosysd() [0x4025de]

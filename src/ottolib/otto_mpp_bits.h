@@ -1,0 +1,20 @@
+#ifndef _OTTO_MPP_BITS_H_
+#define _OTTO_MPP_BITS_H_
+
+enum EXTDEFS
+{
+   JOBSCRIPT,
+   PARAMETERS,
+   DESCRIPTION,
+   AUTOHOLD,
+   DATE_CONDITIONS,
+   DAYS_OF_WEEK,
+   START_MINS,
+   START_TIMES,
+   EXTDEF_TOTAL
+};
+
+#endif
+//
+// vim: ts=3 sw=3 ai
+//
