@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "ottobits.h"
+#include "ottoipc.h"
 #include "ottojob.h"
 #include "otto_mpp_bits.h"
 #include "otto_mpp_reader.h"
@@ -477,6 +478,9 @@ validate_and_copy_mpp_xml(MPP_TASKLIST *tasklist, JOBLIST *joblist)
 		{
 			// move each XML attribute into its corresponding job field
 			// performing sanity checks along the way
+
+			// all tasks in a MPP XML file resolve to CREATE_JOB actions
+			joblist->item[i].opcode = CREATE_JOB;
 
 			// NAME copy and verification
 			{
