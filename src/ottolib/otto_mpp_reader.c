@@ -482,6 +482,9 @@ validate_and_copy_mpp_xml(MPP_TASKLIST *tasklist, JOBLIST *joblist)
 			// all tasks in a MPP XML file resolve to CREATE_JOB actions
 			joblist->item[i].opcode = CREATE_JOB;
 
+			// transfer the MPP XML level attribute directly to the joblist item
+			joblist->item[i].level = tasklist->item[i].level;
+
 			// NAME copy and verification
 			{
 				xmlcpy(namstr, tasklist->item[i].name);

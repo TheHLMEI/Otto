@@ -7,6 +7,10 @@
 # Unignore all dirs
 !*/
 
+# Ignore specific directories
+lib/
+include/
+
 # log files
 *.log
 

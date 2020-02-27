@@ -14,6 +14,7 @@
 #include "ottosignal.h"
 #include "ottoutil.h"
 
+#include "otto_dtl_writer.h"
 #include "otto_jil_reader.h"
 #include "otto_jil_writer.h"
 #include "otto_mpp_reader.h"
@@ -25,6 +26,7 @@ enum FILETYPES
 	TYPE_UNKNOWN,
 	TYPE_JIL,
 	TYPE_MPP,
+	TYPE_DTL,
 	TYPE_TOTAL
 };
 
@@ -136,6 +138,8 @@ ottoxlat_getargs(int argc, char **argv)
 				{
 					input_type    = get_type(optarg);
 					input_optarg  = optarg;
+					if(input_type == TYPE_DTL)
+						input_type = TYPE_UNKNOWN;
 				}
 				break;
 			case 'h':
@@ -177,6 +181,7 @@ ottoxlat_getargs(int argc, char **argv)
 			fprintf(stderr, "Missing input file type.\n");
 		retval = OTTO_FAIL;
 	}
+	/*
 	else
 	{
 		if(input_type == output_type)
@@ -185,7 +190,7 @@ ottoxlat_getargs(int argc, char **argv)
 			retval = OTTO_FAIL;
 		}
 	}
-
+	*/
 
 	return(retval);
 }
@@ -256,6 +261,9 @@ ottoxlat(void)
 	{
 		switch(output_type)
 		{
+			case TYPE_DTL:
+				retval = write_dtl(&joblist);
+				break;
 			case TYPE_JIL:
 				retval = write_jil(&joblist);
 				break;
@@ -277,6 +285,9 @@ int
 get_type(char *optarg)
 {
 	int retval = TYPE_UNKNOWN;
+
+	if(strcasecmp(optarg, "DTL") == 0)
+		retval = TYPE_DTL;
 
 	if(strcasecmp(optarg, "JIL") == 0)
 		retval = TYPE_JIL;
