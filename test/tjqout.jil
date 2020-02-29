@@ -1,0 +1,5206 @@
+/* ----------------- DESIGN_PREP_ALL ----------------- */
+
+insert_job:      DESIGN_PREP_ALL
+job_type:        b
+description:     "Overall conversion job"
+auto_hold:       1
+
+ /* ----------------- CNV_PM_DESIGN_PREP_ALL_MAP ----------------- */
+
+ insert_job:      CNV_PM_DESIGN_PREP_ALL_MAP
+ job_type:        c
+ box_name:        DESIGN_PREP_ALL
+ command:         cnv_autojob.sh cnvj_gen_des_app all m Y
+ description:     "All mapping export"
+ auto_hold:       1
+
+ /* ----------------- CNV_PM_DESIGN_PREP_ALL_BMT ----------------- */
+
+ insert_job:      CNV_PM_DESIGN_PREP_ALL_BMT
+ job_type:        c
+ box_name:        DESIGN_PREP_ALL
+ command:         cnv_autojob.sh cnvj_gen_des_app all b Y
+ condition:       s(CNV_PM_DESIGN_PREP_ALL_MAP)
+ description:     "All BMT export"
+ auto_hold:       1
+
+ /* ----------------- CNV_PM_DESIGN_PREP_ALL_ACTION ----------------- */
+
+ insert_job:      CNV_PM_DESIGN_PREP_ALL_ACTION
+ job_type:        c
+ box_name:        DESIGN_PREP_ALL
+ command:         cnv_autojob.sh cnvj_gen_des_app all a Y
+ condition:       s(CNV_PM_DESIGN_PREP_ALL_BMT)
+ description:     "All action item report"
+ auto_hold:       1
+
+/* ----------------- DESIGN_PREP_BMT ----------------- */
+
+insert_job:      DESIGN_PREP_BMT
+job_type:        b
+description:     "Generate BMT reports"
+auto_hold:       1
+
+ /* ----------------- CNV_PM_REF_BMT_RPT ----------------- */
+
+ insert_job:      CNV_PM_REF_BMT_RPT
+ job_type:        c
+ box_name:        DESIGN_PREP_BMT
+ command:         cnv_autojob.sh cnvj_gen_des_app ref b Y
+ description:     "Generate BMT"
+ auto_hold:       1
+
+ /* ----------------- CNV_PM_MBR_BMT_RPT ----------------- */
+
+ insert_job:      CNV_PM_MBR_BMT_RPT
+ job_type:        c
+ box_name:        DESIGN_PREP_BMT
+ command:         cnv_autojob.sh cnvj_gen_des_app mbr b Y
+ condition:       s(CNV_PM_REF_BMT_RPT)
+ description:     "Generate BMT"
+ auto_hold:       1
+
+ /* ----------------- CNV_PM_PRV_BMT_RPT ----------------- */
+
+ insert_job:      CNV_PM_PRV_BMT_RPT
+ job_type:        c
+ box_name:        DESIGN_PREP_BMT
+ command:         cnv_autojob.sh cnvj_gen_des_app prv b Y
+ condition:       s(CNV_PM_MBR_BMT_RPT)
+ description:     "Generate BMT"
+ auto_hold:       1
+
+ /* ----------------- CNV_PM_MGD_BMT_RPT ----------------- */
+
+ insert_job:      CNV_PM_MGD_BMT_RPT
+ job_type:        c
+ box_name:        DESIGN_PREP_BMT
+ command:         cnv_autojob.sh cnvj_gen_des_app mgd b Y
+ condition:       s(CNV_PM_PRV_BMT_RPT)
+ description:     "Generate BMT"
+ auto_hold:       1
+
+ /* ----------------- CNV_PM_FIN_BMT_RPT ----------------- */
+
+ insert_job:      CNV_PM_FIN_BMT_RPT
+ job_type:        c
+ box_name:        DESIGN_PREP_BMT
+ command:         cnv_autojob.sh cnvj_gen_des_app fin b Y
+ condition:       s(CNV_PM_MGD_BMT_RPT)
+ description:     "Generate BMT"
+ auto_hold:       1
+
+ /* ----------------- CNV_PM_PAU_BMT_RPT ----------------- */
+
+ insert_job:      CNV_PM_PAU_BMT_RPT
+ job_type:        c
+ box_name:        DESIGN_PREP_BMT
+ command:         cnv_autojob.sh cnvj_gen_des_app pau b Y
+ condition:       s(CNV_PM_FIN_BMT_RPT)
+ description:     "Generate BMT"
+ auto_hold:       1
+
+ /* ----------------- CNV_PM_TPL_BMT_RPT ----------------- */
+
+ insert_job:      CNV_PM_TPL_BMT_RPT
+ job_type:        c
+ box_name:        DESIGN_PREP_BMT
+ command:         cnv_autojob.sh cnvj_gen_des_app tpl b Y
+ condition:       s(CNV_PM_PAU_BMT_RPT)
+ description:     "Generate BMT"
+ auto_hold:       1
+
+ /* ----------------- CNV_PM_RBT_BMT_RPT ----------------- */
+
+ insert_job:      CNV_PM_RBT_BMT_RPT
+ job_type:        c
+ box_name:        DESIGN_PREP_BMT
+ command:         cnv_autojob.sh cnvj_gen_des_app rbt b Y
+ condition:       s(CNV_PM_TPL_BMT_RPT)
+ description:     "Generate BMT"
+ auto_hold:       1
+
+ /* ----------------- CNV_PM_BUY_BMT_RPT ----------------- */
+
+ insert_job:      CNV_PM_BUY_BMT_RPT
+ job_type:        c
+ box_name:        DESIGN_PREP_BMT
+ command:         cnv_autojob.sh cnvj_gen_des_app buy b Y
+ condition:       s(CNV_PM_RBT_BMT_RPT)
+ description:     "Generate BMT"
+ auto_hold:       1
+
+ /* ----------------- CNV_PM_CLM_BMT_RPT ----------------- */
+
+ insert_job:      CNV_PM_CLM_BMT_RPT
+ job_type:        c
+ box_name:        DESIGN_PREP_BMT
+ command:         cnv_autojob.sh cnvj_gen_des_app clm b Y
+ condition:       s(CNV_PM_BUY_BMT_RPT)
+ description:     "Generate BMT"
+ auto_hold:       1
+
+/* ----------------- DESIGN_PREP_ACTION ----------------- */
+
+insert_job:      DESIGN_PREP_ACTION
+job_type:        b
+description:     "Overall conversion job"
+auto_hold:       1
+
+ /* ----------------- CNV_PM_REF_ACT_RPT ----------------- */
+
+ insert_job:      CNV_PM_REF_ACT_RPT
+ job_type:        c
+ box_name:        DESIGN_PREP_ACTION
+ command:         cnv_autojob.sh cnvj_gen_des_app ref a Y
+ description:     "Generate BMT"
+ auto_hold:       1
+
+ /* ----------------- CNV_PM_MBR_ACT_RPT ----------------- */
+
+ insert_job:      CNV_PM_MBR_ACT_RPT
+ job_type:        c
+ box_name:        DESIGN_PREP_ACTION
+ command:         cnv_autojob.sh cnvj_gen_des_app mbr a Y
+ condition:       s(CNV_PM_REF_ACT_RPT)
+ description:     "Generate BMT"
+ auto_hold:       1
+
+ /* ----------------- CNV_PM_PRV_ACT_RPT ----------------- */
+
+ insert_job:      CNV_PM_PRV_ACT_RPT
+ job_type:        c
+ box_name:        DESIGN_PREP_ACTION
+ command:         cnv_autojob.sh cnvj_gen_des_app prv a Y
+ condition:       s(CNV_PM_MBR_ACT_RPT)
+ description:     "Generate BMT"
+ auto_hold:       1
+
+ /* ----------------- CNV_PM_MGD_ACT_RPT ----------------- */
+
+ insert_job:      CNV_PM_MGD_ACT_RPT
+ job_type:        c
+ box_name:        DESIGN_PREP_ACTION
+ command:         cnv_autojob.sh cnvj_gen_des_app mgd a Y
+ condition:       s(CNV_PM_PRV_ACT_RPT)
+ description:     "Generate BMT"
+ auto_hold:       1
+
+ /* ----------------- CNV_PM_FIN_ACT_RPT ----------------- */
+
+ insert_job:      CNV_PM_FIN_ACT_RPT
+ job_type:        c
+ box_name:        DESIGN_PREP_ACTION
+ command:         cnv_autojob.sh cnvj_gen_des_app fin a Y
+ condition:       s(CNV_PM_MGD_ACT_RPT)
+ description:     "Generate BMT"
+ auto_hold:       1
+
+ /* ----------------- CNV_PM_PAU_ACT_RPT ----------------- */
+
+ insert_job:      CNV_PM_PAU_ACT_RPT
+ job_type:        c
+ box_name:        DESIGN_PREP_ACTION
+ command:         cnv_autojob.sh cnvj_gen_des_app pau a Y
+ condition:       s(CNV_PM_FIN_ACT_RPT)
+ description:     "Generate BMT"
+ auto_hold:       1
+
+ /* ----------------- CNV_PM_TPL_ACT_RPT ----------------- */
+
+ insert_job:      CNV_PM_TPL_ACT_RPT
+ job_type:        c
+ box_name:        DESIGN_PREP_ACTION
+ command:         cnv_autojob.sh cnvj_gen_des_app tpl a Y
+ condition:       s(CNV_PM_PAU_ACT_RPT)
+ description:     "Generate BMT"
+ auto_hold:       1
+
+ /* ----------------- CNV_PM_RBT_ACT_RPT ----------------- */
+
+ insert_job:      CNV_PM_RBT_ACT_RPT
+ job_type:        c
+ box_name:        DESIGN_PREP_ACTION
+ command:         cnv_autojob.sh cnvj_gen_des_app rbt a Y
+ condition:       s(CNV_PM_TPL_ACT_RPT)
+ description:     "Generate BMT"
+ auto_hold:       1
+
+ /* ----------------- CNV_PM_BUY_ACT_RPT ----------------- */
+
+ insert_job:      CNV_PM_BUY_ACT_RPT
+ job_type:        c
+ box_name:        DESIGN_PREP_ACTION
+ command:         cnv_autojob.sh cnvj_gen_des_app buy a Y
+ condition:       s(CNV_PM_RBT_ACT_RPT)
+ description:     "Generate BMT"
+ auto_hold:       1
+
+ /* ----------------- CNV_PM_CLM_ACT_RPT ----------------- */
+
+ insert_job:      CNV_PM_CLM_ACT_RPT
+ job_type:        c
+ box_name:        DESIGN_PREP_ACTION
+ command:         cnv_autojob.sh cnvj_gen_des_app clm a Y
+ condition:       s(CNV_PM_BUY_ACT_RPT)
+ description:     "Generate BMT"
+ auto_hold:       1
+
+/* ----------------- CNV_THURSDAY_REMINDER ----------------- */
+
+insert_job:      CNV_THURSDAY_REMINDER
+job_type:        c
+command:         cnv_autojob.sh cnvj_thu_mail
+description:     "Sends the Thursday reminder email"
+date_conditions: 1
+days_of_week:    th
+start_times:     "6:00"
+
+/* ----------------- CNV_TUESDAY_REMINDER ----------------- */
+
+insert_job:      CNV_TUESDAY_REMINDER
+job_type:        c
+command:         cnv_autojob.sh cnvj_tue_mail
+description:     "Sends the Tuesday reminder email"
+date_conditions: 1
+days_of_week:    tu
+start_times:     "6:00"
+
+/* ----------------- CNV_PM_DSGN_PREP_ALL_MAP_DLY ----------------- */
+
+insert_job:      CNV_PM_DSGN_PREP_ALL_MAP_DLY
+job_type:        c
+command:         cnv_autojob.sh cnvj_gen_des_app all m Y
+description:     "All mapping export"
+date_conditions: 1
+days_of_week:    mo,tu,we,th,fr
+start_times:     "5:00"
+
+/* ----------------- CNV_CONV_COUNT_RPT ----------------- */
+
+insert_job:      CNV_CONV_COUNT_RPT
+job_type:        c
+command:         cnv_autojob.sh cnvj_genconvcntrpt
+description:     "Generates the weekly cust count report"
+date_conditions: 1
+days_of_week:    mo,we,fr
+start_times:     "14:00"
+
+/* ----------------- CNV_CUST_COUNT_RPT ----------------- */
+
+insert_job:      CNV_CUST_COUNT_RPT
+job_type:        c
+command:         cnv_autojob.sh cnvj_gencustcntrpt
+description:     "Generates the weekly cust count report"
+date_conditions: 1
+days_of_week:    fr
+start_times:     "1:00"
+
+/* ----------------- MS_CONV_DASHBOARD_CUSTOMIZED ----------------- */
+
+insert_job:      MS_CONV_DASHBOARD_CUSTOMIZED
+job_type:        b
+description:     "Conversion Dashboard Customized"
+
+ /* ----------------- CNV_DASH_SRC_J ----------------- */
+
+ insert_job:      CNV_DASH_SRC_J
+ job_type:        c
+ box_name:        MS_CONV_DASHBOARD_CUSTOMIZED
+ command:         cnv_autojob.sh cnvj_cnvdash Y S
+ description:     "Conversion Dashboard Customized Source"
+
+ /* ----------------- CNV_DASH_TGT_J ----------------- */
+
+ insert_job:      CNV_DASH_TGT_J
+ job_type:        c
+ box_name:        MS_CONV_DASHBOARD_CUSTOMIZED
+ command:         cnv_autojob.sh cnvj_cnvdash Y T
+ description:     "Conversion Dashboard Customized Target"
+
+ /* ----------------- CNV_DASH_MAP_APRV_J ----------------- */
+
+ insert_job:      CNV_DASH_MAP_APRV_J
+ job_type:        c
+ box_name:        MS_CONV_DASHBOARD_CUSTOMIZED
+ command:         cnv_autojob.sh cnvj_cnvdash Y a
+ description:     "Conversion Dashboard Customized Map Approve"
+
+ /* ----------------- CNV_DASH_ACT_J ----------------- */
+
+ insert_job:      CNV_DASH_ACT_J
+ job_type:        c
+ box_name:        MS_CONV_DASHBOARD_CUSTOMIZED
+ command:         cnv_autojob.sh cnvj_cnvdash Y z
+ description:     "Conversion Dashboard Customized Action"
+
+ /* ----------------- CNV_DASH_QUAL_J ----------------- */
+
+ insert_job:      CNV_DASH_QUAL_J
+ job_type:        c
+ box_name:        MS_CONV_DASHBOARD_CUSTOMIZED
+ command:         cnv_autojob.sh cnvj_cnvdash Y q
+ description:     "Conversion Dashboard Customized Quality"
+
+ /* ----------------- CNV_DASH_TEST_J ----------------- */
+
+ insert_job:      CNV_DASH_TEST_J
+ job_type:        c
+ box_name:        MS_CONV_DASHBOARD_CUSTOMIZED
+ command:         cnv_autojob.sh cnvj_cnvdash Y t
+ description:     "Conversion Dashboard Customized Test"
+
+ /* ----------------- CNV_DASH_DEC_J ----------------- */
+
+ insert_job:      CNV_DASH_DEC_J
+ job_type:        c
+ box_name:        MS_CONV_DASHBOARD_CUSTOMIZED
+ command:         cnv_autojob.sh cnvj_cnvdash Y d
+ description:     "Conversion Dashboard Customized Decisions"
+
+/* ----------------- CNV_CCR_RPT ----------------- */
+
+insert_job:      CNV_CCR_RPT
+job_type:        c
+command:         cnv_autojob.sh cnvj_ccr $RUNID
+description:     "Generates the Conversion Cycle Report"
+date_conditions: 1
+days_of_week:    th
+start_times:     "4:30"
+
+/* ----------------- MS_CONV_CYCLE ----------------- */
+
+insert_job:      MS_CONV_CYCLE
+job_type:        b
+description:     "Conversion cycle"
+
+ /* ----------------- CNV_ALL_START_NOTIFY ----------------- */
+
+ insert_job:      CNV_ALL_START_NOTIFY
+ job_type:        c
+ box_name:        MS_CONV_CYCLE
+ command:         cnv_autojob.sh cnv_send_msg.sh ALL Starting conversion cycle. TFAL validte RUNID and /usr/local/conv/cnv_config/env_setup.sh conversion_date equal to start date of conversion.
+ description:     "Starting conversion cycle ensure /home/dsprconv/.profile runid is updated."
+
+ /* ----------------- CNV_ALL_START_WATCHCYCLE ----------------- */
+
+ insert_job:      CNV_ALL_START_WATCHCYCLE
+ job_type:        c
+ box_name:        MS_CONV_CYCLE
+ command:         cnv_autojob.sh watchcycle -d 6000 -p CNV_% -f  60000 -r msddi_conversion@dxc.com
+ description:     "Watchcycle job"
+
+ /* ----------------- CNV_ALL_TRUNC_EMPTY ----------------- */
+
+ insert_job:      CNV_ALL_TRUNC_EMPTY
+ job_type:        c
+ box_name:        MS_CONV_CYCLE
+ command:         cnv_autojob.sh cnvjtrun_empty.sh CONV
+ condition:       s(CNV_ALL_START_WATCHCYCLE)
+ description:     "Truncate empty tables"
+
+ /* ----------------- CNV_ALL_COPY_MANUAL ----------------- */
+
+ insert_job:      CNV_ALL_COPY_MANUAL
+ job_type:        c
+ box_name:        MS_CONV_CYCLE
+ command:         cnv_autojob.sh cnv_send_msg.sh TFAL Send request to DBA to copy config data, run  cnvj_cfgreq script and send output to DBA.
+ condition:       s(CNV_ALL_TRUNC_EMPTY)
+ description:     "Copy manual tables from config"
+
+ /* ----------------- CNV_ALL_VERIFY_EMPTY_J ----------------- */
+
+ insert_job:      CNV_ALL_VERIFY_EMPTY_J
+ job_type:        c
+ box_name:        MS_CONV_CYCLE
+ command:         cnv_autojob.sh cnvjcnt_empty.sh CONV
+ condition:       s(CNV_ALL_COPY_MANUAL)
+ description:     "Job to validate empty counts."
+
+ /* ----------------- CNV_REF_PART1 ----------------- */
+
+ insert_job:      CNV_REF_PART1
+ job_type:        b
+ box_name:        MS_CONV_CYCLE
+ condition:       s(CNV_ALL_COPY_MANUAL)
+ description:     "Reference conversion part 1"
+ auto_hold:       1
+
+  /* ----------------- CNV_REF_PRESAK ----------------- */
+
+  insert_job:      CNV_REF_PRESAK
+  job_type:        b
+  box_name:        CNV_REF_PART1
+  condition:       s(CNV_ALL_COPY_MANUAL)
+  description:     "Reference presak"
+
+   /* ----------------- CNV_REF_PRESAK_DIAG ----------------- */
+
+   insert_job:      CNV_REF_PRESAK_DIAG
+   job_type:        c
+   box_name:        CNV_REF_PRESAK
+   command:         cnv_autojob.sh cnvjref_diag_saking.sh RUNID
+   condition:       s(CNV_ALL_COPY_MANUAL)
+   description:     "Presaking for Diagnosis"
+
+   /* ----------------- CNV_REF_PRESAK_REV ----------------- */
+
+   insert_job:      CNV_REF_PRESAK_REV
+   job_type:        c
+   box_name:        CNV_REF_PRESAK
+   command:         cnv_autojob.sh cnvjref_rev_saking.sh RUNID
+   condition:       s(CNV_ALL_COPY_MANUAL)
+   description:     "Presaking for Revenue"
+
+   /* ----------------- CNV_REF_PRESAK_PROC ----------------- */
+
+   insert_job:      CNV_REF_PRESAK_PROC
+   job_type:        c
+   box_name:        CNV_REF_PRESAK
+   command:         cnv_autojob.sh cnvjref_proc_saking.sh RUNID
+   condition:       s(CNV_ALL_COPY_MANUAL)
+   description:     "Presaking for Procedure"
+
+   /* ----------------- CNV_REF_PRESAK_ICDP ----------------- */
+
+   insert_job:      CNV_REF_PRESAK_ICDP
+   job_type:        c
+   box_name:        CNV_REF_PRESAK
+   command:         cnv_autojob.sh cnvjref_icdp_saking.sh RUNID
+   condition:       s(CNV_ALL_COPY_MANUAL)
+   description:     "Presaking for ICD Procedure"
+
+   /* ----------------- CNV_REF_PRESAK_DRUG ----------------- */
+
+   insert_job:      CNV_REF_PRESAK_DRUG
+   job_type:        c
+   box_name:        CNV_REF_PRESAK
+   command:         cnv_autojob.sh cnvjref_drug_saking.sh RUNID
+   condition:       s(CNV_ALL_COPY_MANUAL)
+   description:     "Presaking for Drug"
+
+   /* ----------------- CNV_REF_PRESAK_DRG ----------------- */
+
+   insert_job:      CNV_REF_PRESAK_DRG
+   job_type:        c
+   box_name:        CNV_REF_PRESAK
+   command:         cnv_autojob.sh cnvjref_drg_saking.sh RUNID
+   condition:       s(CNV_ALL_COPY_MANUAL)
+   description:     "Presaking for DRG"
+
+   /* ----------------- CNV_REF_PRESAK_ESC ----------------- */
+
+   insert_job:      CNV_REF_PRESAK_ESC
+   job_type:        c
+   box_name:        CNV_REF_PRESAK
+   command:         cnv_autojob.sh cnvjref_esc_saking.sh RUNID
+   condition:       s(CNV_ALL_COPY_MANUAL)
+   description:     "Presaking for ESC"
+
+  /* ----------------- CNV_REF_MS_LOCAL_LOOKUP ----------------- */
+
+  insert_job:      CNV_REF_MS_LOCAL_LOOKUP
+  job_type:        b
+  box_name:        CNV_REF_PART1
+  condition:       s(CNV_REF_PRESAK)
+  description:     "REF Local Lookup"
+
+   /* ----------------- CNV_REF_MS_LOCAL_LOOKUP_H ----------------- */
+
+   insert_job:      CNV_REF_MS_LOCAL_LOOKUP_H
+   job_type:        c
+   box_name:        CNV_REF_MS_LOCAL_LOOKUP
+   command:         cnv_autojob.sh cnvh
+   condition:       s(CNV_REF_PRESAK)
+   description:     "BDB Unload"
+
+  /* ----------------- CNV_REF_MS_UNLOAD_PART1 ----------------- */
+
+  insert_job:      CNV_REF_MS_UNLOAD_PART1
+  job_type:        b
+  box_name:        CNV_REF_PART1
+  condition:       s(CNV_REF_MS_LOCAL_LOOKUP_H)
+  description:     "Reference unload"
+
+   /* ----------------- CNV_REF_MS_DIAG_S ----------------- */
+
+   insert_job:      CNV_REF_MS_DIAG_S
+   job_type:        c
+   box_name:        CNV_REF_MS_UNLOAD_PART1
+   command:         cnv_autojob.sh cnvs
+   condition:       s(CNV_REF_MS_LOCAL_LOOKUP_H)
+   description:     "Source Unload"
+
+   /* ----------------- CNV_REF_MS_REV_S ----------------- */
+
+   insert_job:      CNV_REF_MS_REV_S
+   job_type:        c
+   box_name:        CNV_REF_MS_UNLOAD_PART1
+   command:         cnv_autojob.sh cnvs
+   condition:       s(CNV_REF_MS_LOCAL_LOOKUP_H)
+   description:     "Source Unload"
+
+   /* ----------------- CNV_REF_MS_PROC_S ----------------- */
+
+   insert_job:      CNV_REF_MS_PROC_S
+   job_type:        c
+   box_name:        CNV_REF_MS_UNLOAD_PART1
+   command:         cnv_autojob.sh cnvs
+   condition:       s(CNV_REF_MS_LOCAL_LOOKUP_H)
+   description:     "Source Unload"
+
+   /* ----------------- CNV_REF_MS_ICD_PROC_S ----------------- */
+
+   insert_job:      CNV_REF_MS_ICD_PROC_S
+   job_type:        c
+   box_name:        CNV_REF_MS_UNLOAD_PART1
+   command:         cnv_autojob.sh cnvs
+   condition:       s(CNV_REF_MS_LOCAL_LOOKUP_H)
+   description:     "Source Unload"
+
+   /* ----------------- CNV_REF_MS_DRUG_S ----------------- */
+
+   insert_job:      CNV_REF_MS_DRUG_S
+   job_type:        c
+   box_name:        CNV_REF_MS_UNLOAD_PART1
+   command:         cnv_autojob.sh cnvs
+   condition:       s(CNV_REF_MS_LOCAL_LOOKUP_H)
+   description:     "Source Unload"
+
+   /* ----------------- CNV_REF_MS_DRG_S ----------------- */
+
+   insert_job:      CNV_REF_MS_DRG_S
+   job_type:        c
+   box_name:        CNV_REF_MS_UNLOAD_PART1
+   command:         cnv_autojob.sh cnvs
+   condition:       s(CNV_REF_MS_LOCAL_LOOKUP_H)
+   description:     "Source Unload"
+
+   /* ----------------- CNV_REF_MS_PROC_PROV_REATE_S ----------------- */
+
+   insert_job:      CNV_REF_MS_PROC_PROV_REATE_S
+   job_type:        c
+   box_name:        CNV_REF_MS_UNLOAD_PART1
+   command:         cnv_autojob.sh cnvs
+   condition:       s(CNV_REF_MS_LOCAL_LOOKUP_H)
+   description:     "Source Unload"
+
+   /* ----------------- CNV_REF_MS_ESC_S ----------------- */
+
+   insert_job:      CNV_REF_MS_ESC_S
+   job_type:        c
+   box_name:        CNV_REF_MS_UNLOAD_PART1
+   command:         cnv_autojob.sh cnvs
+   condition:       s(CNV_REF_MS_LOCAL_LOOKUP_H)
+   description:     "Source Unload"
+
+   /* ----------------- CNV_REF_MS_GCN_S ----------------- */
+
+   insert_job:      CNV_REF_MS_GCN_S
+   job_type:        c
+   box_name:        CNV_REF_MS_UNLOAD_PART1
+   command:         cnv_autojob.sh cnvs
+   condition:       s(CNV_REF_MS_LOCAL_LOOKUP_H)
+   description:     "Source Unload"
+
+  /* ----------------- CNV_REF_PART1_JOBS ----------------- */
+
+  insert_job:      CNV_REF_PART1_JOBS
+  job_type:        b
+  box_name:        CNV_REF_PART1
+  description:     "Reference part 1 jobs"
+
+   /* ----------------- CNV_REF_MS_DIAG ----------------- */
+
+   insert_job:      CNV_REF_MS_DIAG
+   job_type:        b
+   box_name:        CNV_REF_PART1_JOBS
+   condition:       s(CNV_REF_MS_DIAG_S)
+   description:     "Diag"
+
+    /* ----------------- CNV_REF_MS_DIAG_H ----------------- */
+
+    insert_job:      CNV_REF_MS_DIAG_H
+    job_type:        c
+    box_name:        CNV_REF_MS_DIAG
+    command:         cnv_autojob.sh cnvh
+    condition:       s(CNV_REF_MS_DIAG_S)
+    description:     "BDB Unload"
+
+    /* ----------------- CNV_REF_MS_DIAG_J ----------------- */
+
+    insert_job:      CNV_REF_MS_DIAG_J
+    job_type:        c
+    box_name:        CNV_REF_MS_DIAG
+    command:         cnv_autojob.sh cnvj RUNID
+    condition:       s(CNV_REF_MS_DIAG_H)
+    description:     "Job"
+
+    /* ----------------- CNV_REF_MS_DIAG_N ----------------- */
+
+    insert_job:      CNV_REF_MS_DIAG_N
+    job_type:        c
+    box_name:        CNV_REF_MS_DIAG
+    command:         cnv_autojob.sh cnvn RUNID
+    condition:       s(CNV_REF_MS_DIAG_J)
+    description:     "Check for null fields"
+
+    /* ----------------- CNV_REF_MS_DIAG_L_CONV ----------------- */
+
+    insert_job:      CNV_REF_MS_DIAG_L_CONV
+    job_type:        c
+    box_name:        CNV_REF_MS_DIAG
+    command:         cnv_autojob.sh cnvl RUNID CONV
+    condition:       s(CNV_REF_MS_DIAG_N)
+    description:     "Load"
+
+    /* ----------------- CNV_REF_MS_DIAG_F ----------------- */
+
+    insert_job:      CNV_REF_MS_DIAG_F
+    job_type:        c
+    box_name:        CNV_REF_MS_DIAG
+    command:         cnv_autojob.sh cnvf RUNID ref
+    condition:       s(CNV_REF_MS_DIAG_L_CONV)
+    description:     "FASR"
+
+   /* ----------------- CNV_REF_MS_DIAG_GRP ----------------- */
+
+   insert_job:      CNV_REF_MS_DIAG_GRP
+   job_type:        b
+   box_name:        CNV_REF_PART1_JOBS
+   description:     "Diag Group"
+
+    /* ----------------- CNV_REF_MS_DIAG_GRP_S ----------------- */
+
+    insert_job:      CNV_REF_MS_DIAG_GRP_S
+    job_type:        c
+    box_name:        CNV_REF_MS_DIAG_GRP
+    command:         cnv_autojob.sh cnvs
+    condition:       s(CNV_REF_MS_DIAG_F)
+    description:     "Source Unload"
+
+    /* ----------------- CNV_REF_MS_DIAG_GRP_H ----------------- */
+
+    insert_job:      CNV_REF_MS_DIAG_GRP_H
+    job_type:        c
+    box_name:        CNV_REF_MS_DIAG_GRP
+    command:         cnv_autojob.sh cnvh
+    condition:       s(CNV_REF_MS_DIAG_GRP_S)
+    description:     "BDB Unload"
+
+    /* ----------------- CNV_REF_MS_DIAG_GRP_J ----------------- */
+
+    insert_job:      CNV_REF_MS_DIAG_GRP_J
+    job_type:        c
+    box_name:        CNV_REF_MS_DIAG_GRP
+    command:         cnv_autojob.sh cnvj RUNID
+    condition:       s(CNV_REF_MS_DIAG_GRP_H)
+    description:     "Job"
+
+    /* ----------------- CNV_REF_MS_DIAG_GRP_N ----------------- */
+
+    insert_job:      CNV_REF_MS_DIAG_GRP_N
+    job_type:        c
+    box_name:        CNV_REF_MS_DIAG_GRP
+    command:         cnv_autojob.sh cnvn RUNID
+    condition:       s(CNV_REF_MS_DIAG_GRP_J)
+    description:     "Check for null fields"
+
+    /* ----------------- CNV_REF_MS_DIAG_GRP_L_CONV ----------------- */
+
+    insert_job:      CNV_REF_MS_DIAG_GRP_L_CONV
+    job_type:        c
+    box_name:        CNV_REF_MS_DIAG_GRP
+    command:         cnv_autojob.sh cnvl RUNID CONV
+    condition:       s(CNV_REF_MS_DIAG_GRP_N)
+    description:     "Load"
+    auto_hold:       1
+
+    /* ----------------- CNV_REF_MS_DIAG_GRP_F ----------------- */
+
+    insert_job:      CNV_REF_MS_DIAG_GRP_F
+    job_type:        c
+    box_name:        CNV_REF_MS_DIAG_GRP
+    command:         cnv_autojob.sh cnvf RUNID ref
+    condition:       s(CNV_REF_MS_DIAG_GRP_L_CONV)
+    description:     "FASR"
+
+   /* ----------------- CNV_REF_MS_PROC ----------------- */
+
+   insert_job:      CNV_REF_MS_PROC
+   job_type:        b
+   box_name:        CNV_REF_PART1_JOBS
+   condition:       s(CNV_REF_MS_PROC_S)
+   description:     "Proc"
+
+    /* ----------------- CNV_REF_MS_PROC_H ----------------- */
+
+    insert_job:      CNV_REF_MS_PROC_H
+    job_type:        c
+    box_name:        CNV_REF_MS_PROC
+    command:         cnv_autojob.sh cnvh
+    condition:       s(CNV_REF_MS_PROC_S)
+    description:     "BDB Unload"
+
+    /* ----------------- CNV_REF_MS_PROC_J ----------------- */
+
+    insert_job:      CNV_REF_MS_PROC_J
+    job_type:        c
+    box_name:        CNV_REF_MS_PROC
+    command:         cnv_autojob.sh cnvj RUNID
+    condition:       s(CNV_REF_MS_PROC_H)
+    description:     "Job"
+
+    /* ----------------- CNV_REF_MS_PROC_N ----------------- */
+
+    insert_job:      CNV_REF_MS_PROC_N
+    job_type:        c
+    box_name:        CNV_REF_MS_PROC
+    command:         cnv_autojob.sh cnvn RUNID
+    condition:       s(CNV_REF_MS_PROC_J)
+    description:     "Check for null fields"
+
+    /* ----------------- CNV_REF_MS_PROC_L_CONV ----------------- */
+
+    insert_job:      CNV_REF_MS_PROC_L_CONV
+    job_type:        c
+    box_name:        CNV_REF_MS_PROC
+    command:         cnv_autojob.sh cnvl RUNID CONV
+    condition:       s(CNV_REF_MS_PROC_N)
+    description:     "Load"
+
+    /* ----------------- CNV_REF_MS_PROC_F ----------------- */
+
+    insert_job:      CNV_REF_MS_PROC_F
+    job_type:        c
+    box_name:        CNV_REF_MS_PROC
+    command:         cnv_autojob.sh cnvf RUNID ref
+    condition:       s(CNV_REF_MS_PROC_L_CONV)
+    description:     "FASR"
+
+   /* ----------------- CNV_REF_MS_PROC_GRP ----------------- */
+
+   insert_job:      CNV_REF_MS_PROC_GRP
+   job_type:        b
+   box_name:        CNV_REF_PART1_JOBS
+   condition:       s(CNV_REF_MS_PROC_F)
+   description:     "Proc Group"
+
+    /* ----------------- CNV_REF_MS_PROC_GRP_S ----------------- */
+
+    insert_job:      CNV_REF_MS_PROC_GRP_S
+    job_type:        c
+    box_name:        CNV_REF_MS_PROC_GRP
+    command:         cnv_autojob.sh cnvs
+    condition:       s(CNV_REF_MS_PROC_F)
+    description:     "Source Unload"
+
+    /* ----------------- CNV_REF_MS_PROC_GRP_H ----------------- */
+
+    insert_job:      CNV_REF_MS_PROC_GRP_H
+    job_type:        c
+    box_name:        CNV_REF_MS_PROC_GRP
+    command:         cnv_autojob.sh cnvh
+    condition:       s(CNV_REF_MS_PROC_GRP_S)
+    description:     "BDB Unload"
+
+    /* ----------------- CNV_REF_MS_PROC_GRP_J ----------------- */
+
+    insert_job:      CNV_REF_MS_PROC_GRP_J
+    job_type:        c
+    box_name:        CNV_REF_MS_PROC_GRP
+    command:         cnv_autojob.sh cnvj RUNID
+    condition:       s(CNV_REF_MS_PROC_GRP_H)
+    description:     "Job"
+
+    /* ----------------- CNV_REF_MS_PROC_GRP_N ----------------- */
+
+    insert_job:      CNV_REF_MS_PROC_GRP_N
+    job_type:        c
+    box_name:        CNV_REF_MS_PROC_GRP
+    command:         cnv_autojob.sh cnvn RUNID
+    condition:       s(CNV_REF_MS_PROC_GRP_J)
+    description:     "Check for null fields"
+
+    /* ----------------- CNV_REF_MS_PROC_GRP_L_CONV ----------------- */
+
+    insert_job:      CNV_REF_MS_PROC_GRP_L_CONV
+    job_type:        c
+    box_name:        CNV_REF_MS_PROC_GRP
+    command:         cnv_autojob.sh cnvl RUNID CONV
+    condition:       s(CNV_REF_MS_PROC_GRP_N)
+    description:     "Load"
+    auto_hold:       1
+
+    /* ----------------- CNV_REF_MS_PROC_GRP_F ----------------- */
+
+    insert_job:      CNV_REF_MS_PROC_GRP_F
+    job_type:        c
+    box_name:        CNV_REF_MS_PROC_GRP
+    command:         cnv_autojob.sh cnvf RUNID ref
+    condition:       s(CNV_REF_MS_PROC_GRP_L_CONV)
+    description:     "FASR"
+
+   /* ----------------- CNV_REF_MS_ICD_PROC ----------------- */
+
+   insert_job:      CNV_REF_MS_ICD_PROC
+   job_type:        b
+   box_name:        CNV_REF_PART1_JOBS
+   condition:       s(CNV_REF_PRESAK_ICDP)
+   description:     "ICD Group"
+
+    /* ----------------- CNV_REF_MS_ICD_PROC_H ----------------- */
+
+    insert_job:      CNV_REF_MS_ICD_PROC_H
+    job_type:        c
+    box_name:        CNV_REF_MS_ICD_PROC
+    command:         cnv_autojob.sh cnvh
+    condition:       s(CNV_REF_PRESAK_ICDP)
+    description:     "BDB Unload"
+
+    /* ----------------- CNV_REF_MS_ICD_PROC_J ----------------- */
+
+    insert_job:      CNV_REF_MS_ICD_PROC_J
+    job_type:        c
+    box_name:        CNV_REF_MS_ICD_PROC
+    command:         cnv_autojob.sh cnvj RUNID
+    condition:       s(CNV_REF_MS_ICD_PROC_H)
+    description:     "Job"
+
+    /* ----------------- CNV_REF_MS_ICD_PROC_N ----------------- */
+
+    insert_job:      CNV_REF_MS_ICD_PROC_N
+    job_type:        c
+    box_name:        CNV_REF_MS_ICD_PROC
+    command:         cnv_autojob.sh cnvn RUNID
+    condition:       s(CNV_REF_MS_ICD_PROC_J)
+    description:     "Check for null fields"
+
+    /* ----------------- CNV_REF_MS_ICD_PROC_L_CONV ----------------- */
+
+    insert_job:      CNV_REF_MS_ICD_PROC_L_CONV
+    job_type:        c
+    box_name:        CNV_REF_MS_ICD_PROC
+    command:         cnv_autojob.sh cnvl RUNID CONV
+    condition:       s(CNV_REF_MS_ICD_PROC_N)
+    description:     "Load"
+
+    /* ----------------- CNV_REF_MS_ICD_PROC_F ----------------- */
+
+    insert_job:      CNV_REF_MS_ICD_PROC_F
+    job_type:        c
+    box_name:        CNV_REF_MS_ICD_PROC
+    command:         cnv_autojob.sh cnvf RUNID ref
+    condition:       s(CNV_REF_MS_ICD_PROC_L_CONV)
+    description:     "FASR"
+
+   /* ----------------- CNV_REF_MS_ICD_GRP ----------------- */
+
+   insert_job:      CNV_REF_MS_ICD_GRP
+   job_type:        b
+   box_name:        CNV_REF_PART1_JOBS
+   condition:       s(CNV_REF_MS_ICD_PROC_F)
+   description:     "ICD"
+
+    /* ----------------- CNV_REF_MS_ICD_GRP_S ----------------- */
+
+    insert_job:      CNV_REF_MS_ICD_GRP_S
+    job_type:        c
+    box_name:        CNV_REF_MS_ICD_GRP
+    command:         cnv_autojob.sh cnvs
+    condition:       s(CNV_REF_MS_ICD_PROC_F)
+    description:     "Source Unload"
+
+    /* ----------------- CNV_REF_MS_ICD_GRP_H ----------------- */
+
+    insert_job:      CNV_REF_MS_ICD_GRP_H
+    job_type:        c
+    box_name:        CNV_REF_MS_ICD_GRP
+    command:         cnv_autojob.sh cnvh
+    condition:       s(CNV_REF_MS_ICD_GRP_S)
+    description:     "BDB Unload"
+
+    /* ----------------- CNV_REF_MS_ICD_GRP_J ----------------- */
+
+    insert_job:      CNV_REF_MS_ICD_GRP_J
+    job_type:        c
+    box_name:        CNV_REF_MS_ICD_GRP
+    command:         cnv_autojob.sh cnvj RUNID
+    condition:       s(CNV_REF_MS_ICD_GRP_H)
+    description:     "Job"
+
+    /* ----------------- CNV_REF_MS_ICD_GRP_N ----------------- */
+
+    insert_job:      CNV_REF_MS_ICD_GRP_N
+    job_type:        c
+    box_name:        CNV_REF_MS_ICD_GRP
+    command:         cnv_autojob.sh cnvn RUNID
+    condition:       s(CNV_REF_MS_ICD_GRP_J)
+    description:     "Check for null fields"
+
+    /* ----------------- CNV_REF_MS_ICD_GRP_L_CONV ----------------- */
+
+    insert_job:      CNV_REF_MS_ICD_GRP_L_CONV
+    job_type:        c
+    box_name:        CNV_REF_MS_ICD_GRP
+    command:         cnv_autojob.sh cnvl RUNID CONV
+    condition:       s(CNV_REF_MS_ICD_GRP_N)
+    description:     "Load"
+    auto_hold:       1
+
+    /* ----------------- CNV_REF_MS_ICD_GRP_F ----------------- */
+
+    insert_job:      CNV_REF_MS_ICD_GRP_F
+    job_type:        c
+    box_name:        CNV_REF_MS_ICD_GRP
+    command:         cnv_autojob.sh cnvf RUNID ref
+    condition:       s(CNV_REF_MS_ICD_GRP_L_CONV)
+    description:     "FASR"
+
+   /* ----------------- CNV_REF_MS_REV ----------------- */
+
+   insert_job:      CNV_REF_MS_REV
+   job_type:        b
+   box_name:        CNV_REF_PART1_JOBS
+   condition:       s(CNV_REF_MS_REV_S)
+   description:     "Rev"
+
+    /* ----------------- CNV_REF_MS_REV_H ----------------- */
+
+    insert_job:      CNV_REF_MS_REV_H
+    job_type:        c
+    box_name:        CNV_REF_MS_REV
+    command:         cnv_autojob.sh cnvh
+    condition:       s(CNV_REF_MS_REV_S)
+    description:     "BDB Unload"
+
+    /* ----------------- CNV_REF_MS_REV_J ----------------- */
+
+    insert_job:      CNV_REF_MS_REV_J
+    job_type:        c
+    box_name:        CNV_REF_MS_REV
+    command:         cnv_autojob.sh cnvj RUNID
+    condition:       s(CNV_REF_MS_REV_H)
+    description:     "Job"
+
+    /* ----------------- CNV_REF_MS_REV_N ----------------- */
+
+    insert_job:      CNV_REF_MS_REV_N
+    job_type:        c
+    box_name:        CNV_REF_MS_REV
+    command:         cnv_autojob.sh cnvn RUNID
+    condition:       s(CNV_REF_MS_REV_J)
+    description:     "Check for null fields"
+
+    /* ----------------- CNV_REF_MS_REV_L_CONV ----------------- */
+
+    insert_job:      CNV_REF_MS_REV_L_CONV
+    job_type:        c
+    box_name:        CNV_REF_MS_REV
+    command:         cnv_autojob.sh cnvl RUNID CONV
+    condition:       s(CNV_REF_MS_REV_N)
+    description:     "Load"
+
+    /* ----------------- CNV_REF_MS_REV_F ----------------- */
+
+    insert_job:      CNV_REF_MS_REV_F
+    job_type:        c
+    box_name:        CNV_REF_MS_REV
+    command:         cnv_autojob.sh cnvf RUNID ref
+    condition:       s(CNV_REF_MS_REV_L_CONV)
+    description:     "FASR"
+
+   /* ----------------- CNV_REF_MS_REV_GRP ----------------- */
+
+   insert_job:      CNV_REF_MS_REV_GRP
+   job_type:        b
+   box_name:        CNV_REF_PART1_JOBS
+   condition:       s(CNV_REF_MS_REV_F)
+   description:     "Rev Group"
+
+    /* ----------------- CNV_REF_MS_REV_GRP_S ----------------- */
+
+    insert_job:      CNV_REF_MS_REV_GRP_S
+    job_type:        c
+    box_name:        CNV_REF_MS_REV_GRP
+    command:         cnv_autojob.sh cnvs
+    condition:       s(CNV_REF_MS_REV_F)
+    description:     "Source Unload"
+
+    /* ----------------- CNV_REF_MS_REV_GRP_H ----------------- */
+
+    insert_job:      CNV_REF_MS_REV_GRP_H
+    job_type:        c
+    box_name:        CNV_REF_MS_REV_GRP
+    command:         cnv_autojob.sh cnvh
+    condition:       s(CNV_REF_MS_REV_GRP_S)
+    description:     "BDB Unload"
+
+    /* ----------------- CNV_REF_MS_REV_GRP_J ----------------- */
+
+    insert_job:      CNV_REF_MS_REV_GRP_J
+    job_type:        c
+    box_name:        CNV_REF_MS_REV_GRP
+    command:         cnv_autojob.sh cnvj RUNID
+    condition:       s(CNV_REF_MS_REV_GRP_H)
+    description:     "Job"
+
+    /* ----------------- CNV_REF_MS_REV_GRP_N ----------------- */
+
+    insert_job:      CNV_REF_MS_REV_GRP_N
+    job_type:        c
+    box_name:        CNV_REF_MS_REV_GRP
+    command:         cnv_autojob.sh cnvn RUNID
+    condition:       s(CNV_REF_MS_REV_GRP_J)
+    description:     "Check for null fields"
+
+    /* ----------------- CNV_REF_MS_REV_GRP_L_CONV ----------------- */
+
+    insert_job:      CNV_REF_MS_REV_GRP_L_CONV
+    job_type:        c
+    box_name:        CNV_REF_MS_REV_GRP
+    command:         cnv_autojob.sh cnvl RUNID CONV
+    condition:       s(CNV_REF_MS_REV_GRP_N)
+    description:     "Load"
+    auto_hold:       1
+
+    /* ----------------- CNV_REF_MS_REV_GRP_F ----------------- */
+
+    insert_job:      CNV_REF_MS_REV_GRP_F
+    job_type:        c
+    box_name:        CNV_REF_MS_REV_GRP
+    command:         cnv_autojob.sh cnvf RUNID ref
+    condition:       s(CNV_REF_MS_REV_GRP_L_CONV)
+    description:     "FASR"
+
+   /* ----------------- CNV_REF_MS_DRG ----------------- */
+
+   insert_job:      CNV_REF_MS_DRG
+   job_type:        b
+   box_name:        CNV_REF_PART1_JOBS
+   condition:       s(CNV_REF_MS_DRG_S)
+   description:     "DRG"
+
+    /* ----------------- CNV_REF_MS_DRG_H ----------------- */
+
+    insert_job:      CNV_REF_MS_DRG_H
+    job_type:        c
+    box_name:        CNV_REF_MS_DRG
+    command:         cnv_autojob.sh cnvh
+    condition:       s(CNV_REF_MS_DRG_S)
+    description:     "BDB Unload"
+
+    /* ----------------- CNV_REF_MS_DRG_J ----------------- */
+
+    insert_job:      CNV_REF_MS_DRG_J
+    job_type:        c
+    box_name:        CNV_REF_MS_DRG
+    command:         cnv_autojob.sh cnvj RUNID
+    condition:       s(CNV_REF_MS_DRG_H)
+    description:     "Job"
+
+    /* ----------------- CNV_REF_MS_DRG_N ----------------- */
+
+    insert_job:      CNV_REF_MS_DRG_N
+    job_type:        c
+    box_name:        CNV_REF_MS_DRG
+    command:         cnv_autojob.sh cnvn RUNID
+    condition:       s(CNV_REF_MS_DRG_J)
+    description:     "Check for null fields"
+
+    /* ----------------- CNV_REF_MS_DRG_L_CONV ----------------- */
+
+    insert_job:      CNV_REF_MS_DRG_L_CONV
+    job_type:        c
+    box_name:        CNV_REF_MS_DRG
+    command:         cnv_autojob.sh cnvl RUNID CONV
+    condition:       s(CNV_REF_MS_DRG_N)
+    description:     "Load"
+
+    /* ----------------- CNV_REF_MS_DRG_F ----------------- */
+
+    insert_job:      CNV_REF_MS_DRG_F
+    job_type:        c
+    box_name:        CNV_REF_MS_DRG
+    command:         cnv_autojob.sh cnvf RUNID ref
+    condition:       s(CNV_REF_MS_DRG_L_CONV)
+    description:     "FASR"
+
+   /* ----------------- CNV_REF_MS_DRG_GRP ----------------- */
+
+   insert_job:      CNV_REF_MS_DRG_GRP
+   job_type:        b
+   box_name:        CNV_REF_PART1_JOBS
+   condition:       s(CNV_REF_MS_DRG_F)
+   description:     "DRG Group"
+
+    /* ----------------- CNV_REF_MS_DRG_GRP_S ----------------- */
+
+    insert_job:      CNV_REF_MS_DRG_GRP_S
+    job_type:        c
+    box_name:        CNV_REF_MS_DRG_GRP
+    command:         cnv_autojob.sh cnvs
+    condition:       s(CNV_REF_MS_DRG_F)
+    description:     "Source Unload"
+
+    /* ----------------- CNV_REF_MS_DRG_GRP_H ----------------- */
+
+    insert_job:      CNV_REF_MS_DRG_GRP_H
+    job_type:        c
+    box_name:        CNV_REF_MS_DRG_GRP
+    command:         cnv_autojob.sh cnvh
+    condition:       s(CNV_REF_MS_DRG_GRP_S)
+    description:     "BDB Unload"
+
+    /* ----------------- CNV_REF_MS_DRG_GRP_J ----------------- */
+
+    insert_job:      CNV_REF_MS_DRG_GRP_J
+    job_type:        c
+    box_name:        CNV_REF_MS_DRG_GRP
+    command:         cnv_autojob.sh cnvj RUNID
+    condition:       s(CNV_REF_MS_DRG_GRP_H)
+    description:     "Job"
+
+    /* ----------------- CNV_REF_MS_DRG_GRP_N ----------------- */
+
+    insert_job:      CNV_REF_MS_DRG_GRP_N
+    job_type:        c
+    box_name:        CNV_REF_MS_DRG_GRP
+    command:         cnv_autojob.sh cnvn RUNID
+    condition:       s(CNV_REF_MS_DRG_GRP_J)
+    description:     "Check for null fields"
+
+    /* ----------------- CNV_REF_MS_DRG_GRP_L_CONV ----------------- */
+
+    insert_job:      CNV_REF_MS_DRG_GRP_L_CONV
+    job_type:        c
+    box_name:        CNV_REF_MS_DRG_GRP
+    command:         cnv_autojob.sh cnvl RUNID CONV
+    condition:       s(CNV_REF_MS_DRG_GRP_N)
+    description:     "Load"
+    auto_hold:       1
+
+    /* ----------------- CNV_REF_MS_DRG_GRP_F ----------------- */
+
+    insert_job:      CNV_REF_MS_DRG_GRP_F
+    job_type:        c
+    box_name:        CNV_REF_MS_DRG_GRP
+    command:         cnv_autojob.sh cnvf RUNID ref
+    condition:       s(CNV_REF_MS_DRG_GRP_L_CONV)
+    description:     "FASR"
+
+   /* ----------------- CNV_REF_MS_DRUG ----------------- */
+
+   insert_job:      CNV_REF_MS_DRUG
+   job_type:        b
+   box_name:        CNV_REF_PART1_JOBS
+   condition:       s(CNV_REF_MS_DRUG_S)
+   description:     "Drug"
+
+    /* ----------------- CNV_REF_MS_DRUG_H ----------------- */
+
+    insert_job:      CNV_REF_MS_DRUG_H
+    job_type:        c
+    box_name:        CNV_REF_MS_DRUG
+    command:         cnv_autojob.sh cnvh
+    condition:       s(CNV_REF_MS_DRUG_S)
+    description:     "BDB Unload"
+
+    /* ----------------- CNV_REF_MS_DRUG_J ----------------- */
+
+    insert_job:      CNV_REF_MS_DRUG_J
+    job_type:        c
+    box_name:        CNV_REF_MS_DRUG
+    command:         cnv_autojob.sh cnvj RUNID
+    condition:       s(CNV_REF_MS_DRUG_H)
+    description:     "Job"
+
+    /* ----------------- CNV_REF_MS_DRUG_N ----------------- */
+
+    insert_job:      CNV_REF_MS_DRUG_N
+    job_type:        c
+    box_name:        CNV_REF_MS_DRUG
+    command:         cnv_autojob.sh cnvn RUNID
+    condition:       s(CNV_REF_MS_DRUG_J)
+    description:     "Check for null fields"
+
+    /* ----------------- CNV_REF_MS_DRUG_L_CONV ----------------- */
+
+    insert_job:      CNV_REF_MS_DRUG_L_CONV
+    job_type:        c
+    box_name:        CNV_REF_MS_DRUG
+    command:         cnv_autojob.sh cnvl RUNID CONV
+    condition:       s(CNV_REF_MS_DRUG_N)
+    description:     "Load"
+
+    /* ----------------- CNV_REF_MS_DRUG_F ----------------- */
+
+    insert_job:      CNV_REF_MS_DRUG_F
+    job_type:        c
+    box_name:        CNV_REF_MS_DRUG
+    command:         cnv_autojob.sh cnvf RUNID ref
+    condition:       s(CNV_REF_MS_DRUG_L_CONV)
+    description:     "FASR"
+
+   /* ----------------- CNV_REF_MS_DRUG_GRP ----------------- */
+
+   insert_job:      CNV_REF_MS_DRUG_GRP
+   job_type:        b
+   box_name:        CNV_REF_PART1_JOBS
+   condition:       s(CNV_REF_MS_DRUG_F)
+   description:     "Drug group"
+
+    /* ----------------- CNV_REF_MS_DRUG_GRP_S ----------------- */
+
+    insert_job:      CNV_REF_MS_DRUG_GRP_S
+    job_type:        c
+    box_name:        CNV_REF_MS_DRUG_GRP
+    command:         cnv_autojob.sh cnvs
+    condition:       s(CNV_REF_MS_DRUG_F)
+    description:     "Source Unload"
+
+    /* ----------------- CNV_REF_MS_DRUG_GRP_H ----------------- */
+
+    insert_job:      CNV_REF_MS_DRUG_GRP_H
+    job_type:        c
+    box_name:        CNV_REF_MS_DRUG_GRP
+    command:         cnv_autojob.sh cnvh
+    condition:       s(CNV_REF_MS_DRUG_GRP_S)
+    description:     "BDB Unload"
+
+    /* ----------------- CNV_REF_MS_DRUG_GRP_J ----------------- */
+
+    insert_job:      CNV_REF_MS_DRUG_GRP_J
+    job_type:        c
+    box_name:        CNV_REF_MS_DRUG_GRP
+    command:         cnv_autojob.sh cnvj RUNID
+    condition:       s(CNV_REF_MS_DRUG_GRP_H)
+    description:     "Job"
+
+    /* ----------------- CNV_REF_MS_DRUG_GRP_N ----------------- */
+
+    insert_job:      CNV_REF_MS_DRUG_GRP_N
+    job_type:        c
+    box_name:        CNV_REF_MS_DRUG_GRP
+    command:         cnv_autojob.sh cnvn RUNID
+    condition:       s(CNV_REF_MS_DRUG_GRP_J)
+    description:     "Check for null fields"
+
+    /* ----------------- CNV_REF_MS_DRUG_GRP_L_CONV ----------------- */
+
+    insert_job:      CNV_REF_MS_DRUG_GRP_L_CONV
+    job_type:        c
+    box_name:        CNV_REF_MS_DRUG_GRP
+    command:         cnv_autojob.sh cnvl RUNID CONV
+    condition:       s(CNV_REF_MS_DRUG_GRP_N)
+    description:     "Load"
+    auto_hold:       1
+
+    /* ----------------- CNV_REF_MS_DRUG_GRP_F ----------------- */
+
+    insert_job:      CNV_REF_MS_DRUG_GRP_F
+    job_type:        c
+    box_name:        CNV_REF_MS_DRUG_GRP
+    command:         cnv_autojob.sh cnvf RUNID ref
+    condition:       s(CNV_REF_MS_DRUG_GRP_L_CONV)
+    description:     "FASR"
+
+   /* ----------------- CNV_REF_MS_ESC ----------------- */
+
+   insert_job:      CNV_REF_MS_ESC
+   job_type:        b
+   box_name:        CNV_REF_PART1_JOBS
+   condition:       s(CNV_REF_MS_ESC_S)
+   description:     "ESC"
+
+    /* ----------------- CNV_REF_MS_ESC_H ----------------- */
+
+    insert_job:      CNV_REF_MS_ESC_H
+    job_type:        c
+    box_name:        CNV_REF_MS_ESC
+    command:         cnv_autojob.sh cnvh
+    condition:       s(CNV_REF_MS_ESC_S)
+    description:     "BDB Unload"
+
+    /* ----------------- CNV_REF_MS_ESC_J ----------------- */
+
+    insert_job:      CNV_REF_MS_ESC_J
+    job_type:        c
+    box_name:        CNV_REF_MS_ESC
+    command:         cnv_autojob.sh cnvj RUNID
+    condition:       s(CNV_REF_MS_ESC_H)
+    description:     "Job"
+
+    /* ----------------- CNV_REF_MS_ESC_N ----------------- */
+
+    insert_job:      CNV_REF_MS_ESC_N
+    job_type:        c
+    box_name:        CNV_REF_MS_ESC
+    command:         cnv_autojob.sh cnvn RUNID
+    condition:       s(CNV_REF_MS_ESC_J)
+    description:     "Check for null fields"
+
+    /* ----------------- CNV_REF_MS_ESC_L_CONV ----------------- */
+
+    insert_job:      CNV_REF_MS_ESC_L_CONV
+    job_type:        c
+    box_name:        CNV_REF_MS_ESC
+    command:         cnv_autojob.sh cnvl RUNID CONV
+    condition:       s(CNV_REF_MS_ESC_N)
+    description:     "Load"
+
+    /* ----------------- CNV_REF_MS_ESC_F ----------------- */
+
+    insert_job:      CNV_REF_MS_ESC_F
+    job_type:        c
+    box_name:        CNV_REF_MS_ESC
+    command:         cnv_autojob.sh cnvf RUNID ref
+    condition:       s(CNV_REF_MS_ESC_L_CONV)
+    description:     "FASR"
+
+   /* ----------------- CNV_REF_MS_GCN ----------------- */
+
+   insert_job:      CNV_REF_MS_GCN
+   job_type:        b
+   box_name:        CNV_REF_PART1_JOBS
+   condition:       s(CNV_REF_MS_GCN_S)
+   description:     "GCN"
+
+    /* ----------------- CNV_REF_MS_GCN_H ----------------- */
+
+    insert_job:      CNV_REF_MS_GCN_H
+    job_type:        c
+    box_name:        CNV_REF_MS_GCN
+    command:         cnv_autojob.sh cnvh
+    condition:       s(CNV_REF_MS_GCN_S)
+    description:     "BDB Unload"
+
+    /* ----------------- CNV_REF_MS_GCN_J ----------------- */
+
+    insert_job:      CNV_REF_MS_GCN_J
+    job_type:        c
+    box_name:        CNV_REF_MS_GCN
+    command:         cnv_autojob.sh cnvj RUNID
+    condition:       s(CNV_REF_MS_GCN_H)
+    description:     "Job"
+
+    /* ----------------- CNV_REF_MS_GCN_N ----------------- */
+
+    insert_job:      CNV_REF_MS_GCN_N
+    job_type:        c
+    box_name:        CNV_REF_MS_GCN
+    command:         cnv_autojob.sh cnvn RUNID
+    condition:       s(CNV_REF_MS_GCN_J)
+    description:     "Check for null fields"
+
+    /* ----------------- CNV_REF_MS_GCN_L_CONV ----------------- */
+
+    insert_job:      CNV_REF_MS_GCN_L_CONV
+    job_type:        c
+    box_name:        CNV_REF_MS_GCN
+    command:         cnv_autojob.sh cnvl RUNID CONV
+    condition:       s(CNV_REF_MS_GCN_N)
+    description:     "Load"
+
+    /* ----------------- CNV_REF_MS_GCN_F ----------------- */
+
+    insert_job:      CNV_REF_MS_GCN_F
+    job_type:        c
+    box_name:        CNV_REF_MS_GCN
+    command:         cnv_autojob.sh cnvf RUNID ref
+    condition:       s(CNV_REF_MS_GCN_L_CONV)
+    description:     "FASR"
+
+  /* ----------------- CNV_REF_MS_SHARED_LOOKUP ----------------- */
+
+  insert_job:      CNV_REF_MS_SHARED_LOOKUP
+  job_type:        b
+  box_name:        CNV_REF_PART1
+  condition:       s(CNV_REF_PART1_JOBS)
+  description:     "Ref shared lookup"
+
+   /* ----------------- CNV_REF_MS_SHARED_LOOKUP_H ----------------- */
+
+   insert_job:      CNV_REF_MS_SHARED_LOOKUP_H
+   job_type:        c
+   box_name:        CNV_REF_MS_SHARED_LOOKUP
+   command:         cnv_autojob.sh cnvh
+   condition:       s(CNV_REF_PART1_JOBS)
+   description:     "Source Unload"
+
+  /* ----------------- CNV_REF_MS_MSG_PART1 ----------------- */
+
+  insert_job:      CNV_REF_MS_MSG_PART1
+  job_type:        b
+  box_name:        CNV_REF_PART1
+  description:     "Reference part 1 messages"
+
+   /* ----------------- CNV_REF_MS_DIAG_M ----------------- */
+
+   insert_job:      CNV_REF_MS_DIAG_M
+   job_type:        c
+   box_name:        CNV_REF_MS_MSG_PART1
+   command:         cnv_autojob.sh cnvm RUNID
+   condition:       s(CNV_REF_MS_DIAG_J)
+   description:     "Load messages"
+
+   /* ----------------- CNV_REF_MS_DIAG_GRP_M ----------------- */
+
+   insert_job:      CNV_REF_MS_DIAG_GRP_M
+   job_type:        c
+   box_name:        CNV_REF_MS_MSG_PART1
+   command:         cnv_autojob.sh cnvm RUNID
+   condition:       s(CNV_REF_MS_DIAG_GRP_J)
+   description:     "Load messages"
+
+   /* ----------------- CNV_REF_MS_REV_M ----------------- */
+
+   insert_job:      CNV_REF_MS_REV_M
+   job_type:        c
+   box_name:        CNV_REF_MS_MSG_PART1
+   command:         cnv_autojob.sh cnvm RUNID
+   condition:       s(CNV_REF_MS_REV_J)
+   description:     "Load messages"
+
+   /* ----------------- CNV_REF_MS_REV_GRP_M ----------------- */
+
+   insert_job:      CNV_REF_MS_REV_GRP_M
+   job_type:        c
+   box_name:        CNV_REF_MS_MSG_PART1
+   command:         cnv_autojob.sh cnvm RUNID
+   condition:       s(CNV_REF_MS_REV_GRP_J)
+   description:     "Load messages"
+
+   /* ----------------- CNV_REF_MS_PROC_M ----------------- */
+
+   insert_job:      CNV_REF_MS_PROC_M
+   job_type:        c
+   box_name:        CNV_REF_MS_MSG_PART1
+   command:         cnv_autojob.sh cnvm RUNID
+   condition:       s(CNV_REF_MS_PROC_J)
+   description:     "Load messages"
+
+   /* ----------------- CNV_REF_MS_PROC_GRP_M ----------------- */
+
+   insert_job:      CNV_REF_MS_PROC_GRP_M
+   job_type:        c
+   box_name:        CNV_REF_MS_MSG_PART1
+   command:         cnv_autojob.sh cnvm RUNID
+   condition:       s(CNV_REF_MS_PROC_GRP_J)
+   description:     "Load messages"
+
+   /* ----------------- CNV_REF_MS_ICD_PROC_M ----------------- */
+
+   insert_job:      CNV_REF_MS_ICD_PROC_M
+   job_type:        c
+   box_name:        CNV_REF_MS_MSG_PART1
+   command:         cnv_autojob.sh cnvm RUNID
+   condition:       s(CNV_REF_MS_ICD_PROC_J)
+   description:     "Load messages"
+
+   /* ----------------- CNV_REF_MS_ICD_GRP_M ----------------- */
+
+   insert_job:      CNV_REF_MS_ICD_GRP_M
+   job_type:        c
+   box_name:        CNV_REF_MS_MSG_PART1
+   command:         cnv_autojob.sh cnvm RUNID
+   condition:       s(CNV_REF_MS_ICD_GRP_J)
+   description:     "Load messages"
+
+   /* ----------------- CNV_REF_MS_DRUG_M ----------------- */
+
+   insert_job:      CNV_REF_MS_DRUG_M
+   job_type:        c
+   box_name:        CNV_REF_MS_MSG_PART1
+   command:         cnv_autojob.sh cnvm RUNID
+   condition:       s(CNV_REF_MS_DRUG_J)
+   description:     "Load messages"
+
+   /* ----------------- CNV_REF_MS_DRUG_GRP_M ----------------- */
+
+   insert_job:      CNV_REF_MS_DRUG_GRP_M
+   job_type:        c
+   box_name:        CNV_REF_MS_MSG_PART1
+   command:         cnv_autojob.sh cnvm RUNID
+   condition:       s(CNV_REF_MS_DRUG_GRP_J)
+   description:     "Load messages"
+
+   /* ----------------- CNV_REF_MS_DRG_M ----------------- */
+
+   insert_job:      CNV_REF_MS_DRG_M
+   job_type:        c
+   box_name:        CNV_REF_MS_MSG_PART1
+   command:         cnv_autojob.sh cnvm RUNID
+   condition:       s(CNV_REF_MS_DRG_J)
+   description:     "Load messages"
+
+   /* ----------------- CNV_REF_MS_DRG_GRP_M ----------------- */
+
+   insert_job:      CNV_REF_MS_DRG_GRP_M
+   job_type:        c
+   box_name:        CNV_REF_MS_MSG_PART1
+   command:         cnv_autojob.sh cnvm RUNID
+   condition:       s(CNV_REF_MS_DRG_GRP_J)
+   description:     "Load messages"
+
+   /* ----------------- CNV_REF_MS_ESC_M ----------------- */
+
+   insert_job:      CNV_REF_MS_ESC_M
+   job_type:        c
+   box_name:        CNV_REF_MS_MSG_PART1
+   command:         cnv_autojob.sh cnvm RUNID
+   condition:       s(CNV_REF_MS_ESC_J)
+   description:     "Load messages"
+
+   /* ----------------- CNV_REF_MS_GCN_M ----------------- */
+
+   insert_job:      CNV_REF_MS_GCN_M
+   job_type:        c
+   box_name:        CNV_REF_MS_MSG_PART1
+   command:         cnv_autojob.sh cnvm RUNID
+   condition:       s(CNV_REF_MS_GCN_J)
+   description:     "Load messages"
+
+ /* ----------------- CNV_PRV ----------------- */
+
+ insert_job:      CNV_PRV
+ job_type:        b
+ box_name:        MS_CONV_CYCLE
+ condition:       s(CNV_ALL_COPY_MANUAL)
+ description:     "Provider Conversion"
+
+  /* ----------------- CNV_PRV_PRESAK ----------------- */
+
+  insert_job:      CNV_PRV_PRESAK
+  job_type:        b
+  box_name:        CNV_PRV
+  condition:       s(CNV_ALL_COPY_MANUAL)
+  description:     "Provider presak"
+
+   /* ----------------- CNV_PRV_MS_PRESAK_S ----------------- */
+
+   insert_job:      CNV_PRV_MS_PRESAK_S
+   job_type:        c
+   box_name:        CNV_PRV_PRESAK
+   command:         cnv_autojob.sh cnvs
+   condition:       s(CNV_ALL_COPY_MANUAL)
+   description:     "Unload data for the prv_ms_master conversion"
+
+   /* ----------------- CNV_PRV_MS_PRESAK_H ----------------- */
+
+   insert_job:      CNV_PRV_MS_PRESAK_H
+   job_type:        c
+   box_name:        CNV_PRV_PRESAK
+   command:         cnv_autojob.sh cnvh
+   condition:       s(CNV_PRV_MS_PRESAK_S)
+   description:     "Create .out files for dataload.sh and build local lookups"
+
+   /* ----------------- CNV_PRV_MS_PRESAK_J ----------------- */
+
+   insert_job:      CNV_PRV_MS_PRESAK_J
+   job_type:        c
+   box_name:        CNV_PRV_PRESAK
+   command:         cnv_autojob.sh cnvj RUNID
+   condition:       s(CNV_PRV_MS_PRESAK_H)
+   description:     "Perform the prv_ms_master conversion"
+
+   /* ----------------- CNV_PRV_MS_PRESAK_L_CONV ----------------- */
+
+   insert_job:      CNV_PRV_MS_PRESAK_L_CONV
+   job_type:        c
+   box_name:        CNV_PRV_PRESAK
+   command:         cnv_autojob.sh cnvl RUNID CONV
+   condition:       s(CNV_PRV_MS_PRESAK_J)
+   description:     "Load the converted data to the conversion database"
+
+   /* ----------------- CNV_PRV_MS_PRESAK_F ----------------- */
+
+   insert_job:      CNV_PRV_MS_PRESAK_F
+   job_type:        c
+   box_name:        CNV_PRV_PRESAK
+   command:         cnv_autojob.sh cnvf RUNID prv
+   condition:       s(CNV_PRV_MS_PRESAK_L_CONV)
+   description:     "Create the FASR for CNV_PRV_MS_MASTER"
+
+  /* ----------------- CNV_PRV_COMMON ----------------- */
+
+  insert_job:      CNV_PRV_COMMON
+  job_type:        b
+  box_name:        CNV_PRV
+  condition:       s(CNV_PRV_MS_PRESAK_F)
+  description:     "Provider common"
+
+   /* ----------------- CNV_PRV_MS_COMMON_S ----------------- */
+
+   insert_job:      CNV_PRV_MS_COMMON_S
+   job_type:        c
+   box_name:        CNV_PRV_COMMON
+   command:         cnv_autojob.sh cnvs
+   condition:       s(CNV_PRV_MS_PRESAK_F)
+   description:     "Unload data for the prv_ms_master conversion"
+
+   /* ----------------- CNV_PRV_MS_COMMON_H ----------------- */
+
+   insert_job:      CNV_PRV_MS_COMMON_H
+   job_type:        c
+   box_name:        CNV_PRV_COMMON
+   command:         cnv_autojob.sh cnvh
+   condition:       s(CNV_PRV_MS_COMMON_S)
+   description:     "Create .out files for dataload.sh and build local lookups"
+
+   /* ----------------- CNV_PRV_MS_COMMON_J ----------------- */
+
+   insert_job:      CNV_PRV_MS_COMMON_J
+   job_type:        c
+   box_name:        CNV_PRV_COMMON
+   command:         cnv_autojob.sh cnvj RUNID
+   condition:       s(CNV_PRV_MS_COMMON_H)
+   description:     "Perform the prv_ms_master conversion"
+
+   /* ----------------- CNV_PRV_MS_COMMON_L_CONV ----------------- */
+
+   insert_job:      CNV_PRV_MS_COMMON_L_CONV
+   job_type:        c
+   box_name:        CNV_PRV_COMMON
+   command:         cnv_autojob.sh cnvl RUNID CONV
+   condition:       s(CNV_PRV_MS_COMMON_J)
+   description:     "Load the converted data to the conversion database"
+
+   /* ----------------- CNV_PRV_MS_COMMON_F ----------------- */
+
+   insert_job:      CNV_PRV_MS_COMMON_F
+   job_type:        c
+   box_name:        CNV_PRV_COMMON
+   command:         cnv_autojob.sh cnvf RUNID prv
+   condition:       s(CNV_PRV_MS_COMMON_J)
+   description:     "Create the FASR for CNV_PRV_MS_MASTER"
+
+  /* ----------------- CNV_PRV_MS_MASTER ----------------- */
+
+  insert_job:      CNV_PRV_MS_MASTER
+  job_type:        b
+  box_name:        CNV_PRV
+  condition:       s(CNV_PRV_MS_COMMON_F)
+  description:     "Control the prv_ms_master conversion"
+
+   /* ----------------- CNV_PRV_MS_MASTER_S ----------------- */
+
+   insert_job:      CNV_PRV_MS_MASTER_S
+   job_type:        c
+   box_name:        CNV_PRV_MS_MASTER
+   command:         cnv_autojob.sh cnvs
+   condition:       s(CNV_PRV_MS_PRESAK_F)
+   description:     "Unload data for the prv_ms_master conversion"
+
+   /* ----------------- CNV_PRV_MS_MASTER_H ----------------- */
+
+   insert_job:      CNV_PRV_MS_MASTER_H
+   job_type:        c
+   box_name:        CNV_PRV_MS_MASTER
+   command:         cnv_autojob.sh cnvh
+   condition:       s(CNV_PRV_MS_COMMON_F)
+   description:     "Create .out files for dataload.sh and build local lookups"
+
+   /* ----------------- CNV_PRV_MS_MASTER_J ----------------- */
+
+   insert_job:      CNV_PRV_MS_MASTER_J
+   job_type:        c
+   box_name:        CNV_PRV_MS_MASTER
+   command:         cnv_autojob.sh cnvj RUNID
+   condition:       s(CNV_PRV_MS_MASTER_H)
+   description:     "Perform the prv_ms_master conversion"
+
+   /* ----------------- CNV_PRV_MS_MASTER_N ----------------- */
+
+   insert_job:      CNV_PRV_MS_MASTER_N
+   job_type:        c
+   box_name:        CNV_PRV_MS_MASTER
+   command:         cnv_autojob.sh cnvn RUNID
+   condition:       s(CNV_PRV_MS_MASTER_J)
+   description:     "Check for null fields"
+
+   /* ----------------- CNV_PRV_MS_MASTER_L_CONV ----------------- */
+
+   insert_job:      CNV_PRV_MS_MASTER_L_CONV
+   job_type:        c
+   box_name:        CNV_PRV_MS_MASTER
+   command:         cnv_autojob.sh cnvl RUNID CONV
+   condition:       s(CNV_PRV_MS_MASTER_N)
+   description:     "Load the converted data to the conversion database"
+
+   /* ----------------- CNV_PRV_MS_MASTER_F ----------------- */
+
+   insert_job:      CNV_PRV_MS_MASTER_F
+   job_type:        c
+   box_name:        CNV_PRV_MS_MASTER
+   command:         cnv_autojob.sh cnvf RUNID prv
+   condition:       s(CNV_PRV_MS_MASTER_J)
+   description:     "Create the FASR for CNV_PRV_MS_MASTER"
+
+  /* ----------------- CNV_PRV_MS_EFT ----------------- */
+
+  insert_job:      CNV_PRV_MS_EFT
+  job_type:        b
+  box_name:        CNV_PRV
+  condition:       s(CNV_PRV_MS_MASTER_F)
+  description:     "Provider EFT"
+
+   /* ----------------- CNV_PRV_MS_EFT_S ----------------- */
+
+   insert_job:      CNV_PRV_MS_EFT_S
+   job_type:        c
+   box_name:        CNV_PRV_MS_EFT
+   command:         cnv_autojob.sh cnvs
+   condition:       s(CNV_PRV_MS_PRESAK_F)
+   description:     "Unload data for the prv_ms_master conversion"
+
+   /* ----------------- CNV_PRV_MS_EFT_H ----------------- */
+
+   insert_job:      CNV_PRV_MS_EFT_H
+   job_type:        c
+   box_name:        CNV_PRV_MS_EFT
+   command:         cnv_autojob.sh cnvh
+   condition:       s(CNV_PRV_MS_MASTER_F)
+   description:     "Create .out files for dataload.sh and build local lookups"
+
+   /* ----------------- CNV_PRV_MS_EFT_J ----------------- */
+
+   insert_job:      CNV_PRV_MS_EFT_J
+   job_type:        c
+   box_name:        CNV_PRV_MS_EFT
+   command:         cnv_autojob.sh cnvj RUNID
+   condition:       s(CNV_PRV_MS_EFT_H)
+   description:     "Perform the prv_ms_master conversion"
+
+   /* ----------------- CNV_PRV_MS_EFT_N ----------------- */
+
+   insert_job:      CNV_PRV_MS_EFT_N
+   job_type:        c
+   box_name:        CNV_PRV_MS_EFT
+   command:         cnv_autojob.sh cnvn RUNID
+   condition:       s(CNV_PRV_MS_EFT_J)
+   description:     "Check for null fields"
+
+   /* ----------------- CNV_PRV_MS_EFT_L_CONV ----------------- */
+
+   insert_job:      CNV_PRV_MS_EFT_L_CONV
+   job_type:        c
+   box_name:        CNV_PRV_MS_EFT
+   command:         cnv_autojob.sh cnvl RUNID CONV
+   condition:       s(CNV_PRV_MS_EFT_N)
+   description:     "Load the converted data to the conversion database"
+
+   /* ----------------- CNV_PRV_MS_EFT_F ----------------- */
+
+   insert_job:      CNV_PRV_MS_EFT_F
+   job_type:        c
+   box_name:        CNV_PRV_MS_EFT
+   command:         cnv_autojob.sh cnvf RUNID prv
+   condition:       s(CNV_PRV_MS_EFT_L_CONV)
+   description:     "Create the FASR for CNV_PRV_MS_MASTER"
+
+  /* ----------------- CNV_PRV_MS_OWNER ----------------- */
+
+  insert_job:      CNV_PRV_MS_OWNER
+  job_type:        b
+  box_name:        CNV_PRV
+  condition:       s(CNV_PRV_MS_EFT_F)
+  description:     "Provider owner"
+
+   /* ----------------- CNV_PRV_MS_OWNER_S ----------------- */
+
+   insert_job:      CNV_PRV_MS_OWNER_S
+   job_type:        c
+   box_name:        CNV_PRV_MS_OWNER
+   command:         cnv_autojob.sh cnvs
+   condition:       s(CNV_PRV_MS_EFT_F)
+   description:     "Unload data for the prv_ms_master conversion"
+
+   /* ----------------- CNV_PRV_MS_OWNER_H ----------------- */
+
+   insert_job:      CNV_PRV_MS_OWNER_H
+   job_type:        c
+   box_name:        CNV_PRV_MS_OWNER
+   command:         cnv_autojob.sh cnvh
+   condition:       s(CNV_PRV_MS_EFT_F)
+   description:     "Create .out files for dataload.sh and build local lookups"
+
+   /* ----------------- CNV_PRV_MS_OWNER_J ----------------- */
+
+   insert_job:      CNV_PRV_MS_OWNER_J
+   job_type:        c
+   box_name:        CNV_PRV_MS_OWNER
+   command:         cnv_autojob.sh cnvj RUNID
+   condition:       s(CNV_PRV_MS_OWNER_H)
+   description:     "Perform the prv_ms_master conversion"
+
+   /* ----------------- CNV_PRV_MS_OWNER_N ----------------- */
+
+   insert_job:      CNV_PRV_MS_OWNER_N
+   job_type:        c
+   box_name:        CNV_PRV_MS_OWNER
+   command:         cnv_autojob.sh cnvn RUNID
+   condition:       s(CNV_PRV_MS_OWNER_J)
+   description:     "Check for null fields"
+
+   /* ----------------- CNV_PRV_MS_OWNER_L_CONV ----------------- */
+
+   insert_job:      CNV_PRV_MS_OWNER_L_CONV
+   job_type:        c
+   box_name:        CNV_PRV_MS_OWNER
+   command:         cnv_autojob.sh cnvl RUNID CONV
+   condition:       s(CNV_PRV_MS_OWNER_N)
+   description:     "Load the converted data to the conversion database"
+
+   /* ----------------- CNV_PRV_MS_OWNER_F ----------------- */
+
+   insert_job:      CNV_PRV_MS_OWNER_F
+   job_type:        c
+   box_name:        CNV_PRV_MS_OWNER
+   command:         cnv_autojob.sh cnvf RUNID prv
+   condition:       s(CNV_PRV_MS_OWNER_L_CONV)
+   description:     "Create the FASR for CNV_PRV_MS_MASTER"
+
+  /* ----------------- CNV_PRV_MS_PREP_ADDR ----------------- */
+
+  insert_job:      CNV_PRV_MS_PREP_ADDR
+  job_type:        b
+  box_name:        CNV_PRV
+  condition:       s(CNV_PRV_MS_OWNER_F)
+  description:     "Prep addr"
+
+   /* ----------------- CNV_PRV_MS_PREP_ADDR_S ----------------- */
+
+   insert_job:      CNV_PRV_MS_PREP_ADDR_S
+   job_type:        c
+   box_name:        CNV_PRV_MS_PREP_ADDR
+   command:         cnv_autojob.sh cnvs
+   condition:       s(CNV_PRV_MS_OWNER_F)
+   description:     "Unload data for the prv_ms_master conversion"
+
+   /* ----------------- CNV_PRV_MS_PREP_ADDR_H ----------------- */
+
+   insert_job:      CNV_PRV_MS_PREP_ADDR_H
+   job_type:        c
+   box_name:        CNV_PRV_MS_PREP_ADDR
+   command:         cnv_autojob.sh cnvh
+   condition:       s(CNV_PRV_MS_PREP_ADDR_S)
+   description:     "Create .out files for dataload.sh and build local lookups"
+
+   /* ----------------- CNV_PRV_MS_PREP_ADDR_J ----------------- */
+
+   insert_job:      CNV_PRV_MS_PREP_ADDR_J
+   job_type:        c
+   box_name:        CNV_PRV_MS_PREP_ADDR
+   command:         cnv_autojob.sh cnvj RUNID
+   condition:       s(CNV_PRV_MS_PREP_ADDR_H)
+   description:     "Perform the prv_ms_master conversion"
+
+   /* ----------------- CNV_PRV_MS_PREP_ADDR_L_CONV ----------------- */
+
+   insert_job:      CNV_PRV_MS_PREP_ADDR_L_CONV
+   job_type:        c
+   box_name:        CNV_PRV_MS_PREP_ADDR
+   command:         cnv_autojob.sh cnvl RUNID CONV
+   condition:       s(CNV_PRV_MS_PREP_ADDR_J)
+   description:     "Load the converted data to the conversion database"
+
+   /* ----------------- CNV_PRV_MS_PREP_ADDR_F ----------------- */
+
+   insert_job:      CNV_PRV_MS_PREP_ADDR_F
+   job_type:        c
+   box_name:        CNV_PRV_MS_PREP_ADDR
+   command:         cnv_autojob.sh cnvf RUNID prv
+   condition:       s(CNV_PRV_MS_PREP_ADDR_L_CONV)
+   description:     "Create the FASR for CNV_PRV_MS_MASTER"
+
+  /* ----------------- CNV_PRV_SHARED_LOOKUP ----------------- */
+
+  insert_job:      CNV_PRV_SHARED_LOOKUP
+  job_type:        b
+  box_name:        CNV_PRV
+  condition:       s(CNV_PRV_MS_PREP_ADDR_F)
+  description:     "Provider shared lookup"
+
+   /* ----------------- CNV_PRV_MS_SHARED_LOOKUP_H ----------------- */
+
+   insert_job:      CNV_PRV_MS_SHARED_LOOKUP_H
+   job_type:        c
+   box_name:        CNV_PRV_SHARED_LOOKUP
+   command:         cnv_autojob.sh cnvh
+   condition:       s(CNV_PRV_MS_PREP_ADDR_F)
+   description:     "Create .out files for dataload.sh and build local lookups"
+
+  /* ----------------- CNV_PRV_MS_MSG ----------------- */
+
+  insert_job:      CNV_PRV_MS_MSG
+  job_type:        b
+  box_name:        CNV_PRV
+  description:     "Provider messages"
+
+   /* ----------------- CNV_PRV_MS_MASTER_M ----------------- */
+
+   insert_job:      CNV_PRV_MS_MASTER_M
+   job_type:        c
+   box_name:        CNV_PRV_MS_MSG
+   command:         cnv_autojob.sh cnvm RUNID
+   condition:       s(CNV_PRV_MS_MASTER_J)
+   description:     "Load messages"
+
+   /* ----------------- CNV_PRV_MS_EFT_M ----------------- */
+
+   insert_job:      CNV_PRV_MS_EFT_M
+   job_type:        c
+   box_name:        CNV_PRV_MS_MSG
+   command:         cnv_autojob.sh cnvm RUNID
+   condition:       s(CNV_PRV_MS_EFT_J)
+   description:     "Load messages"
+
+   /* ----------------- CNV_PRV_MS_OWNER_M ----------------- */
+
+   insert_job:      CNV_PRV_MS_OWNER_M
+   job_type:        c
+   box_name:        CNV_PRV_MS_MSG
+   command:         cnv_autojob.sh cnvm RUNID
+   condition:       s(CNV_PRV_MS_OWNER_J)
+   description:     "Load messages"
+
+ /* ----------------- CNV_MBR ----------------- */
+
+ insert_job:      CNV_MBR
+ job_type:        b
+ box_name:        MS_CONV_CYCLE
+ condition:       s(CNV_ALL_COPY_MANUAL)
+ description:     "Member Conversion"
+
+  /* ----------------- CNV_MBR_PRESAK ----------------- */
+
+  insert_job:      CNV_MBR_PRESAK
+  job_type:        b
+  box_name:        CNV_MBR
+  condition:       s(CNV_ALL_COPY_MANUAL)
+  description:     "Member Presak"
+
+   /* ----------------- CNV_MBR_MS_PRESAK_RECIP ----------------- */
+
+   insert_job:      CNV_MBR_MS_PRESAK_RECIP
+   job_type:        c
+   box_name:        CNV_MBR_PRESAK
+   command:         cnv_autojob.sh cnvjmbr_saking.sh
+   condition:       s(CNV_ALL_COPY_MANUAL) & s(CNV_PRV_MS_SHARED_LOOKUP_H)
+   description:     "Presak job"
+
+  /* ----------------- CNV_MBR_MS_SHARED_LOOKUP ----------------- */
+
+  insert_job:      CNV_MBR_MS_SHARED_LOOKUP
+  job_type:        b
+  box_name:        CNV_MBR
+  condition:       s(CNV_MBR_MS_PRESAK_RECIP)
+  description:     "Member shared lookup"
+
+   /* ----------------- CNV_MBR_MS_SHARED_LOOKUP_H ----------------- */
+
+   insert_job:      CNV_MBR_MS_SHARED_LOOKUP_H
+   job_type:        c
+   box_name:        CNV_MBR_MS_SHARED_LOOKUP
+   command:         cnv_autojob.sh cnvh
+   condition:       s(CNV_MBR_MS_PRESAK_RECIP)
+   description:     "bdB Unload"
+
+  /* ----------------- CNV_MBR_MS_MASTER ----------------- */
+
+  insert_job:      CNV_MBR_MS_MASTER
+  job_type:        b
+  box_name:        CNV_MBR
+  condition:       s(CNV_MBR_MS_SHARED_LOOKUP_H)
+  description:     "Member Master"
+
+   /* ----------------- CNV_MBR_MS_MASTER_S ----------------- */
+
+   insert_job:      CNV_MBR_MS_MASTER_S
+   job_type:        c
+   box_name:        CNV_MBR_MS_MASTER
+   command:         cnv_autojob.sh cnvs
+   condition:       s(CNV_MBR_MS_SHARED_LOOKUP_H)
+   description:     "source Unload"
+
+   /* ----------------- CNV_MBR_MS_MASTER_H ----------------- */
+
+   insert_job:      CNV_MBR_MS_MASTER_H
+   job_type:        c
+   box_name:        CNV_MBR_MS_MASTER
+   command:         cnv_autojob.sh cnvh
+   condition:       s(CNV_MBR_MS_MASTER_S)
+   description:     "BDB Unload"
+
+   /* ----------------- CNV_MBR_MS_MASTER_J ----------------- */
+
+   insert_job:      CNV_MBR_MS_MASTER_J
+   job_type:        c
+   box_name:        CNV_MBR_MS_MASTER
+   command:         cnv_autojob.sh cnvj RUNID
+   condition:       s(CNV_MBR_MS_MASTER_H)
+   description:     "Job"
+
+   /* ----------------- CNV_MBR_MS_MASTER_N ----------------- */
+
+   insert_job:      CNV_MBR_MS_MASTER_N
+   job_type:        c
+   box_name:        CNV_MBR_MS_MASTER
+   command:         cnv_autojob.sh cnvn RUNID
+   condition:       s(CNV_MBR_MS_MASTER_J)
+   description:     "Check for null fields"
+
+   /* ----------------- CNV_MBR_MS_MASTER_L_CONV ----------------- */
+
+   insert_job:      CNV_MBR_MS_MASTER_L_CONV
+   job_type:        c
+   box_name:        CNV_MBR_MS_MASTER
+   command:         cnv_autojob.sh cnvl RUNID CONV
+   condition:       s(CNV_MBR_MS_MASTER_N)
+   description:     "Load"
+
+   /* ----------------- CNV_MBR_MS_MASTER_F ----------------- */
+
+   insert_job:      CNV_MBR_MS_MASTER_F
+   job_type:        c
+   box_name:        CNV_MBR_MS_MASTER
+   command:         cnv_autojob.sh cnvf RUNID mbr
+   condition:       s(CNV_MBR_MS_MASTER_L_CONV)
+   description:     "FASR"
+
+  /* ----------------- CNV_MBR_MS_MSG ----------------- */
+
+  insert_job:      CNV_MBR_MS_MSG
+  job_type:        b
+  box_name:        CNV_MBR
+  condition:       s(CNV_MBR_MS_MASTER_J)
+  description:     "Member messages"
+
+   /* ----------------- CNV_MBR_MS_MASTER_M ----------------- */
+
+   insert_job:      CNV_MBR_MS_MASTER_M
+   job_type:        c
+   box_name:        CNV_MBR_MS_MSG
+   command:         cnv_autojob.sh cnvm RUNID
+   condition:       s(CNV_MBR_MS_MASTER_J)
+   description:     "Load messages"
+
+ /* ----------------- CNV_REF_PART2 ----------------- */
+
+ insert_job:      CNV_REF_PART2
+ job_type:        b
+ box_name:        MS_CONV_CYCLE
+ condition:       s(CNV_REF_MS_SHARED_LOOKUP_H) & s(CNV_PRV_MS_SHARED_LOOKUP_H)
+ description:     "Reference conversion part 2"
+
+  /* ----------------- CNV_REF_PART2_JOBS ----------------- */
+
+  insert_job:      CNV_REF_PART2_JOBS
+  job_type:        b
+  box_name:        CNV_REF_PART2
+  condition:       s(CNV_REF_MS_SHARED_LOOKUP_H) & s(CNV_PRV_MS_SHARED_LOOKUP_H)
+  description:     "Reference part 2 jobs"
+
+   /* ----------------- CNV_REF_MS_UNLOAD_PART2 ----------------- */
+
+   insert_job:      CNV_REF_MS_UNLOAD_PART2
+   job_type:        b
+   box_name:        CNV_REF_PART2_JOBS
+   condition:       s(CNV_REF_MS_SHARED_LOOKUP_H) & s(CNV_PRV_MS_SHARED_LOOKUP_H)
+   description:     "Reference unload"
+
+    /* ----------------- CNV_REF_MS_PROC_PROV_RATE_S ----------------- */
+
+    insert_job:      CNV_REF_MS_PROC_PROV_RATE_S
+    job_type:        c
+    box_name:        CNV_REF_MS_UNLOAD_PART2
+    command:         cnv_autojob.sh cnvs
+    condition:       s(CNV_REF_MS_SHARED_LOOKUP_H) & s(CNV_PRV_MS_SHARED_LOOKUP_H)
+    description:     "Source Unload"
+
+    /* ----------------- CNV_REF_MS_PROV_RATE_S ----------------- */
+
+    insert_job:      CNV_REF_MS_PROV_RATE_S
+    job_type:        c
+    box_name:        CNV_REF_MS_UNLOAD_PART2
+    command:         cnv_autojob.sh cnvs
+    condition:       s(CNV_REF_MS_PROC_PROV_RATE_S)
+    description:     "Source Unload"
+
+   /* ----------------- CNV_REF_MS_PROC_PROV_RATE ----------------- */
+
+   insert_job:      CNV_REF_MS_PROC_PROV_RATE
+   job_type:        b
+   box_name:        CNV_REF_PART2_JOBS
+   condition:       s(CNV_REF_MS_PROC_PROV_RATE_S)
+   description:     "Proc Prov Rate"
+
+    /* ----------------- CNV_REF_MS_PROC_PROV_RATE_H ----------------- */
+
+    insert_job:      CNV_REF_MS_PROC_PROV_RATE_H
+    job_type:        c
+    box_name:        CNV_REF_MS_PROC_PROV_RATE
+    command:         cnv_autojob.sh cnvh
+    condition:       s(CNV_REF_MS_PROC_PROV_RATE_S)
+    description:     "BDB Unload"
+
+    /* ----------------- CNV_REF_MS_PROC_PROV_RATE_J ----------------- */
+
+    insert_job:      CNV_REF_MS_PROC_PROV_RATE_J
+    job_type:        c
+    box_name:        CNV_REF_MS_PROC_PROV_RATE
+    command:         cnv_autojob.sh cnvj RUNID
+    condition:       s(CNV_REF_MS_PROC_PROV_RATE_H)
+    description:     "Job"
+
+    /* ----------------- CNV_REF_MS_PROC_PROV_RATE_N ----------------- */
+
+    insert_job:      CNV_REF_MS_PROC_PROV_RATE_N
+    job_type:        c
+    box_name:        CNV_REF_MS_PROC_PROV_RATE
+    command:         cnv_autojob.sh cnvn RUNID
+    condition:       s(CNV_REF_MS_PROC_PROV_RATE_J)
+    description:     "Check for null fields"
+
+    /* ----------------- CNV_REF_MS_PROC_PROV_RATE_L_CONV ----------------- */
+
+    insert_job:      CNV_REF_MS_PROC_PROV_RATE_L_CONV
+    job_type:        c
+    box_name:        CNV_REF_MS_PROC_PROV_RATE
+    command:         cnv_autojob.sh cnvl RUNID CONV
+    condition:       s(CNV_REF_MS_PROC_PROV_RATE_N)
+    description:     "Load"
+
+    /* ----------------- CNV_REF_MS_PROC_PROV_RATE_F ----------------- */
+
+    insert_job:      CNV_REF_MS_PROC_PROV_RATE_F
+    job_type:        c
+    box_name:        CNV_REF_MS_PROC_PROV_RATE
+    command:         cnv_autojob.sh cnvf RUNID ref
+    condition:       s(CNV_REF_MS_PROC_PROV_RATE_L_CONV)
+    description:     "FASR"
+
+   /* ----------------- CNV_REF_MS_PROV_RATE ----------------- */
+
+   insert_job:      CNV_REF_MS_PROV_RATE
+   job_type:        b
+   box_name:        CNV_REF_PART2_JOBS
+   condition:       s(CNV_REF_MS_PROV_RATE_S)
+   description:     "Prov Rate"
+
+    /* ----------------- CNV_REF_MS_PROV_RATE_H ----------------- */
+
+    insert_job:      CNV_REF_MS_PROV_RATE_H
+    job_type:        c
+    box_name:        CNV_REF_MS_PROV_RATE
+    command:         cnv_autojob.sh cnvh
+    condition:       s(CNV_REF_MS_PROV_RATE_S)
+    description:     "BDB Unload"
+
+    /* ----------------- CNV_REF_MS_PROV_RATE_J ----------------- */
+
+    insert_job:      CNV_REF_MS_PROV_RATE_J
+    job_type:        c
+    box_name:        CNV_REF_MS_PROV_RATE
+    command:         cnv_autojob.sh cnvj RUNID
+    condition:       s(CNV_REF_MS_PROV_RATE_H)
+    description:     "Job"
+
+    /* ----------------- CNV_REF_MS_PROV_RATE_N ----------------- */
+
+    insert_job:      CNV_REF_MS_PROV_RATE_N
+    job_type:        c
+    box_name:        CNV_REF_MS_PROV_RATE
+    command:         cnv_autojob.sh cnvn RUNID
+    condition:       s(CNV_REF_MS_PROV_RATE_J)
+    description:     "Check for null fields"
+
+    /* ----------------- CNV_REF_MS_PROV_RATE_L_CONV ----------------- */
+
+    insert_job:      CNV_REF_MS_PROV_RATE_L_CONV
+    job_type:        c
+    box_name:        CNV_REF_MS_PROV_RATE
+    command:         cnv_autojob.sh cnvl RUNID CONV
+    condition:       s(CNV_REF_MS_PROV_RATE_N)
+    description:     "Load"
+
+    /* ----------------- CNV_REF_MS_PROV_RATE_F ----------------- */
+
+    insert_job:      CNV_REF_MS_PROV_RATE_F
+    job_type:        c
+    box_name:        CNV_REF_MS_PROV_RATE
+    command:         cnv_autojob.sh cnvf RUNID ref
+    condition:       s(CNV_REF_MS_PROV_RATE_L_CONV)
+    description:     "FASR"
+
+  /* ----------------- CNV_REF_MS_MSG_PART2 ----------------- */
+
+  insert_job:      CNV_REF_MS_MSG_PART2
+  job_type:        b
+  box_name:        CNV_REF_PART2
+  description:     "Reference part 2 messages"
+
+   /* ----------------- CNV_REF_MS_PROC_PROV_RATE_M ----------------- */
+
+   insert_job:      CNV_REF_MS_PROC_PROV_RATE_M
+   job_type:        c
+   box_name:        CNV_REF_MS_MSG_PART2
+   command:         cnv_autojob.sh cnvm RUNID
+   condition:       s(CNV_REF_MS_PROC_PROV_RATE_J)
+   description:     "Load messages"
+
+   /* ----------------- CNV_REF_MS_PROV_RATE_M ----------------- */
+
+   insert_job:      CNV_REF_MS_PROV_RATE_M
+   job_type:        c
+   box_name:        CNV_REF_MS_MSG_PART2
+   command:         cnv_autojob.sh cnvm RUNID
+   condition:       s(CNV_REF_MS_PROV_RATE_J)
+   description:     "Load messages"
+
+ /* ----------------- CNV_MGD ----------------- */
+
+ insert_job:      CNV_MGD
+ job_type:        b
+ box_name:        MS_CONV_CYCLE
+ condition:       s(CNV_REF_MS_SHARED_LOOKUP_H) & s(CNV_MBR_MS_SHARED_LOOKUP_H) & s(CNV_PRV_MS_SHARED_LOOKUP_H)
+ description:     "Control the Managed care Conversion"
+
+  /* ----------------- CNV_MGD_MS_PRE_SAKKING ----------------- */
+
+  insert_job:      CNV_MGD_MS_PRE_SAKKING
+  job_type:        b
+  box_name:        CNV_MGD
+  condition:       s(CNV_REF_MS_SHARED_LOOKUP_H) & s(CNV_MBR_MS_SHARED_LOOKUP_H) & s(CNV_PRV_MS_SHARED_LOOKUP_H)
+  description:     "Control the MGD_ms_sak_cap_mstr conversion pre-sakking"
+
+   /* ----------------- CNV_MGD_MS_SAK_CAP_MST_S ----------------- */
+
+   insert_job:      CNV_MGD_MS_SAK_CAP_MST_S
+   job_type:        c
+   box_name:        CNV_MGD_MS_PRE_SAKKING
+   command:         cnv_autojob.sh cnvs
+   condition:       s(CNV_REF_MS_SHARED_LOOKUP_H) & s(CNV_MBR_MS_SHARED_LOOKUP_H) & s(CNV_PRV_MS_SHARED_LOOKUP_H)
+   description:     "Unload data for the MGD_ms_sak_cap_mstr/adj conversions"
+
+   /* ----------------- CNV_MGD_MS_SAK_CAP_MST_MV_ADJ ----------------- */
+
+   insert_job:      CNV_MGD_MS_SAK_CAP_MST_MV_ADJ
+   job_type:        c
+   box_name:        CNV_MGD_MS_PRE_SAKKING
+   command:         cnv_autojob.sh otto_cp_file1_to_file2.sh -s DDIR /mgd/mgd_ms_sak_cap_mst/unload/ c_hdr_adj_vd_tb.dat -t DDIR /mgd/mgd_ms_sak_cap_adj/unload/ c_hdr_adj_vd_tb.dat
+   condition:       s(CNV_MGD_MS_SAK_CAP_MST_S)
+   description:     "Move unloaded file to the _adj directory"
+
+   /* ----------------- CNV_MGD_MS_SAK_CAP_MST_J ----------------- */
+
+   insert_job:      CNV_MGD_MS_SAK_CAP_MST_J
+   job_type:        c
+   box_name:        CNV_MGD_MS_PRE_SAKKING
+   command:         cnv_autojob.sh cnvj RUNID
+   condition:       s(CNV_MGD_MS_SAK_CAP_MST_MV_ADJ)
+   description:     "Perform the MGD_ms_sak_cap_mstr conversion"
+
+   /* ----------------- CNV_MGD_MS_SAK_CAP_MST_CP_MSTR_4_ADJ ----------------- */
+
+   insert_job:      CNV_MGD_MS_SAK_CAP_MST_CP_MSTR_4_ADJ
+   job_type:        c
+   box_name:        CNV_MGD_MS_PRE_SAKKING
+   command:         cnv_autojob.sh otto_cp_file1_to_file2.sh -s DDIR /mgd/mgd_ms_sak_cap_mst/output/ RUNID /t_cnv_mgd_sak_cap_mstr.dat -t DDIR /mgd/mgd_ms_sak_cap_adj/unload/t_cnv_mgd_sak_cap_mstr.dat
+   condition:       s(CNV_MGD_MS_SAK_CAP_MST_J)
+   description:     "Move updated sak_master to the next step for adjustments"
+
+   /* ----------------- CNV_MGD_MS_SAK_CAP_MST_CP_MSTR_4_LU ----------------- */
+
+   insert_job:      CNV_MGD_MS_SAK_CAP_MST_CP_MSTR_4_LU
+   job_type:        c
+   box_name:        CNV_MGD_MS_PRE_SAKKING
+   command:         cnv_autojob.sh otto_cp_file1_to_file2.sh -s DDIR /mgd/mgd_ms_sak_cap_mst/output/ RUNID /t_cnv_mgd_sak_cap_mstr.dat -t DDIR /mgd/mgd_shared_lookup/bdb/t_cnv_mgd_sak_cap_mstr.dat
+   condition:       s(CNV_MGD_MS_SAK_CAP_MST_J)
+   description:     "Move updated sak_master to the next step for adjustments"
+
+   /* ----------------- CNV_MGD_MS_SAK_CAP_MST_M ----------------- */
+
+   insert_job:      CNV_MGD_MS_SAK_CAP_MST_M
+   job_type:        c
+   box_name:        CNV_MGD_MS_PRE_SAKKING
+   command:         cnv_autojob.sh cnvm RUNID replace
+   condition:       s(CNV_MGD_MS_SAK_CAP_MST_J)
+   description:     "Load the messages to CUST database for CNV_MGD_MS_SAK_CAP_MST"
+
+   /* ----------------- CNV_MGD_MS_SAK_CAP_MST_F ----------------- */
+
+   insert_job:      CNV_MGD_MS_SAK_CAP_MST_F
+   job_type:        c
+   box_name:        CNV_MGD_MS_PRE_SAKKING
+   command:         cnv_autojob.sh cnvf RUNID mgd
+   condition:       s(CNV_MGD_MS_SAK_CAP_MST_J)
+   description:     "Create the FASR for CNV_MGD_MS_SAK_CAP_MST"
+
+   /* ----------------- CNV_MGD_SHARED_LOOKUP_H_1A ----------------- */
+
+   insert_job:      CNV_MGD_SHARED_LOOKUP_H_1A
+   job_type:        c
+   box_name:        CNV_MGD_MS_PRE_SAKKING
+   command:         cnv_autojob.sh cnvh
+   condition:       s(CNV_MGD_MS_SAK_CAP_MST_CP_MSTR_4_LU)
+   description:     "Update the shared lookups"
+
+   /* ----------------- CNV_MGD_MS_SAK_CAP_ADJ_J ----------------- */
+
+   insert_job:      CNV_MGD_MS_SAK_CAP_ADJ_J
+   job_type:        c
+   box_name:        CNV_MGD_MS_PRE_SAKKING
+   command:         cnv_autojob.sh cnvj RUNID
+   condition:       s(CNV_MGD_SHARED_LOOKUP_H_1A)
+   description:     "process the sak_master to set adjustment pointers"
+
+   /* ----------------- CNV_MGD_MS_SAK_CAP_ADJ_L_CUST ----------------- */
+
+   insert_job:      CNV_MGD_MS_SAK_CAP_ADJ_L_CUST
+   job_type:        c
+   box_name:        CNV_MGD_MS_PRE_SAKKING
+   command:         cnv_autojob.sh cnvl RUNID CONV
+   condition:       s(CNV_MGD_MS_SAK_CAP_ADJ_J)
+   description:     "Load the converted data to the customer database"
+
+   /* ----------------- CNV_MGD_MS_SAK_CAP_ADJ_M ----------------- */
+
+   insert_job:      CNV_MGD_MS_SAK_CAP_ADJ_M
+   job_type:        c
+   box_name:        CNV_MGD_MS_PRE_SAKKING
+   command:         cnv_autojob.sh cnvm RUNID replace
+   condition:       s(CNV_MGD_MS_SAK_CAP_ADJ_J)
+   description:     "Load the messages to CUST database for CNV_MGD_MS_SAK_CAP_ADJ"
+
+   /* ----------------- CNV_MGD_MS_SAK_CAP_ADJ_F ----------------- */
+
+   insert_job:      CNV_MGD_MS_SAK_CAP_ADJ_F
+   job_type:        c
+   box_name:        CNV_MGD_MS_PRE_SAKKING
+   command:         cnv_autojob.sh cvnf RUNID
+   condition:       s(CNV_MGD_MS_SAK_CAP_ADJ_J)
+   description:     "Create the FASR for CNV_MGD_MS_SAK_CAP_ADJ"
+
+   /* ----------------- CNV_MGD_MS_SAK_CAP_ADJ_CP_4_LU ----------------- */
+
+   insert_job:      CNV_MGD_MS_SAK_CAP_ADJ_CP_4_LU
+   job_type:        c
+   box_name:        CNV_MGD_MS_PRE_SAKKING
+   command:         cnv_autojob.sh cnvl RUNID CUST
+   condition:       s(CNV_MGD_MS_SAK_CAP_ADJ_J)
+   description:     "Move updated sak_master to the next step for lookup build"
+
+   /* ----------------- CNV_MGD_SHARED_LOOKUP_H_1B ----------------- */
+
+   insert_job:      CNV_MGD_SHARED_LOOKUP_H_1B
+   job_type:        c
+   box_name:        CNV_MGD_MS_PRE_SAKKING
+   command:         cnv_autojob.sh cnvh get_cap_info
+   condition:       s(CNV_MGD_MS_SAK_CAP_ADJ_CP_4_LU)
+   description:     "Build the MGD lookups"
+
+  /* ----------------- CNV_MGD_MS_ASSIGNMENT ----------------- */
+
+  insert_job:      CNV_MGD_MS_ASSIGNMENT
+  job_type:        b
+  box_name:        CNV_MGD
+  condition:       s(CNV_MGD_SHARED_LOOKUP_H_1B)
+  description:     "Control the MGD_ms_assignment conversion"
+
+   /* ----------------- CNV_MGD_MS_BUILD_PRE_ASGN_LU ----------------- */
+
+   insert_job:      CNV_MGD_MS_BUILD_PRE_ASGN_LU
+   job_type:        b
+   box_name:        CNV_MGD_MS_ASSIGNMENT
+   condition:       s(CNV_MGD_SHARED_LOOKUP_H_1B)
+   description:     "Load the lookups needed for the assignment conversion"
+
+    /* ----------------- CNV_MGD_SHARED_LOOKUP_H_2A ----------------- */
+
+    insert_job:      CNV_MGD_SHARED_LOOKUP_H_2A
+    job_type:        c
+    box_name:        CNV_MGD_MS_BUILD_PRE_ASGN_LU
+    command:         cnv_autojob.sh cnvh get_sak_re_pmp_assign get_sak_re_pmp_asgn_mult get_cde_mc_region get_cde_rsn_mc
+    condition:       s(CNV_MGD_SHARED_LOOKUP_H_1B)
+    description:     "build the MGD lookups"
+
+   /* ----------------- CNV_MGD_MS_ASSIGNMENT_CNV ----------------- */
+
+   insert_job:      CNV_MGD_MS_ASSIGNMENT_CNV
+   job_type:        b
+   box_name:        CNV_MGD_MS_ASSIGNMENT
+   condition:       s(CNV_MGD_SHARED_LOOKUP_H_2A)
+   description:     "Control the MGD_ms_assignment conversion"
+
+    /* ----------------- CNV_MGD_MS_ASSIGNMENT_S ----------------- */
+
+    insert_job:      CNV_MGD_MS_ASSIGNMENT_S
+    job_type:        c
+    box_name:        CNV_MGD_MS_ASSIGNMENT_CNV
+    command:         cnv_autojob.sh cnvs
+    condition:       s(CNV_MGD_SHARED_LOOKUP_H_2A)
+    description:     "Unload data for the MGD_MS_ASSIGN conversion"
+
+    /* ----------------- CNV_MGD_MS_ASSIGNMENT_J ----------------- */
+
+    insert_job:      CNV_MGD_MS_ASSIGNMENT_J
+    job_type:        c
+    box_name:        CNV_MGD_MS_ASSIGNMENT_CNV
+    command:         cnv_autojob.sh cnvj RUNID
+    condition:       s(CNV_MGD_MS_ASSIGNMENT_S)
+    description:     "Create the assignment tables"
+
+    /* ----------------- CNV_MGD_MS_ASSIGNMENT_N ----------------- */
+
+    insert_job:      CNV_MGD_MS_ASSIGNMENT_N
+    job_type:        c
+    box_name:        CNV_MGD_MS_ASSIGNMENT_CNV
+    command:         cnv_autojob.sh cnvn RUNID
+    condition:       s(CNV_MGD_MS_ASSIGNMENT_J)
+    description:     "Runs NULL NINJA to check for invalid characters"
+
+    /* ----------------- CNV_MGD_MS_ASSIGNMENT_L_CONV ----------------- */
+
+    insert_job:      CNV_MGD_MS_ASSIGNMENT_L_CONV
+    job_type:        c
+    box_name:        CNV_MGD_MS_ASSIGNMENT_CNV
+    command:         cnv_autojob.sh cnvl RUNID CONV
+    condition:       s(CNV_MGD_MS_ASSIGNMENT_N)
+    description:     "Load the converted data to the conversion database"
+
+    /* ----------------- CNV_MGD_MS_ASSIGNMENT_M ----------------- */
+
+    insert_job:      CNV_MGD_MS_ASSIGNMENT_M
+    job_type:        c
+    box_name:        CNV_MGD_MS_ASSIGNMENT_CNV
+    command:         cnv_autojob.sh cnvm RUNID
+    condition:       s(CNV_MGD_MS_ASSIGNMENT_L_CONV)
+    description:     "Load messages to CUST database for CNV_MGD_MS_SAK_CAP_ADJ"
+
+    /* ----------------- CNV_MGD_MS_ASSIGNMENT_F ----------------- */
+
+    insert_job:      CNV_MGD_MS_ASSIGNMENT_F
+    job_type:        c
+    box_name:        CNV_MGD_MS_ASSIGNMENT_CNV
+    command:         cnv_autojob.sh cnvf RUNID mgd
+    condition:       s(CNV_MGD_MS_ASSIGNMENT_M)
+    description:     "Create the FASR for CNV_MGD_MS_SAK_CAP_ADJ"
+
+   /* ----------------- CNV_MGD_MS_BUILD_POST_ASGN_LU ----------------- */
+
+   insert_job:      CNV_MGD_MS_BUILD_POST_ASGN_LU
+   job_type:        b
+   box_name:        CNV_MGD_MS_ASSIGNMENT
+   condition:       s(CNV_MGD_MS_ASSIGNMENT_F)
+   description:     "Load the lookups updated by the assignment conversion"
+
+    /* ----------------- CNV_MGD_SHARED_LOOKUP_H_3A ----------------- */
+
+    insert_job:      CNV_MGD_SHARED_LOOKUP_H_3A
+    job_type:        c
+    box_name:        CNV_MGD_MS_BUILD_POST_ASGN_LU
+    command:         cnv_autojob.sh cnvh get_sak_re_pmp_assign get_sak_re_pmp_asgn_mult
+    condition:       s(CNV_MGD_MS_ASSIGNMENT_F)
+    description:     "build the MGD lookups"
+
+  /* ----------------- CNV_MGD_MS_CAPITATIONS ----------------- */
+
+  insert_job:      CNV_MGD_MS_CAPITATIONS
+  job_type:        b
+  box_name:        CNV_MGD
+  condition:       s(CNV_MGD_SHARED_LOOKUP_H_3A)
+  description:     "Control the MGD_ms_capitations conversion"
+
+   /* ----------------- CNV_MGD_MS_CAPITATIONS_J ----------------- */
+
+   insert_job:      CNV_MGD_MS_CAPITATIONS_J
+   job_type:        b
+   box_name:        CNV_MGD_MS_CAPITATIONS
+   condition:       s(CNV_MGD_SHARED_LOOKUP_H_3A)
+   description:     "Control the MGD_ms_capitations j jobs"
+
+    /* ----------------- CNV_MGD_MS_CAPITATIONS_J_A ----------------- */
+
+    insert_job:      CNV_MGD_MS_CAPITATIONS_J_A
+    job_type:        c
+    box_name:        CNV_MGD_MS_CAPITATIONS_J
+    command:         cnv_autojob.sh mgd_cnvj_all_quarters.sh GROUPA RUNID
+    condition:       s(CNV_MGD_SHARED_LOOKUP_H_3A)
+    description:     "Capitation conversion - GroupA"
+
+    /* ----------------- CNV_MGD_MS_CAPITATIONS_J_B ----------------- */
+
+    insert_job:      CNV_MGD_MS_CAPITATIONS_J_B
+    job_type:        c
+    box_name:        CNV_MGD_MS_CAPITATIONS_J
+    command:         cnv_autojob.sh mgd_cnvj_all_quarters.sh GROUPB RUNID
+    condition:       s(CNV_MGD_MS_CAPITATIONS_J_A)
+    description:     "Capitation conversion - GroupB"
+
+    /* ----------------- CNV_MGD_MS_CAPITATIONS_J_C ----------------- */
+
+    insert_job:      CNV_MGD_MS_CAPITATIONS_J_C
+    job_type:        c
+    box_name:        CNV_MGD_MS_CAPITATIONS_J
+    command:         cnv_autojob.sh mgd_cnvj_all_quarters.sh GROUPC RUNID
+    condition:       s(CNV_MGD_MS_CAPITATIONS_J_B)
+    description:     "Capitation conversion - GroupC"
+
+    /* ----------------- CNV_MGD_MS_CAPITATIONS_J_D ----------------- */
+
+    insert_job:      CNV_MGD_MS_CAPITATIONS_J_D
+    job_type:        c
+    box_name:        CNV_MGD_MS_CAPITATIONS_J
+    command:         cnv_autojob.sh mgd_cnvj_all_quarters.sh GROUPD RUNID
+    condition:       s(CNV_MGD_MS_CAPITATIONS_J_C)
+    description:     "Capitation conversion - GroupD"
+
+   /* ----------------- CNV_MGD_MS_CAPITATIONS_N ----------------- */
+
+   insert_job:      CNV_MGD_MS_CAPITATIONS_N
+   job_type:        c
+   box_name:        CNV_MGD_MS_CAPITATIONS
+   command:         cnv_autojob.sh mgd_cnvn_all_qtrs.sh RUNID
+   condition:       s(CNV_MGD_MS_CAPITATIONS_J_D)
+   description:     "Runs NULL NINJA to check for invalid characters"
+
+   /* ----------------- CNV_MGD_MS_CAPITATIONS_L ----------------- */
+
+   insert_job:      CNV_MGD_MS_CAPITATIONS_L
+   job_type:        b
+   box_name:        CNV_MGD_MS_CAPITATIONS
+   condition:       s(CNV_MGD_MS_CAPITATIONS_N)
+   description:     "Control the MGD_ms_capitations load jobs"
+
+    /* ----------------- CNV_MGD_MS_CAPITATIONS_L_TRUNC ----------------- */
+
+    insert_job:      CNV_MGD_MS_CAPITATIONS_L_TRUNC
+    job_type:        c
+    box_name:        CNV_MGD_MS_CAPITATIONS_L
+    command:         cnv_autojob.sh mgd_cnvload_cap_truncate.sh TARGDB
+    condition:       s(CNV_MGD_MS_CAPITATIONS_N)
+    description:     "truncate the target tables"
+
+    /* ----------------- CNV_MGD_MS_CAPITATIONS_L_A_CONV ----------------- */
+
+    insert_job:      CNV_MGD_MS_CAPITATIONS_L_A_CONV
+    job_type:        c
+    box_name:        CNV_MGD_MS_CAPITATIONS_L
+    command:         cnv_autojob.sh mgd_cnvload_all_quarters.sh GROUPA RUNID CONV
+    condition:       s(CNV_MGD_MS_CAPITATIONS_L_TRUNC)
+    description:     "Load the converted data to the customer database"
+
+    /* ----------------- CNV_MGD_MS_CAPITATIONS_L_B_CONV ----------------- */
+
+    insert_job:      CNV_MGD_MS_CAPITATIONS_L_B_CONV
+    job_type:        c
+    box_name:        CNV_MGD_MS_CAPITATIONS_L
+    command:         cnv_autojob.sh mgd_cnvload_all_quarters.sh GROUPB RUNID CONV
+    condition:       s(CNV_MGD_MS_CAPITATIONS_L_A_CONV)
+    description:     "Load the converted data to the customer database"
+
+    /* ----------------- CNV_MGD_MS_CAPITATIONS_L_C_CONV ----------------- */
+
+    insert_job:      CNV_MGD_MS_CAPITATIONS_L_C_CONV
+    job_type:        c
+    box_name:        CNV_MGD_MS_CAPITATIONS_L
+    command:         cnv_autojob.sh mgd_cnvload_all_quarters.sh GROUPC RUNID CONV
+    condition:       s(CNV_MGD_MS_CAPITATIONS_L_B_CONV)
+    description:     "Load the converted data to the customer database"
+
+    /* ----------------- CNV_MGD_MS_CAPITATIONS_L_D_CONV ----------------- */
+
+    insert_job:      CNV_MGD_MS_CAPITATIONS_L_D_CONV
+    job_type:        c
+    box_name:        CNV_MGD_MS_CAPITATIONS_L
+    command:         cnv_autojob.sh mgd_cnvload_all_quarters.sh GROUPD RUNID CONV
+    condition:       s(CNV_MGD_MS_CAPITATIONS_L_C_CONV)
+    description:     "Load the converted data to the customer database"
+
+    /* ----------------- CNV_MGD_MS_CAPITATIONS_M ----------------- */
+
+    insert_job:      CNV_MGD_MS_CAPITATIONS_M
+    job_type:        c
+    box_name:        CNV_MGD_MS_CAPITATIONS_L
+    command:         cnv_autojob.sh mgd_cnvm_all.sh RUNID replace
+    condition:       s(CNV_MGD_MS_CAPITATIONS_L_D_CONV)
+    description:     "Load all message files for CNV_MGD_MS_CAPITATIONS"
+
+   /* ----------------- CNV_MGD_MS_CAP_SUMMARY ----------------- */
+
+   insert_job:      CNV_MGD_MS_CAP_SUMMARY
+   job_type:        b
+   box_name:        CNV_MGD_MS_CAPITATIONS
+   condition:       s(CNV_MGD_MS_CAPITATIONS_M)
+   description:     "Control the MGD_ms_cap_summary conversion"
+
+    /* ----------------- CNV_MGD_MS_CAP_SUMMARY_S ----------------- */
+
+    insert_job:      CNV_MGD_MS_CAP_SUMMARY_S
+    job_type:        c
+    box_name:        CNV_MGD_MS_CAP_SUMMARY
+    command:         cnv_autojob.sh cnvs
+    condition:       s(CNV_MGD_MS_CAPITATIONS_M)
+    description:     "Unload data for the MGD_MS_CAP_SUMMARY conversion"
+
+    /* ----------------- CNV_MGD_MS_CAP_SUMMARY_J ----------------- */
+
+    insert_job:      CNV_MGD_MS_CAP_SUMMARY_J
+    job_type:        c
+    box_name:        CNV_MGD_MS_CAP_SUMMARY
+    command:         cnv_autojob.sh cnvj RUNID
+    condition:       s(CNV_MGD_MS_CAP_SUMMARY_S)
+    description:     "CAP SUMMARY conversion"
+
+    /* ----------------- CNV_MGD_MS_CAP_SUMMARY_N ----------------- */
+
+    insert_job:      CNV_MGD_MS_CAP_SUMMARY_N
+    job_type:        c
+    box_name:        CNV_MGD_MS_CAP_SUMMARY
+    command:         cnv_autojob.sh cnvn RUNID
+    condition:       s(CNV_MGD_MS_CAP_SUMMARY_J)
+    description:     "Runs NULL NINJA to check for invalid characters"
+
+    /* ----------------- CNV_MGD_MS_CAP_SUMMARY_L_CONV ----------------- */
+
+    insert_job:      CNV_MGD_MS_CAP_SUMMARY_L_CONV
+    job_type:        c
+    box_name:        CNV_MGD_MS_CAP_SUMMARY
+    command:         cnv_autojob.sh cnvl RUNID CONV
+    condition:       s(CNV_MGD_MS_CAP_SUMMARY_N)
+    description:     "Load the converted data to the customer database"
+
+    /* ----------------- CNV_MGD_MS_CAP_SUMMARY_M ----------------- */
+
+    insert_job:      CNV_MGD_MS_CAP_SUMMARY_M
+    job_type:        c
+    box_name:        CNV_MGD_MS_CAP_SUMMARY
+    command:         cnv_autojob.sh cnvm RUNID replace
+    condition:       s(CNV_MGD_MS_CAP_SUMMARY_L_CONV)
+    description:     "Load messages to CUST database for CNV_MGD_MS_CAP_SUMMARY"
+
+    /* ----------------- CNV_MGD_MS_CAP_SUMMARY_F ----------------- */
+
+    insert_job:      CNV_MGD_MS_CAP_SUMMARY_F
+    job_type:        c
+    box_name:        CNV_MGD_MS_CAP_SUMMARY
+    command:         cnv_autojob.sh cnvf RUNID mgd
+    condition:       s(CNV_MGD_MS_CAP_SUMMARY_M)
+    description:     "Create the FASR for CNV_MGD_MS_CAP_SUMMARY"
+
+  /* ----------------- CNV_MGD_MS_MCO_PROVIDERS ----------------- */
+
+  insert_job:      CNV_MGD_MS_MCO_PROVIDERS
+  job_type:        b
+  box_name:        CNV_MGD
+  condition:       s(CNV_MGD_MS_CAP_SUMMARY_F)
+  description:     "Control the mgd_ms_mco_providers conversion"
+
+   /* ----------------- CNV_MGD_MS_MCO_PROVIDERS_H ----------------- */
+
+   insert_job:      CNV_MGD_MS_MCO_PROVIDERS_H
+   job_type:        c
+   box_name:        CNV_MGD_MS_MCO_PROVIDERS
+   command:         cnv_autojob.sh cnvh
+   condition:       s(CNV_MGD_MS_CAP_SUMMARY_F)
+   description:     "Create .out files for dataload.sh and build local lookups"
+
+   /* ----------------- CNV_MGD_MS_MCO_PROVIDERS_J ----------------- */
+
+   insert_job:      CNV_MGD_MS_MCO_PROVIDERS_J
+   job_type:        c
+   box_name:        CNV_MGD_MS_MCO_PROVIDERS
+   command:         cnv_autojob.sh cnvj RUNID
+   condition:       s(CNV_MGD_MS_MCO_PROVIDERS_H)
+   description:     "Perform the mgd_ms_mco_providers conversion"
+
+   /* ----------------- CNV_MGD_MS_MCO_PROVIDERS_N ----------------- */
+
+   insert_job:      CNV_MGD_MS_MCO_PROVIDERS_N
+   job_type:        c
+   box_name:        CNV_MGD_MS_MCO_PROVIDERS
+   command:         cnv_autojob.sh cnvn RUNID
+   condition:       s(CNV_MGD_MS_MCO_PROVIDERS_J)
+   description:     "Runs NULL NINJA to check for invalid characters"
+
+   /* ----------------- CNV_MGD_MS_MCO_PROVIDERS_L_CONV ----------------- */
+
+   insert_job:      CNV_MGD_MS_MCO_PROVIDERS_L_CONV
+   job_type:        c
+   box_name:        CNV_MGD_MS_MCO_PROVIDERS
+   command:         cnv_autojob.sh cnvl RUNID CONV
+   condition:       s(CNV_MGD_MS_MCO_PROVIDERS_N)
+   description:     "Load the converted data to the conversion database"
+
+   /* ----------------- CNV_MGD_MS_MCO_PROVIDERS_M ----------------- */
+
+   insert_job:      CNV_MGD_MS_MCO_PROVIDERS_M
+   job_type:        c
+   box_name:        CNV_MGD_MS_MCO_PROVIDERS
+   command:         cnv_autojob.sh cnvm RUNID
+   condition:       s(CNV_MGD_MS_MCO_PROVIDERS_L_CONV)
+   description:     "Load messages to CUST database for CNV_MGD_MS_MCO_PROVIDERS"
+
+   /* ----------------- CNV_MGD_MS_MCO_PROVIDERS_F ----------------- */
+
+   insert_job:      CNV_MGD_MS_MCO_PROVIDERS_F
+   job_type:        c
+   box_name:        CNV_MGD_MS_MCO_PROVIDERS
+   command:         cnv_autojob.sh cnvf RUNID mgd
+   condition:       s(CNV_MGD_MS_MCO_PROVIDERS_M)
+   description:     "Create the FASR for CNV_MGD_MS_MCO_PROVIDERS"
+
+  /* ----------------- CNV_MGD_MS_REBUILD_INDEXES ----------------- */
+
+  insert_job:      CNV_MGD_MS_REBUILD_INDEXES
+  job_type:        b
+  box_name:        CNV_MGD
+  condition:       s(CNV_MGD_MS_ASSIGNMENT_L_CONV) & s(CNV_MGD_MS_CAPITATIONS_L) & s(CNV_MGD_MS_CAP_SUMMARY_L_CONV) & s(CNV_MGD_MS_MCO_PROVIDERS_L_CONV)
+  description:     "CHECK AND REBUILD INDEXES AFTER LOADS"
+
+   /* ----------------- CNV_MGD_MS_REBUILD_ALL_INDEXES_CONV ----------------- */
+
+   insert_job:      CNV_MGD_MS_REBUILD_ALL_INDEXES_CONV
+   job_type:        c
+   box_name:        CNV_MGD_MS_REBUILD_INDEXES
+   command:         cnv_autojob.sh mgd_rebuild_indexes.sh -d CONV
+   condition:       s(CNV_MGD_MS_ASSIGNMENT_L_CONV) & s(CNV_MGD_MS_CAPITATIONS_L) & s(CNV_MGD_MS_CAP_SUMMARY_L_CONV) & s(CNV_MGD_MS_MCO_PROVIDERS_L_CONV)
+   description:     "Rebuild any indexes and enable any constraints that need it"
+
+ /* ----------------- CNV_RBT ----------------- */
+
+ insert_job:      CNV_RBT
+ job_type:        b
+ box_name:        MS_CONV_CYCLE
+ condition:       s(CNV_REF_MS_SHARED_LOOKUP_H)
+ description:     "Drug Rebate conversion"
+
+  /* ----------------- CNV_RBT_PRESAK ----------------- */
+
+  insert_job:      CNV_RBT_PRESAK
+  job_type:        b
+  box_name:        CNV_RBT
+  condition:       s(CNV_REF_MS_SHARED_LOOKUP_H)
+  description:     "Drug rebate presak"
+
+   /* ----------------- CNV_RBT_PRESAK_J ----------------- */
+
+   insert_job:      CNV_RBT_PRESAK_J
+   job_type:        c
+   box_name:        CNV_RBT_PRESAK
+   command:         cnv_autojob.sh cnvjrbt_saking.sh CUST
+   condition:       s(CNV_REF_MS_SHARED_LOOKUP_H)
+   description:     "Drug rebate presak"
+
+  /* ----------------- CNV_RBT_SHARED_LOOKUP ----------------- */
+
+  insert_job:      CNV_RBT_SHARED_LOOKUP
+  job_type:        b
+  box_name:        CNV_RBT
+  condition:       s(CNV_RBT_PRESAK_J)
+  description:     "Drug rebate presak"
+
+   /* ----------------- CNV_RBT_SHARED_LOOKUP_H ----------------- */
+
+   insert_job:      CNV_RBT_SHARED_LOOKUP_H
+   job_type:        c
+   box_name:        CNV_RBT_SHARED_LOOKUP
+   command:         cnv_autojob.sh cnvh
+   condition:       s(CNV_RBT_PRESAK_J)
+   description:     "Rebate shared lookup"
+
+  /* ----------------- CNV_RBT_MS_MASTER ----------------- */
+
+  insert_job:      CNV_RBT_MS_MASTER
+  job_type:        b
+  box_name:        CNV_RBT
+  description:     "Drug Rebate master"
+
+   /* ----------------- CNV_RBT_MS_MASTER_S ----------------- */
+
+   insert_job:      CNV_RBT_MS_MASTER_S
+   job_type:        c
+   box_name:        CNV_RBT_MS_MASTER
+   command:         cnv_autojob.sh cnvs
+   condition:       s(CNV_RBT_SHARED_LOOKUP_H)
+   description:     "source Unload"
+
+   /* ----------------- CNV_RBT_MS_MASTER_H ----------------- */
+
+   insert_job:      CNV_RBT_MS_MASTER_H
+   job_type:        c
+   box_name:        CNV_RBT_MS_MASTER
+   command:         cnv_autojob.sh cnvh
+   condition:       s(CNV_RBT_MS_MASTER_S)
+   description:     "BDB Unload"
+
+   /* ----------------- CNV_RBT_MS_MASTER_J ----------------- */
+
+   insert_job:      CNV_RBT_MS_MASTER_J
+   job_type:        c
+   box_name:        CNV_RBT_MS_MASTER
+   command:         cnv_autojob.sh cnvj RUNID
+   condition:       s(CNV_RBT_MS_MASTER_H)
+   description:     "Job"
+
+   /* ----------------- CNV_RBT_MS_MASTER_N ----------------- */
+
+   insert_job:      CNV_RBT_MS_MASTER_N
+   job_type:        c
+   box_name:        CNV_RBT_MS_MASTER
+   command:         cnv_autojob.sh cnvn RUNID
+   condition:       s(CNV_RBT_MS_MASTER_J)
+   description:     "Check for null fields"
+
+   /* ----------------- CNV_RBT_MS_MASTER_L_CONV ----------------- */
+
+   insert_job:      CNV_RBT_MS_MASTER_L_CONV
+   job_type:        c
+   box_name:        CNV_RBT_MS_MASTER
+   command:         cnv_autojob.sh cnvl RUNID CONV
+   condition:       s(CNV_RBT_MS_MASTER_N)
+   description:     "Load"
+
+   /* ----------------- CNV_RBT_MS_MASTER_F ----------------- */
+
+   insert_job:      CNV_RBT_MS_MASTER_F
+   job_type:        c
+   box_name:        CNV_RBT_MS_MASTER
+   command:         cnv_autojob.sh cnvf RUNID rbt
+   condition:       s(CNV_RBT_MS_MASTER_L_CONV)
+   description:     "FASR"
+
+   /* ----------------- CNV_RBT_MS_MASTER_M ----------------- */
+
+   insert_job:      CNV_RBT_MS_MASTER_M
+   job_type:        c
+   box_name:        CNV_RBT_MS_MASTER
+   command:         cnv_autojob.sh cnvm RUNID
+   condition:       s(CNV_RBT_MS_MASTER_J)
+   description:     "Message load"
+
+ /* ----------------- CNV_PAU ----------------- */
+
+ insert_job:      CNV_PAU
+ job_type:        b
+ box_name:        MS_CONV_CYCLE
+ condition:       s(CNV_REF_MS_SHARED_LOOKUP_H) & s(CNV_PRV_MS_SHARED_LOOKUP_H) & s(CNV_MBR_MS_SHARED_LOOKUP_H)
+ description:     "PA conversion"
+
+  /* ----------------- CNV_PAU_PRESAK ----------------- */
+
+  insert_job:      CNV_PAU_PRESAK
+  job_type:        b
+  box_name:        CNV_PAU
+  condition:       s(CNV_REF_MS_SHARED_LOOKUP_H) & s(CNV_PRV_MS_SHARED_LOOKUP_H) & s(CNV_MBR_MS_SHARED_LOOKUP_H)
+  description:     "PA Presak"
+
+   /* ----------------- CNV_PAU_PRESAK_J ----------------- */
+
+   insert_job:      CNV_PAU_PRESAK_J
+   job_type:        c
+   box_name:        CNV_PAU_PRESAK
+   command:         cnv_autojob.sh cnvjpau_saking.sh RUNID
+   condition:       s(CNV_REF_MS_SHARED_LOOKUP_H) & s(CNV_PRV_MS_SHARED_LOOKUP_H) & s(CNV_MBR_MS_SHARED_LOOKUP_H)
+   description:     "Presaking for PA"
+
+  /* ----------------- CNV_PAU_LOCAL_LOOKUP ----------------- */
+
+  insert_job:      CNV_PAU_LOCAL_LOOKUP
+  job_type:        b
+  box_name:        CNV_PAU
+  condition:       s(CNV_PAU_PRESAK_J)
+  description:     "PA local lookup"
+
+   /* ----------------- CNV_PAU_LOCAL_LOOKUP_H ----------------- */
+
+   insert_job:      CNV_PAU_LOCAL_LOOKUP_H
+   job_type:        c
+   box_name:        CNV_PAU_LOCAL_LOOKUP
+   command:         cnv_autojob.sh cnvh
+   condition:       s(CNV_PAU_PRESAK_J)
+   description:     "bdb Unload"
+
+  /* ----------------- CNV_PAU_MS_MASTER ----------------- */
+
+  insert_job:      CNV_PAU_MS_MASTER
+  job_type:        b
+  box_name:        CNV_PAU
+  description:     "PA Master"
+
+   /* ----------------- CNV_PAU_MS_MASTER_S ----------------- */
+
+   insert_job:      CNV_PAU_MS_MASTER_S
+   job_type:        c
+   box_name:        CNV_PAU_MS_MASTER
+   command:         cnv_autojob.sh cnvs
+   condition:       s(CNV_PAU_LOCAL_LOOKUP_H)
+   description:     "source Unload"
+
+   /* ----------------- CNV_PAU_MS_MASTER_H ----------------- */
+
+   insert_job:      CNV_PAU_MS_MASTER_H
+   job_type:        c
+   box_name:        CNV_PAU_MS_MASTER
+   command:         cnv_autojob.sh cnvh
+   condition:       s(CNV_PAU_MS_MASTER_S)
+   description:     "BDB Unload"
+
+   /* ----------------- CNV_PAU_MS_MASTER_J ----------------- */
+
+   insert_job:      CNV_PAU_MS_MASTER_J
+   job_type:        c
+   box_name:        CNV_PAU_MS_MASTER
+   command:         cnv_autojob.sh cnvj RUNID
+   condition:       s(CNV_PAU_MS_MASTER_H)
+   description:     "Job"
+
+   /* ----------------- CNV_PAU_MS_MASTER_N ----------------- */
+
+   insert_job:      CNV_PAU_MS_MASTER_N
+   job_type:        c
+   box_name:        CNV_PAU_MS_MASTER
+   command:         cnv_autojob.sh cnvn RUNID
+   condition:       s(CNV_PAU_MS_MASTER_J)
+   description:     "Check for null fields"
+
+   /* ----------------- CNV_PAU_MS_MASTER_L_CONV ----------------- */
+
+   insert_job:      CNV_PAU_MS_MASTER_L_CONV
+   job_type:        c
+   box_name:        CNV_PAU_MS_MASTER
+   command:         cnv_autojob.sh cnvl RUNID CONV
+   condition:       s(CNV_PAU_MS_MASTER_N)
+   description:     "Load"
+
+   /* ----------------- CNV_PAU_MS_MASTER_F ----------------- */
+
+   insert_job:      CNV_PAU_MS_MASTER_F
+   job_type:        c
+   box_name:        CNV_PAU_MS_MASTER
+   command:         cnv_autojob.sh cnvf RUNID pau
+   condition:       s(CNV_PAU_MS_MASTER_L_CONV)
+   description:     "FASR"
+
+  /* ----------------- CNV_PAU_MS_PBM ----------------- */
+
+  insert_job:      CNV_PAU_MS_PBM
+  job_type:        b
+  box_name:        CNV_PAU
+  condition:       s(CNV_PAU_MS_MASTER_F)
+  description:     "PA PBM Conversion"
+
+   /* ----------------- CNV_PAU_MS_PBM_S ----------------- */
+
+   insert_job:      CNV_PAU_MS_PBM_S
+   job_type:        c
+   box_name:        CNV_PAU_MS_PBM
+   command:         cnv_autojob.sh cnvs
+   condition:       s(CNV_PAU_MS_MASTER_F)
+   description:     "source Unload"
+
+   /* ----------------- CNV_PAU_MS_PBM_H ----------------- */
+
+   insert_job:      CNV_PAU_MS_PBM_H
+   job_type:        c
+   box_name:        CNV_PAU_MS_PBM
+   command:         cnv_autojob.sh cnvh
+   condition:       s(CNV_PAU_MS_PBM_S)
+   description:     "BDB Unload"
+
+   /* ----------------- CNV_PAU_MS_PBM_J ----------------- */
+
+   insert_job:      CNV_PAU_MS_PBM_J
+   job_type:        c
+   box_name:        CNV_PAU_MS_PBM
+   command:         cnv_autojob.sh cnvj RUNID
+   condition:       s(CNV_PAU_MS_PBM_H)
+   description:     "Job"
+
+   /* ----------------- CNV_PAU_MS_PBM_N ----------------- */
+
+   insert_job:      CNV_PAU_MS_PBM_N
+   job_type:        c
+   box_name:        CNV_PAU_MS_PBM
+   command:         cnv_autojob.sh cnvn RUNID
+   condition:       s(CNV_PAU_MS_PBM_J)
+   description:     "Check for null fields"
+
+   /* ----------------- CNV_PAU_MS_PBM_L_CONV ----------------- */
+
+   insert_job:      CNV_PAU_MS_PBM_L_CONV
+   job_type:        c
+   box_name:        CNV_PAU_MS_PBM
+   command:         cnv_autojob.sh cnvl RUNID CONV
+   condition:       s(CNV_PAU_MS_PBM_N)
+   description:     "Load"
+
+   /* ----------------- CNV_PAU_MS_PBM_F ----------------- */
+
+   insert_job:      CNV_PAU_MS_PBM_F
+   job_type:        c
+   box_name:        CNV_PAU_MS_PBM
+   command:         cnv_autojob.sh cnvf RUNID pau
+   condition:       s(CNV_PAU_MS_PBM_L_CONV)
+   description:     "FASR"
+
+  /* ----------------- CNV_PAU_SHARED_LOOKUP ----------------- */
+
+  insert_job:      CNV_PAU_SHARED_LOOKUP
+  job_type:        b
+  box_name:        CNV_PAU
+  condition:       s(CNV_PAU_MS_PBM_F)
+  description:     "PA shared lookup"
+
+   /* ----------------- CNV_PAU_SHARED_LOOKUP_H ----------------- */
+
+   insert_job:      CNV_PAU_SHARED_LOOKUP_H
+   job_type:        c
+   box_name:        CNV_PAU_SHARED_LOOKUP
+   command:         cnv_autojob.sh cnvh
+   condition:       s(CNV_PAU_MS_PBM_F)
+   description:     "BDB Unload"
+
+  /* ----------------- CNV_PAU_MS_MSG ----------------- */
+
+  insert_job:      CNV_PAU_MS_MSG
+  job_type:        b
+  box_name:        CNV_PAU
+  condition:       s(CNV_PAU_MS_MASTER_J)
+  description:     "PA Messages"
+
+   /* ----------------- CNV_PAU_MS_MASTER_M ----------------- */
+
+   insert_job:      CNV_PAU_MS_MASTER_M
+   job_type:        c
+   box_name:        CNV_PAU_MS_MSG
+   command:         cnv_autojob.sh cnvm RUNID
+   condition:       s(CNV_PAU_MS_MASTER_J)
+   description:     "Load messages"
+
+   /* ----------------- CNV_PAU_MS_PBM_M ----------------- */
+
+   insert_job:      CNV_PAU_MS_PBM_M
+   job_type:        c
+   box_name:        CNV_PAU_MS_MSG
+   command:         cnv_autojob.sh cnvm RUNID
+   condition:       s(CNV_PAU_MS_PBM_J)
+   description:     "Load messages"
+
+ /* ----------------- CNV_TPL_PART1 ----------------- */
+
+ insert_job:      CNV_TPL_PART1
+ job_type:        b
+ box_name:        MS_CONV_CYCLE
+ condition:       s(CNV_ALL_COPY_MANUAL)
+ description:     "TPL Conversion"
+
+  /* ----------------- CNV_TPL_PRESAK ----------------- */
+
+  insert_job:      CNV_TPL_PRESAK
+  job_type:        b
+  box_name:        CNV_TPL_PART1
+  condition:       s(CNV_ALL_COPY_MANUAL)
+  description:     "TPL presak"
+
+   /* ----------------- CNV_TPL_PRESAK_J ----------------- */
+
+   insert_job:      CNV_TPL_PRESAK_J
+   job_type:        c
+   box_name:        CNV_TPL_PRESAK
+   command:         cnv_autojob.sh cnvj
+   condition:       s(CNV_ALL_COPY_MANUAL)
+   description:     "presak job"
+
+  /* ----------------- CNV_TPL_SHARED_LOOKUP ----------------- */
+
+  insert_job:      CNV_TPL_SHARED_LOOKUP
+  job_type:        b
+  box_name:        CNV_TPL_PART1
+  condition:       s(CNV_TPL_PRESAK_J)
+  description:     "Shared lookup"
+
+   /* ----------------- CNV_TPL_SHARED_LOOKUP_H ----------------- */
+
+   insert_job:      CNV_TPL_SHARED_LOOKUP_H
+   job_type:        c
+   box_name:        CNV_TPL_SHARED_LOOKUP
+   command:         cnv_autojob.sh cnvh
+   condition:       s(CNV_TPL_PRESAK_J)
+   description:     "bdb Unload"
+
+  /* ----------------- CNV_TPL_MS_CARRIER ----------------- */
+
+  insert_job:      CNV_TPL_MS_CARRIER
+  job_type:        b
+  box_name:        CNV_TPL_PART1
+  condition:       s(CNV_TPL_SHARED_LOOKUP_H)
+  description:     "Carrier"
+
+   /* ----------------- CNV_TPL_MS_CARRIER_S ----------------- */
+
+   insert_job:      CNV_TPL_MS_CARRIER_S
+   job_type:        c
+   box_name:        CNV_TPL_MS_CARRIER
+   command:         cnv_autojob.sh cnvs
+   condition:       s(CNV_REF_MS_SHARED_LOOKUP_H)
+   description:     "source Unload"
+
+   /* ----------------- CNV_TPL_MS_CARRIER_H ----------------- */
+
+   insert_job:      CNV_TPL_MS_CARRIER_H
+   job_type:        c
+   box_name:        CNV_TPL_MS_CARRIER
+   command:         cnv_autojob.sh cnvh
+   condition:       s(CNV_TPL_MS_CARRIER_S)
+   description:     "BDB Unload"
+
+   /* ----------------- CNV_TPL_MS_CARRIER_J ----------------- */
+
+   insert_job:      CNV_TPL_MS_CARRIER_J
+   job_type:        c
+   box_name:        CNV_TPL_MS_CARRIER
+   command:         cnv_autojob.sh cnvj RUNID
+   condition:       s(CNV_TPL_MS_CARRIER_H)
+   description:     "Job"
+
+   /* ----------------- CNV_TPL_MS_CARRIER_N ----------------- */
+
+   insert_job:      CNV_TPL_MS_CARRIER_N
+   job_type:        c
+   box_name:        CNV_TPL_MS_CARRIER
+   command:         cnv_autojob.sh cnvn RUNID
+   condition:       s(CNV_TPL_MS_CARRIER_J)
+   description:     "Check for null fields"
+
+   /* ----------------- CNV_TPL_MS_CARRIER_L_CONV ----------------- */
+
+   insert_job:      CNV_TPL_MS_CARRIER_L_CONV
+   job_type:        c
+   box_name:        CNV_TPL_MS_CARRIER
+   command:         cnv_autojob.sh cnvl RUNID CONV
+   condition:       s(CNV_TPL_MS_CARRIER_N)
+   description:     "Load"
+
+   /* ----------------- CNV_TPL_MS_CARRIER_F ----------------- */
+
+   insert_job:      CNV_TPL_MS_CARRIER_F
+   job_type:        c
+   box_name:        CNV_TPL_MS_CARRIER
+   command:         cnv_autojob.sh cnvf RUNID tpl
+   condition:       s(CNV_TPL_MS_CARRIER_L_CONV)
+   description:     "FASR"
+
+   /* ----------------- CNV_TPL_MS_CARRIER_M ----------------- */
+
+   insert_job:      CNV_TPL_MS_CARRIER_M
+   job_type:        c
+   box_name:        CNV_TPL_MS_CARRIER
+   command:         cnv_autojob.sh cnvm RUNID
+   condition:       s(CNV_TPL_MS_CARRIER_F)
+   description:     "Load messages"
+
+  /* ----------------- CNV_TPL_MS_RESOURCE ----------------- */
+
+  insert_job:      CNV_TPL_MS_RESOURCE
+  job_type:        b
+  box_name:        CNV_TPL_PART1
+  condition:       s(CNV_REF_MS_SHARED_LOOKUP_H) & s(CNV_MBR_MS_SHARED_LOOKUP_H)
+  description:     "Resource"
+
+   /* ----------------- CNV_TPL_MS_RESOURCE_S ----------------- */
+
+   insert_job:      CNV_TPL_MS_RESOURCE_S
+   job_type:        c
+   box_name:        CNV_TPL_MS_RESOURCE
+   command:         cnv_autojob.sh cnvs
+   condition:       s(CNV_REF_MS_SHARED_LOOKUP_H) & s(CNV_MBR_MS_SHARED_LOOKUP_H)
+   description:     "source Unload"
+
+   /* ----------------- CNV_TPL_MS_RESOURCE_H ----------------- */
+
+   insert_job:      CNV_TPL_MS_RESOURCE_H
+   job_type:        c
+   box_name:        CNV_TPL_MS_RESOURCE
+   command:         cnv_autojob.sh cnvh
+   condition:       s(CNV_TPL_MS_RESOURCE_S)
+   description:     "BDB Unload"
+
+   /* ----------------- CNV_TPL_MS_RESOURCE_J ----------------- */
+
+   insert_job:      CNV_TPL_MS_RESOURCE_J
+   job_type:        c
+   box_name:        CNV_TPL_MS_RESOURCE
+   command:         cnv_autojob.sh cnvj RUNID
+   condition:       s(CNV_TPL_MS_RESOURCE_H)
+   description:     "Job"
+
+   /* ----------------- CNV_TPL_MS_RESOURCE_N ----------------- */
+
+   insert_job:      CNV_TPL_MS_RESOURCE_N
+   job_type:        c
+   box_name:        CNV_TPL_MS_RESOURCE
+   command:         cnv_autojob.sh cnvn RUNID
+   condition:       s(CNV_TPL_MS_RESOURCE_J)
+   description:     "Check for null fields"
+
+   /* ----------------- CNV_TPL_MS_RESOURCE_L_CONV ----------------- */
+
+   insert_job:      CNV_TPL_MS_RESOURCE_L_CONV
+   job_type:        c
+   box_name:        CNV_TPL_MS_RESOURCE
+   command:         cnv_autojob.sh cnvl RUNID CONV
+   condition:       s(CNV_TPL_MS_RESOURCE_N)
+   description:     "Load"
+
+   /* ----------------- CNV_TPL_MS_RESOURCE_F ----------------- */
+
+   insert_job:      CNV_TPL_MS_RESOURCE_F
+   job_type:        c
+   box_name:        CNV_TPL_MS_RESOURCE
+   command:         cnv_autojob.sh cnvf RUNID tpl
+   condition:       s(CNV_TPL_MS_RESOURCE_L_CONV)
+   description:     "FASR"
+
+   /* ----------------- CNV_TPL_MS_RESOURCE_M ----------------- */
+
+   insert_job:      CNV_TPL_MS_RESOURCE_M
+   job_type:        c
+   box_name:        CNV_TPL_MS_RESOURCE
+   command:         cnv_autojob.sh cnvm RUNID
+   condition:       s(CNV_TPL_MS_RESOURCE_F)
+   description:     "Load messages"
+
+  /* ----------------- CNV_TPL_MS_MSQ ----------------- */
+
+  insert_job:      CNV_TPL_MS_MSQ
+  job_type:        b
+  box_name:        CNV_TPL_PART1
+  condition:       s(CNV_REF_MS_SHARED_LOOKUP_H) & s(CNV_MBR_MS_SHARED_LOOKUP_H)
+  description:     "MSQ"
+
+   /* ----------------- CNV_TPL_MS_MSQ_S ----------------- */
+
+   insert_job:      CNV_TPL_MS_MSQ_S
+   job_type:        c
+   box_name:        CNV_TPL_MS_MSQ
+   command:         cnv_autojob.sh cnvs
+   condition:       s(CNV_REF_MS_SHARED_LOOKUP_H) & s(CNV_MBR_MS_SHARED_LOOKUP_H)
+   description:     "source Unload"
+
+   /* ----------------- CNV_TPL_MS_MSQ_H ----------------- */
+
+   insert_job:      CNV_TPL_MS_MSQ_H
+   job_type:        c
+   box_name:        CNV_TPL_MS_MSQ
+   command:         cnv_autojob.sh cnvh
+   condition:       s(CNV_TPL_MS_MSQ_S)
+   description:     "BDB Unload"
+
+   /* ----------------- CNV_TPL_MS_MSQ_J ----------------- */
+
+   insert_job:      CNV_TPL_MS_MSQ_J
+   job_type:        c
+   box_name:        CNV_TPL_MS_MSQ
+   command:         cnv_autojob.sh cnvj RUNID
+   condition:       s(CNV_TPL_MS_MSQ_H)
+   description:     "Job"
+
+   /* ----------------- CNV_TPL_MS_MSQ_N ----------------- */
+
+   insert_job:      CNV_TPL_MS_MSQ_N
+   job_type:        c
+   box_name:        CNV_TPL_MS_MSQ
+   command:         cnv_autojob.sh cnvn RUNID
+   condition:       s(CNV_TPL_MS_MSQ_J)
+   description:     "Check for null fields"
+
+   /* ----------------- CNV_TPL_MS_MSQ_L_CONV ----------------- */
+
+   insert_job:      CNV_TPL_MS_MSQ_L_CONV
+   job_type:        c
+   box_name:        CNV_TPL_MS_MSQ
+   command:         cnv_autojob.sh cnvl RUNID CONV
+   condition:       s(CNV_TPL_MS_MSQ_N)
+   description:     "Load"
+
+   /* ----------------- CNV_TPL_MS_MSQ_F ----------------- */
+
+   insert_job:      CNV_TPL_MS_MSQ_F
+   job_type:        c
+   box_name:        CNV_TPL_MS_MSQ
+   command:         cnv_autojob.sh cnvf RUNID tpl
+   condition:       s(CNV_TPL_MS_MSQ_L_CONV)
+   description:     "FASR"
+
+   /* ----------------- CNV_TPL_MS_MSQ_M ----------------- */
+
+   insert_job:      CNV_TPL_MS_MSQ_M
+   job_type:        c
+   box_name:        CNV_TPL_MS_MSQ
+   command:         cnv_autojob.sh cnvm RUNID
+   condition:       s(CNV_TPL_MS_MSQ_F)
+   description:     "Load messages"
+
+ /* ----------------- CNV_FIN_PART1 ----------------- */
+
+ insert_job:      CNV_FIN_PART1
+ job_type:        b
+ box_name:        MS_CONV_CYCLE
+ description:     "FIN conversion"
+ auto_hold:       1
+
+  /* ----------------- CNV_FIN_MS_PRESAK ----------------- */
+
+  insert_job:      CNV_FIN_MS_PRESAK
+  job_type:        b
+  box_name:        CNV_FIN_PART1
+  description:     "FIN Presak part 1"
+  auto_hold:       1
+
+   /* ----------------- CNV_FIN_MS_PRESAK_CHECK_J ----------------- */
+
+   insert_job:      CNV_FIN_MS_PRESAK_CHECK_J
+   job_type:        c
+   box_name:        CNV_FIN_MS_PRESAK
+   command:         cnv_autojob.sh cnvjfin_check_saking.sh
+   condition:       s(CNV_ALL_COPY_MANUAL)
+   description:     "FIN Presak Check"
+   auto_hold:       1
+
+   /* ----------------- CNV_FIN_MS_PRESAK_CASH_J ----------------- */
+
+   insert_job:      CNV_FIN_MS_PRESAK_CASH_J
+   job_type:        c
+   box_name:        CNV_FIN_MS_PRESAK
+   command:         cnv_autojob.sh cnvjfin_cash_saking.sh
+   condition:       s(CNV_ALL_COPY_MANUAL)
+   description:     "FIN presak Cash"
+   auto_hold:       1
+
+  /* ----------------- CNV_FIN_SHARED_LOOKUP ----------------- */
+
+  insert_job:      CNV_FIN_SHARED_LOOKUP
+  job_type:        b
+  box_name:        CNV_FIN_PART1
+  condition:       s(CNV_FIN_MS_PRESAK_CASH_J)
+  description:     "Shared lookup"
+  auto_hold:       1
+
+   /* ----------------- CNV_FIN_SHARED_LOOKUP_S ----------------- */
+
+   insert_job:      CNV_FIN_SHARED_LOOKUP_S
+   job_type:        c
+   box_name:        CNV_FIN_SHARED_LOOKUP
+   command:         cnv_autojob.sh cnvs
+   condition:       s(CNV_FIN_MS_PRESAK_CASH_J)
+   description:     "source Unload"
+   auto_hold:       1
+
+   /* ----------------- CNV_FIN_SHARED_LOOKUP_H ----------------- */
+
+   insert_job:      CNV_FIN_SHARED_LOOKUP_H
+   job_type:        c
+   box_name:        CNV_FIN_SHARED_LOOKUP
+   command:         cnv_autojob.sh cnvh
+   condition:       s(CNV_FIN_SHARED_LOOKUP_S)
+   description:     "bdb Unload"
+   auto_hold:       1
+
+  /* ----------------- CNV_FIN_MS_UNLOAD_PART1 ----------------- */
+
+  insert_job:      CNV_FIN_MS_UNLOAD_PART1
+  job_type:        b
+  box_name:        CNV_FIN_PART1
+  condition:       s(CNV_FIN_SHARED_LOOKUP_H)
+  description:     "FIN Unload source part 1"
+  auto_hold:       1
+
+   /* ----------------- CNV_FIN_MS_CASH_RECEIPT_S ----------------- */
+
+   insert_job:      CNV_FIN_MS_CASH_RECEIPT_S
+   job_type:        c
+   box_name:        CNV_FIN_MS_UNLOAD_PART1
+   command:         cnv_autojob.sh cnvs
+   condition:       s(CNV_FIN_SHARED_LOOKUP_H)
+   description:     "source Unload"
+   auto_hold:       1
+
+   /* ----------------- CNV_FIN_MS_CHECK_S ----------------- */
+
+   insert_job:      CNV_FIN_MS_CHECK_S
+   job_type:        c
+   box_name:        CNV_FIN_MS_UNLOAD_PART1
+   command:         cnv_autojob.sh cnvs
+   condition:       s(CNV_FIN_MS_CASH_RECEIPT_S)
+   description:     "source Unload"
+   auto_hold:       1
+
+   /* ----------------- CNV_FIN_MS_1099_S ----------------- */
+
+   insert_job:      CNV_FIN_MS_1099_S
+   job_type:        c
+   box_name:        CNV_FIN_MS_UNLOAD_PART1
+   command:         cnv_autojob.sh cnvs
+   condition:       s(CNV_FIN_MS_CHECK_S)
+   description:     "source Unload"
+   auto_hold:       1
+
+   /* ----------------- CNV_FIN_MS_DF_COMPENSATION_S ----------------- */
+
+   insert_job:      CNV_FIN_MS_DF_COMPENSATION_S
+   job_type:        c
+   box_name:        CNV_FIN_MS_UNLOAD_PART1
+   command:         cnv_autojob.sh cnvs
+   condition:       s(CNV_FIN_MS_1099_S)
+   description:     "source Unload"
+   auto_hold:       1
+
+   /* ----------------- CNV_FIN_MS_PAYEE_S ----------------- */
+
+   insert_job:      CNV_FIN_MS_PAYEE_S
+   job_type:        c
+   box_name:        CNV_FIN_MS_UNLOAD_PART1
+   command:         cnv_autojob.sh cnvs
+   condition:       s(CNV_FIN_MS_DF_COMPENSATION_S)
+   description:     "source Unload"
+   auto_hold:       1
+
+   /* ----------------- CNV_FIN_MS_EXPENDITURE_S ----------------- */
+
+   insert_job:      CNV_FIN_MS_EXPENDITURE_S
+   job_type:        c
+   box_name:        CNV_FIN_MS_UNLOAD_PART1
+   command:         cnv_autojob.sh cnvs
+   condition:       s(CNV_FIN_MS_PAYEE_S)
+   description:     "source Unload"
+   auto_hold:       1
+
+   /* ----------------- CNV_FIN_MS_PYMT_WITHOLD_S ----------------- */
+
+   insert_job:      CNV_FIN_MS_PYMT_WITHOLD_S
+   job_type:        c
+   box_name:        CNV_FIN_MS_UNLOAD_PART1
+   command:         cnv_autojob.sh cnvs
+   condition:       s(CNV_FIN_MS_EXPENDITURE_S)
+   description:     "source Unload"
+   auto_hold:       1
+
+  /* ----------------- CNV_FIN_MS_CASH_RECEIPT ----------------- */
+
+  insert_job:      CNV_FIN_MS_CASH_RECEIPT
+  job_type:        b
+  box_name:        CNV_FIN_PART1
+  condition:       s(CNV_FIN_MS_PYMT_WITHOLD_S)
+  description:     "Cash Receipt"
+  auto_hold:       1
+
+   /* ----------------- CNV_FIN_MS_CASH_RECEIPT_H ----------------- */
+
+   insert_job:      CNV_FIN_MS_CASH_RECEIPT_H
+   job_type:        c
+   box_name:        CNV_FIN_MS_CASH_RECEIPT
+   command:         cnv_autojob.sh cnvh
+   condition:       s(CNV_FIN_MS_PYMT_WITHOLD_S)
+   description:     "BDB Unload"
+   auto_hold:       1
+
+   /* ----------------- CNV_FIN_MS_CASH_RECEIPT_J ----------------- */
+
+   insert_job:      CNV_FIN_MS_CASH_RECEIPT_J
+   job_type:        c
+   box_name:        CNV_FIN_MS_CASH_RECEIPT
+   command:         cnv_autojob.sh cnvj RUNID
+   condition:       s(CNV_FIN_MS_CASH_RECEIPT_H)
+   description:     "Job"
+   auto_hold:       1
+
+   /* ----------------- CNV_FIN_MS_CASH_RECEIPT_N ----------------- */
+
+   insert_job:      CNV_FIN_MS_CASH_RECEIPT_N
+   job_type:        c
+   box_name:        CNV_FIN_MS_CASH_RECEIPT
+   command:         cnv_autojob.sh cnvn RUNID
+   condition:       s(CNV_FIN_MS_CASH_RECEIPT_J)
+   description:     "Check for null fields"
+   auto_hold:       1
+
+   /* ----------------- CNV_FIN_MS_CASH_RECEIPT_L_CONV ----------------- */
+
+   insert_job:      CNV_FIN_MS_CASH_RECEIPT_L_CONV
+   job_type:        c
+   box_name:        CNV_FIN_MS_CASH_RECEIPT
+   command:         cnv_autojob.sh cnvl RUNID CONV
+   condition:       s(CNV_FIN_MS_CASH_RECEIPT_N)
+   description:     "Load"
+   auto_hold:       1
+
+   /* ----------------- CNV_FIN_MS_CASH_RECEIPT_F ----------------- */
+
+   insert_job:      CNV_FIN_MS_CASH_RECEIPT_F
+   job_type:        c
+   box_name:        CNV_FIN_MS_CASH_RECEIPT
+   command:         cnv_autojob.sh cnvf RUNID fin
+   condition:       s(CNV_FIN_MS_CASH_RECEIPT_L_CONV)
+   description:     "FASR"
+   auto_hold:       1
+
+  /* ----------------- CNV_FIN_MS_CHECK ----------------- */
+
+  insert_job:      CNV_FIN_MS_CHECK
+  job_type:        b
+  box_name:        CNV_FIN_PART1
+  condition:       s(CNV_FIN_MS_CASH_RECEIPT_F)
+  description:     "Check"
+  auto_hold:       1
+
+   /* ----------------- CNV_FIN_MS_CHECK_H ----------------- */
+
+   insert_job:      CNV_FIN_MS_CHECK_H
+   job_type:        c
+   box_name:        CNV_FIN_MS_CHECK
+   command:         cnv_autojob.sh cnvh
+   condition:       s(CNV_FIN_MS_CASH_RECEIPT_F)
+   description:     "BDB Unload"
+   auto_hold:       1
+
+   /* ----------------- CNV_FIN_MS_CHECK_J ----------------- */
+
+   insert_job:      CNV_FIN_MS_CHECK_J
+   job_type:        c
+   box_name:        CNV_FIN_MS_CHECK
+   command:         cnv_autojob.sh cnvj RUNID
+   condition:       s(CNV_FIN_MS_CHECK_H)
+   description:     "Job"
+   auto_hold:       1
+
+   /* ----------------- CNV_FIN_MS_CHECK_N ----------------- */
+
+   insert_job:      CNV_FIN_MS_CHECK_N
+   job_type:        c
+   box_name:        CNV_FIN_MS_CHECK
+   command:         cnv_autojob.sh cnvn RUNID
+   condition:       s(CNV_FIN_MS_CHECK_J)
+   description:     "Check for null fields"
+   auto_hold:       1
+
+   /* ----------------- CNV_FIN_MS_CHECK_L_CONV ----------------- */
+
+   insert_job:      CNV_FIN_MS_CHECK_L_CONV
+   job_type:        c
+   box_name:        CNV_FIN_MS_CHECK
+   command:         cnv_autojob.sh cnvl RUNID CONV
+   condition:       s(CNV_FIN_MS_CHECK_N)
+   description:     "Load"
+   auto_hold:       1
+
+   /* ----------------- CNV_FIN_MS_CHECK_F ----------------- */
+
+   insert_job:      CNV_FIN_MS_CHECK_F
+   job_type:        c
+   box_name:        CNV_FIN_MS_CHECK
+   command:         cnv_autojob.sh cnvf RUNID fin
+   condition:       s(CNV_FIN_MS_CHECK_L_CONV)
+   description:     "FASR"
+   auto_hold:       1
+
+  /* ----------------- CNV_FIN_MS_1099 ----------------- */
+
+  insert_job:      CNV_FIN_MS_1099
+  job_type:        b
+  box_name:        CNV_FIN_PART1
+  condition:       s(CNV_FIN_MS_CHECK_F)
+  description:     "Acct Rec"
+  auto_hold:       1
+
+   /* ----------------- CNV_FIN_MS_1099_H ----------------- */
+
+   insert_job:      CNV_FIN_MS_1099_H
+   job_type:        c
+   box_name:        CNV_FIN_MS_1099
+   command:         cnv_autojob.sh cnvh
+   condition:       s(CNV_FIN_MS_CHECK_F)
+   description:     "BDB Unload"
+   auto_hold:       1
+
+   /* ----------------- CNV_FIN_MS_1099_J ----------------- */
+
+   insert_job:      CNV_FIN_MS_1099_J
+   job_type:        c
+   box_name:        CNV_FIN_MS_1099
+   command:         cnv_autojob.sh cnvj RUNID
+   condition:       s(CNV_FIN_MS_1099_H)
+   description:     "Job"
+   auto_hold:       1
+
+   /* ----------------- CNV_FIN_MS_1099_N ----------------- */
+
+   insert_job:      CNV_FIN_MS_1099_N
+   job_type:        c
+   box_name:        CNV_FIN_MS_1099
+   command:         cnv_autojob.sh cnvn RUNID
+   condition:       s(CNV_FIN_MS_1099_J)
+   description:     "Check for null fields"
+   auto_hold:       1
+
+   /* ----------------- CNV_FIN_MS_1099_L_CONV ----------------- */
+
+   insert_job:      CNV_FIN_MS_1099_L_CONV
+   job_type:        c
+   box_name:        CNV_FIN_MS_1099
+   command:         cnv_autojob.sh cnvl RUNID CONV
+   condition:       s(CNV_FIN_MS_1099_N)
+   description:     "Load"
+   auto_hold:       1
+
+   /* ----------------- CNV_FIN_MS_1099_F ----------------- */
+
+   insert_job:      CNV_FIN_MS_1099_F
+   job_type:        c
+   box_name:        CNV_FIN_MS_1099
+   command:         cnv_autojob.sh cnvf RUNID fin
+   condition:       s(CNV_FIN_MS_1099_L_CONV)
+   description:     "FASR"
+   auto_hold:       1
+
+  /* ----------------- CNV_FIN_MS_DF_COMPENSATION ----------------- */
+
+  insert_job:      CNV_FIN_MS_DF_COMPENSATION
+  job_type:        b
+  box_name:        CNV_FIN_PART1
+  condition:       s(CNV_FIN_MS_1099_F)
+  description:     "Acct Rec"
+  auto_hold:       1
+
+   /* ----------------- CNV_FIN_MS_DF_COMPENSATION_H ----------------- */
+
+   insert_job:      CNV_FIN_MS_DF_COMPENSATION_H
+   job_type:        c
+   box_name:        CNV_FIN_MS_DF_COMPENSATION
+   command:         cnv_autojob.sh cnvh
+   condition:       s(CNV_FIN_MS_1099_F)
+   description:     "BDB Unload"
+   auto_hold:       1
+
+   /* ----------------- CNV_FIN_MS_DF_COMPENSATION_J ----------------- */
+
+   insert_job:      CNV_FIN_MS_DF_COMPENSATION_J
+   job_type:        c
+   box_name:        CNV_FIN_MS_DF_COMPENSATION
+   command:         cnv_autojob.sh cnvj RUNID
+   condition:       s(CNV_FIN_MS_DF_COMPENSATION_H)
+   description:     "Job"
+   auto_hold:       1
+
+   /* ----------------- CNV_FIN_MS_DF_COMPENSATION_N ----------------- */
+
+   insert_job:      CNV_FIN_MS_DF_COMPENSATION_N
+   job_type:        c
+   box_name:        CNV_FIN_MS_DF_COMPENSATION
+   command:         cnv_autojob.sh cnvn RUNID
+   condition:       s(CNV_FIN_MS_DF_COMPENSATION_J)
+   description:     "Check for null fields"
+   auto_hold:       1
+
+   /* ----------------- CNV_FIN_MS_DF_COMPENSATION_L_CONV ----------------- */
+
+   insert_job:      CNV_FIN_MS_DF_COMPENSATION_L_CONV
+   job_type:        c
+   box_name:        CNV_FIN_MS_DF_COMPENSATION
+   command:         cnv_autojob.sh cnvl RUNID CONV
+   condition:       s(CNV_FIN_MS_DF_COMPENSATION_N)
+   description:     "Load"
+   auto_hold:       1
+
+   /* ----------------- CNV_FIN_MS_DF_COMPENSATION_F ----------------- */
+
+   insert_job:      CNV_FIN_MS_DF_COMPENSATION_F
+   job_type:        c
+   box_name:        CNV_FIN_MS_DF_COMPENSATION
+   command:         cnv_autojob.sh cnvf RUNID fin
+   condition:       s(CNV_FIN_MS_DF_COMPENSATION_L_CONV)
+   description:     "FASR"
+   auto_hold:       1
+
+  /* ----------------- CNV_FIN_MS_PAYEE ----------------- */
+
+  insert_job:      CNV_FIN_MS_PAYEE
+  job_type:        b
+  box_name:        CNV_FIN_PART1
+  condition:       s(CNV_FIN_MS_DF_COMPENSATION_F)
+  description:     "Payee"
+  auto_hold:       1
+
+   /* ----------------- CNV_FIN_MS_PAYEE_H ----------------- */
+
+   insert_job:      CNV_FIN_MS_PAYEE_H
+   job_type:        c
+   box_name:        CNV_FIN_MS_PAYEE
+   command:         cnv_autojob.sh cnvh
+   condition:       s(CNV_FIN_MS_DF_COMPENSATION_F)
+   description:     "BDB Unload"
+   auto_hold:       1
+
+   /* ----------------- CNV_FIN_MS_PAYEE_J ----------------- */
+
+   insert_job:      CNV_FIN_MS_PAYEE_J
+   job_type:        c
+   box_name:        CNV_FIN_MS_PAYEE
+   command:         cnv_autojob.sh cnvj RUNID
+   condition:       s(CNV_FIN_MS_PAYEE_H)
+   description:     "Job"
+   auto_hold:       1
+
+   /* ----------------- CNV_FIN_MS_PAYEE_N ----------------- */
+
+   insert_job:      CNV_FIN_MS_PAYEE_N
+   job_type:        c
+   box_name:        CNV_FIN_MS_PAYEE
+   command:         cnv_autojob.sh cnvn RUNID
+   condition:       s(CNV_FIN_MS_PAYEE_J)
+   description:     "Check for null fields"
+   auto_hold:       1
+
+   /* ----------------- CNV_FIN_MS_PAYEE_L_CONV ----------------- */
+
+   insert_job:      CNV_FIN_MS_PAYEE_L_CONV
+   job_type:        c
+   box_name:        CNV_FIN_MS_PAYEE
+   command:         cnv_autojob.sh cnvl RUNID CONV
+   condition:       s(CNV_FIN_MS_PAYEE_N)
+   description:     "Load"
+   auto_hold:       1
+
+   /* ----------------- CNV_FIN_MS_PAYEE_F ----------------- */
+
+   insert_job:      CNV_FIN_MS_PAYEE_F
+   job_type:        c
+   box_name:        CNV_FIN_MS_PAYEE
+   command:         cnv_autojob.sh cnvf RUNID fin
+   condition:       s(CNV_FIN_MS_PAYEE_L_CONV)
+   description:     "FASR"
+   auto_hold:       1
+
+  /* ----------------- CNV_FIN_MS_EXPENDITURE ----------------- */
+
+  insert_job:      CNV_FIN_MS_EXPENDITURE
+  job_type:        b
+  box_name:        CNV_FIN_PART1
+  condition:       s(CNV_FIN_MS_PAYEE_F)
+  description:     "Expend"
+  auto_hold:       1
+
+   /* ----------------- CNV_FIN_MS_EXPENDITURE_H ----------------- */
+
+   insert_job:      CNV_FIN_MS_EXPENDITURE_H
+   job_type:        c
+   box_name:        CNV_FIN_MS_EXPENDITURE
+   command:         cnv_autojob.sh cnvh
+   condition:       s(CNV_FIN_MS_PAYEE_F)
+   description:     "BDB Unload"
+   auto_hold:       1
+
+   /* ----------------- CNV_FIN_MS_EXPENDITURE_J ----------------- */
+
+   insert_job:      CNV_FIN_MS_EXPENDITURE_J
+   job_type:        c
+   box_name:        CNV_FIN_MS_EXPENDITURE
+   command:         cnv_autojob.sh cnvj RUNID
+   condition:       s(CNV_FIN_MS_EXPENDITURE_H)
+   description:     "Job"
+   auto_hold:       1
+
+   /* ----------------- CNV_FIN_MS_EXPENDITURE_N ----------------- */
+
+   insert_job:      CNV_FIN_MS_EXPENDITURE_N
+   job_type:        c
+   box_name:        CNV_FIN_MS_EXPENDITURE
+   command:         cnv_autojob.sh cnvn RUNID
+   condition:       s(CNV_FIN_MS_EXPENDITURE_J)
+   description:     "Check for null fields"
+   auto_hold:       1
+
+   /* ----------------- CNV_FIN_MS_EXPENDITURE_L_CONV ----------------- */
+
+   insert_job:      CNV_FIN_MS_EXPENDITURE_L_CONV
+   job_type:        c
+   box_name:        CNV_FIN_MS_EXPENDITURE
+   command:         cnv_autojob.sh cnvl RUNID CONV
+   condition:       s(CNV_FIN_MS_EXPENDITURE_N)
+   description:     "Load"
+   auto_hold:       1
+
+   /* ----------------- CNV_FIN_MS_EXPENDITURE_F ----------------- */
+
+   insert_job:      CNV_FIN_MS_EXPENDITURE_F
+   job_type:        c
+   box_name:        CNV_FIN_MS_EXPENDITURE
+   command:         cnv_autojob.sh cnvf RUNID fin
+   condition:       s(CNV_FIN_MS_EXPENDITURE_L_CONV)
+   description:     "FASR"
+   auto_hold:       1
+
+  /* ----------------- CNV_FIN_MS_PYMT_WITHOLD ----------------- */
+
+  insert_job:      CNV_FIN_MS_PYMT_WITHOLD
+  job_type:        b
+  box_name:        CNV_FIN_PART1
+  condition:       s(CNV_FIN_MS_EXPENDITURE_F)
+  description:     "Payment withhold"
+  auto_hold:       1
+
+   /* ----------------- CNV_FIN_MS_PYMT_WITHOLD_H ----------------- */
+
+   insert_job:      CNV_FIN_MS_PYMT_WITHOLD_H
+   job_type:        c
+   box_name:        CNV_FIN_MS_PYMT_WITHOLD
+   command:         cnv_autojob.sh cnvh
+   condition:       s(CNV_FIN_MS_EXPENDITURE_F)
+   description:     "BDB Unload"
+   auto_hold:       1
+
+   /* ----------------- CNV_FIN_MS_PYMT_WITHOLD_J ----------------- */
+
+   insert_job:      CNV_FIN_MS_PYMT_WITHOLD_J
+   job_type:        c
+   box_name:        CNV_FIN_MS_PYMT_WITHOLD
+   command:         cnv_autojob.sh cnvj RUNID
+   condition:       s(CNV_FIN_MS_PYMT_WITHOLD_H)
+   description:     "Job"
+   auto_hold:       1
+
+   /* ----------------- CNV_FIN_MS_PYMT_WITHOLD_N ----------------- */
+
+   insert_job:      CNV_FIN_MS_PYMT_WITHOLD_N
+   job_type:        c
+   box_name:        CNV_FIN_MS_PYMT_WITHOLD
+   command:         cnv_autojob.sh cnvn RUNID
+   condition:       s(CNV_FIN_MS_PYMT_WITHOLD_J)
+   description:     "Check for null fields"
+   auto_hold:       1
+
+   /* ----------------- CNV_FIN_MS_PYMT_WITHOLD_L_CONV ----------------- */
+
+   insert_job:      CNV_FIN_MS_PYMT_WITHOLD_L_CONV
+   job_type:        c
+   box_name:        CNV_FIN_MS_PYMT_WITHOLD
+   command:         cnv_autojob.sh cnvl RUNID CONV
+   condition:       s(CNV_FIN_MS_PYMT_WITHOLD_N)
+   description:     "Load"
+   auto_hold:       1
+
+   /* ----------------- CNV_FIN_MS_PYMT_WITHOLD_F ----------------- */
+
+   insert_job:      CNV_FIN_MS_PYMT_WITHOLD_F
+   job_type:        c
+   box_name:        CNV_FIN_MS_PYMT_WITHOLD
+   command:         cnv_autojob.sh cnvf RUNID fin
+   condition:       s(CNV_FIN_MS_PYMT_WITHOLD_L_CONV)
+   description:     "FASR"
+   auto_hold:       1
+
+  /* ----------------- CNV_FIN_MS_MSG_PART1 ----------------- */
+
+  insert_job:      CNV_FIN_MS_MSG_PART1
+  job_type:        b
+  box_name:        CNV_FIN_PART1
+  description:     "FIN Message part 1"
+  auto_hold:       1
+
+   /* ----------------- CNV_FIN_MS_CASH_RECEIPT_M ----------------- */
+
+   insert_job:      CNV_FIN_MS_CASH_RECEIPT_M
+   job_type:        c
+   box_name:        CNV_FIN_MS_MSG_PART1
+   command:         cnv_autojob.sh cnvm RUNID
+   condition:       s(CNV_FIN_MS_CASH_RECEIPT_J)
+   description:     "Load messages"
+   auto_hold:       1
+
+   /* ----------------- CNV_FIN_MS_CHECK_M ----------------- */
+
+   insert_job:      CNV_FIN_MS_CHECK_M
+   job_type:        c
+   box_name:        CNV_FIN_MS_MSG_PART1
+   command:         cnv_autojob.sh cnvm RUNID
+   condition:       s(CNV_FIN_MS_CHECK_J)
+   description:     "Load messages"
+   auto_hold:       1
+
+   /* ----------------- CNV_FIN_MS_1099_M ----------------- */
+
+   insert_job:      CNV_FIN_MS_1099_M
+   job_type:        c
+   box_name:        CNV_FIN_MS_MSG_PART1
+   command:         cnv_autojob.sh cnvm RUNID
+   condition:       s(CNV_FIN_MS_1099_J)
+   description:     "Load messages"
+   auto_hold:       1
+
+   /* ----------------- CNV_FIN_MS_DF_COMPENSATION_M ----------------- */
+
+   insert_job:      CNV_FIN_MS_DF_COMPENSATION_M
+   job_type:        c
+   box_name:        CNV_FIN_MS_MSG_PART1
+   command:         cnv_autojob.sh cnvm RUNID
+   condition:       s(CNV_FIN_MS_DF_COMPENSATION_J)
+   description:     "Load messages"
+   auto_hold:       1
+
+   /* ----------------- CNV_FIN_MS_PAYEE_M ----------------- */
+
+   insert_job:      CNV_FIN_MS_PAYEE_M
+   job_type:        c
+   box_name:        CNV_FIN_MS_MSG_PART1
+   command:         cnv_autojob.sh cnvm RUNID
+   condition:       s(CNV_FIN_MS_PAYEE_J)
+   description:     "Load messages"
+   auto_hold:       1
+
+   /* ----------------- CNV_FIN_MS_EXPENDITURE_M ----------------- */
+
+   insert_job:      CNV_FIN_MS_EXPENDITURE_M
+   job_type:        c
+   box_name:        CNV_FIN_MS_MSG_PART1
+   command:         cnv_autojob.sh cnvm RUNID
+   condition:       s(CNV_FIN_MS_EXPENDITURE_J)
+   description:     "Load messages"
+   auto_hold:       1
+
+   /* ----------------- CNV_FIN_MS_PYMT_WITHOLD_M ----------------- */
+
+   insert_job:      CNV_FIN_MS_PYMT_WITHOLD_M
+   job_type:        c
+   box_name:        CNV_FIN_MS_MSG_PART1
+   command:         cnv_autojob.sh cnvm RUNID
+   condition:       s(CNV_FIN_MS_PYMT_WITHOLD_J)
+   description:     "Load messages"
+   auto_hold:       1
+
+ /* ----------------- CNV_CLM ----------------- */
+
+ insert_job:      CNV_CLM
+ job_type:        b
+ box_name:        MS_CONV_CYCLE
+ condition:       s(CNV_ALL_COPY_MANUAL)
+ description:     "Claims conversion"
+
+  /* ----------------- CNV_CLM_MS_LOCAL_LOOKUPS ----------------- */
+
+  insert_job:      CNV_CLM_MS_LOCAL_LOOKUPS
+  job_type:        b
+  box_name:        CNV_CLM
+  condition:       s(CNV_ALL_COPY_MANUAL)
+  description:     "Claim local lookups"
+
+   /* ----------------- CNV_CLM_LOCAL_LOOKUP_H_UNIT ----------------- */
+
+   insert_job:      CNV_CLM_LOCAL_LOOKUP_H_UNIT
+   job_type:        c
+   box_name:        CNV_CLM_MS_LOCAL_LOOKUPS
+   command:         cnv_autojob.sh cnvh
+   condition:       s(CNV_ALL_COPY_MANUAL)
+   description:     "Claim local lookup"
+
+   /* ----------------- CNV_CLM_SHARED_LOOKUP_H ----------------- */
+
+   insert_job:      CNV_CLM_SHARED_LOOKUP_H
+   job_type:        c
+   box_name:        CNV_CLM_MS_LOCAL_LOOKUPS
+   command:         cnv_autojob.sh cnvh
+   condition:       s(CNV_CLM_LOCAL_LOOKUP_H_UNIT)
+   description:     "Claim shared lookup"
+
+  /* ----------------- CNV_CLM_MS_DENTAL ----------------- */
+
+  insert_job:      CNV_CLM_MS_DENTAL
+  job_type:        b
+  box_name:        CNV_CLM
+  condition:       s(CNV_REF_MS_SHARED_LOOKUP_H) & s(CNV_MBR_MS_SHARED_LOOKUP_H) & s(CNV_PRV_MS_SHARED_LOOKUP_H) & s(CNV_CLM_LOCAL_LOOKUP_H_UNIT) & s(CNV_CLM_SHARED_LOOKUP_H) & s(CNV_PAU_SHARED_LOOKUP_H)
+  description:     "Dental Claims Conversion"
+
+   /* ----------------- CNV_CLM_MS_DNTL_S ----------------- */
+
+   insert_job:      CNV_CLM_MS_DNTL_S
+   job_type:        c
+   box_name:        CNV_CLM_MS_DENTAL
+   command:         cnv_autojob.sh cnvsclm_ms_dntl.sh 1903
+   condition:       s(CNV_REF_MS_SHARED_LOOKUP_H) & s(CNV_MBR_MS_SHARED_LOOKUP_H) & s(CNV_PRV_MS_SHARED_LOOKUP_H) & s(CNV_CLM_LOCAL_LOOKUP_H_UNIT) & s(CNV_CLM_SHARED_LOOKUP_H) & s(CNV_PAU_SHARED_LOOKUP_H)
+   description:     "Dental claims source"
+
+   /* ----------------- CNV_CLM_MS_DNTL_H ----------------- */
+
+   insert_job:      CNV_CLM_MS_DNTL_H
+   job_type:        c
+   box_name:        CNV_CLM_MS_DENTAL
+   command:         cnv_autojob.sh cnvhclm_ms_dntl.sh 1903
+   condition:       s(CNV_CLM_MS_DNTL_S)
+   description:     "Dental claims bdb"
+
+   /* ----------------- CNV_CLM_MS_DNTL_J ----------------- */
+
+   insert_job:      CNV_CLM_MS_DNTL_J
+   job_type:        c
+   box_name:        CNV_CLM_MS_DENTAL
+   command:         cnv_autojob.sh cnvjclm_ms_dntl.sh 1903
+   condition:       s(CNV_CLM_MS_DNTL_H)
+   description:     "Dental calims job"
+
+   /* ----------------- CNV_CLM_MS_DNTL_M ----------------- */
+
+   insert_job:      CNV_CLM_MS_DNTL_M
+   job_type:        c
+   box_name:        CNV_CLM_MS_DENTAL
+   command:         cnv_autojob.sh cnvmclm_ms_dntl.sh 1903
+   condition:       s(CNV_CLM_MS_DNTL_J)
+   description:     "Dental claims message"
+
+   /* ----------------- CNV_CLM_MS_DNTL_N ----------------- */
+
+   insert_job:      CNV_CLM_MS_DNTL_N
+   job_type:        c
+   box_name:        CNV_CLM_MS_DENTAL
+   command:         cnv_autojob.sh cnvn 1903
+   condition:       s(CNV_CLM_MS_DNTL_M)
+   description:     "Check for null fields"
+
+   /* ----------------- CNV_CLM_MS_DNTL_L_CONV ----------------- */
+
+   insert_job:      CNV_CLM_MS_DNTL_L_CONV
+   job_type:        c
+   box_name:        CNV_CLM_MS_DENTAL
+   command:         cnv_autojob.sh cnvlclm_ms_dntl.sh 1903 CONV
+   condition:       s(CNV_CLM_MS_DNTL_N)
+   description:     "Dental claims load"
+
+   /* ----------------- CNV_CLM_MS_DNTL_F ----------------- */
+
+   insert_job:      CNV_CLM_MS_DNTL_F
+   job_type:        c
+   box_name:        CNV_CLM_MS_DENTAL
+   command:         cnv_autojob.sh cnvfclm_ms_dntl.sh 1903 clm
+   condition:       s(CNV_CLM_MS_DNTL_L_CONV)
+   description:     "Dental claims FASR"
+
+  /* ----------------- CNV_CLM_MS_UB ----------------- */
+
+  insert_job:      CNV_CLM_MS_UB
+  job_type:        b
+  box_name:        CNV_CLM
+  condition:       s(CNV_CLM_MS_DNTL_F)
+  description:     "UB92 Claims conversion"
+
+   /* ----------------- CNV_CLM_MS_UB92_S ----------------- */
+
+   insert_job:      CNV_CLM_MS_UB92_S
+   job_type:        c
+   box_name:        CNV_CLM_MS_UB
+   command:         cnv_autojob.sh cnvsclm_ms_ub92.sh 1903
+   condition:       s(CNV_CLM_MS_DNTL_F)
+   description:     "UB92 claims source"
+
+   /* ----------------- CNV_CLM_MS_UB92_H ----------------- */
+
+   insert_job:      CNV_CLM_MS_UB92_H
+   job_type:        c
+   box_name:        CNV_CLM_MS_UB
+   command:         cnv_autojob.sh cnvhclm_ms_ub92.sh 1903
+   condition:       s(CNV_CLM_MS_UB92_S)
+   description:     "UB92 claims bdb"
+
+   /* ----------------- CNV_CLM_MS_UB92_J ----------------- */
+
+   insert_job:      CNV_CLM_MS_UB92_J
+   job_type:        c
+   box_name:        CNV_CLM_MS_UB
+   command:         cnv_autojob.sh cnvjclm_ms_ub92.sh 1903
+   condition:       s(CNV_CLM_MS_UB92_H)
+   description:     "UB92 calims job"
+
+   /* ----------------- CNV_CLM_MS_UB92_M ----------------- */
+
+   insert_job:      CNV_CLM_MS_UB92_M
+   job_type:        c
+   box_name:        CNV_CLM_MS_UB
+   command:         cnv_autojob.sh cnvmclm_ms_ub92.sh 1903
+   condition:       s(CNV_CLM_MS_UB92_J)
+   description:     "UB92 claims message"
+
+   /* ----------------- CNV_CLM_MS_UB92_N ----------------- */
+
+   insert_job:      CNV_CLM_MS_UB92_N
+   job_type:        c
+   box_name:        CNV_CLM_MS_UB
+   command:         cnv_autojob.sh cnvn 1903
+   condition:       s(CNV_CLM_MS_UB92_M)
+   description:     "Check for null fields"
+
+   /* ----------------- CNV_CLM_MS_UB92_L_CONV ----------------- */
+
+   insert_job:      CNV_CLM_MS_UB92_L_CONV
+   job_type:        c
+   box_name:        CNV_CLM_MS_UB
+   command:         cnv_autojob.sh cnvlclm_ms_ub92.sh 1903 CONV
+   condition:       s(CNV_CLM_MS_UB92_N)
+   description:     "UB92 claims load"
+
+   /* ----------------- CNV_CLM_MS_UB92_F ----------------- */
+
+   insert_job:      CNV_CLM_MS_UB92_F
+   job_type:        c
+   box_name:        CNV_CLM_MS_UB
+   command:         cnv_autojob.sh cnvfclm_ms_ub92.sh 1903 clm
+   condition:       s(CNV_CLM_MS_UB92_L_CONV)
+   description:     "UB92 claims FASR"
+
+  /* ----------------- CNV_CLM_MS_PHYS ----------------- */
+
+  insert_job:      CNV_CLM_MS_PHYS
+  job_type:        b
+  box_name:        CNV_CLM
+  condition:       s(CNV_CLM_MS_UB92_F)
+  description:     "Physician claims conversion"
+
+   /* ----------------- CNV_CLM_MS_PHYS_S ----------------- */
+
+   insert_job:      CNV_CLM_MS_PHYS_S
+   job_type:        c
+   box_name:        CNV_CLM_MS_PHYS
+   command:         cnv_autojob.sh cnvsclm_ms_phys.sh 1903
+   condition:       s(CNV_CLM_MS_UB92_F)
+   description:     "Phys claims source"
+
+   /* ----------------- CNV_CLM_MS_PHYS_H ----------------- */
+
+   insert_job:      CNV_CLM_MS_PHYS_H
+   job_type:        c
+   box_name:        CNV_CLM_MS_PHYS
+   command:         cnv_autojob.sh cnvhclm_ms_phys.sh 1903
+   condition:       s(CNV_CLM_MS_PHYS_S)
+   description:     "Phys claims bdb"
+
+   /* ----------------- CNV_CLM_MS_PHYS_J ----------------- */
+
+   insert_job:      CNV_CLM_MS_PHYS_J
+   job_type:        c
+   box_name:        CNV_CLM_MS_PHYS
+   command:         cnv_autojob.sh cnvjclm_ms_phys.sh 1903
+   condition:       s(CNV_CLM_MS_PHYS_H)
+   description:     "Phys calims job"
+
+   /* ----------------- CNV_CLM_MS_PHYS_M ----------------- */
+
+   insert_job:      CNV_CLM_MS_PHYS_M
+   job_type:        c
+   box_name:        CNV_CLM_MS_PHYS
+   command:         cnv_autojob.sh cnvmclm_ms_phys.sh 1903
+   condition:       s(CNV_CLM_MS_PHYS_J)
+   description:     "Phys claims message"
+
+   /* ----------------- CNV_CLM_MS_PHYS_N ----------------- */
+
+   insert_job:      CNV_CLM_MS_PHYS_N
+   job_type:        c
+   box_name:        CNV_CLM_MS_PHYS
+   command:         cnv_autojob.sh cnvn 1903
+   condition:       s(CNV_CLM_MS_PHYS_M)
+   description:     "Check for null fields"
+
+   /* ----------------- CNV_CLM_MS_PHYS_L_CONV ----------------- */
+
+   insert_job:      CNV_CLM_MS_PHYS_L_CONV
+   job_type:        c
+   box_name:        CNV_CLM_MS_PHYS
+   command:         cnv_autojob.sh cnvlclm_ms_phys.sh 1903 CONV
+   condition:       s(CNV_CLM_MS_PHYS_N)
+   description:     "Phys claims load"
+
+   /* ----------------- CNV_CLM_MS_PHYS_F ----------------- */
+
+   insert_job:      CNV_CLM_MS_PHYS_F
+   job_type:        c
+   box_name:        CNV_CLM_MS_PHYS
+   command:         cnv_autojob.sh cnvfclm_ms_phys.sh 1903 clm
+   condition:       s(CNV_CLM_MS_PHYS_L_CONV)
+   description:     "Phys claims FASR"
+
+  /* ----------------- CNV_CLM_MS_ENT_ADR ----------------- */
+
+  insert_job:      CNV_CLM_MS_ENT_ADR
+  job_type:        b
+  box_name:        CNV_CLM
+  condition:       s(CNV_CLM_MS_PHYS_F)
+  description:     "Claim ENT address"
+
+   /* ----------------- CNV_CLM_MS_ENT_ADR_S ----------------- */
+
+   insert_job:      CNV_CLM_MS_ENT_ADR_S
+   job_type:        c
+   box_name:        CNV_CLM_MS_ENT_ADR
+   command:         cnv_autojob.sh cnvsclm_ms_ent_adr.sh 1903
+   condition:       s(CNV_CLM_MS_PHYS_F)
+   description:     "Ent Adr claims source"
+
+   /* ----------------- CNV_CLM_MS_ENT_ADR_H ----------------- */
+
+   insert_job:      CNV_CLM_MS_ENT_ADR_H
+   job_type:        c
+   box_name:        CNV_CLM_MS_ENT_ADR
+   command:         cnv_autojob.sh cnvhclm_ms_ent_adr.sh 1903
+   condition:       s(CNV_CLM_MS_ENT_ADR_S)
+   description:     "Ent Adr claims bdb"
+
+   /* ----------------- CNV_CLM_MS_ENT_ADR_J ----------------- */
+
+   insert_job:      CNV_CLM_MS_ENT_ADR_J
+   job_type:        c
+   box_name:        CNV_CLM_MS_ENT_ADR
+   command:         cnv_autojob.sh cnvjclm_ms_ent_adr.sh 1903
+   condition:       s(CNV_CLM_MS_ENT_ADR_H)
+   description:     "Ent Adr calims job"
+
+   /* ----------------- CNV_CLM_MS_ENT_ADR_M ----------------- */
+
+   insert_job:      CNV_CLM_MS_ENT_ADR_M
+   job_type:        c
+   box_name:        CNV_CLM_MS_ENT_ADR
+   command:         cnv_autojob.sh cnvmclm_ms_endadr.sh 1903 CONV
+   condition:       s(CNV_CLM_MS_ENT_ADR_J)
+   description:     "Ent Adr claims message"
+
+   /* ----------------- CNV_CLM_MS_ENT_ADR_N ----------------- */
+
+   insert_job:      CNV_CLM_MS_ENT_ADR_N
+   job_type:        c
+   box_name:        CNV_CLM_MS_ENT_ADR
+   command:         cnv_autojob.sh cnvnclm_ms_ent_adr.sh 1903
+   condition:       s(CNV_CLM_MS_ENT_ADR_M)
+   description:     "Check for null fields"
+
+   /* ----------------- CNV_CLM_MS_ENT_ADR_L_CONV ----------------- */
+
+   insert_job:      CNV_CLM_MS_ENT_ADR_L_CONV
+   job_type:        c
+   box_name:        CNV_CLM_MS_ENT_ADR
+   command:         cnv_autojob.sh cnvlclm_ms_ent_adr.sh 1903 CONV
+   condition:       s(CNV_CLM_MS_ENT_ADR_N)
+   description:     "Ent Adr claims load"
+
+   /* ----------------- CNV_CLM_MS_ENT_ADR_F ----------------- */
+
+   insert_job:      CNV_CLM_MS_ENT_ADR_F
+   job_type:        c
+   box_name:        CNV_CLM_MS_ENT_ADR
+   command:         cnv_autojob.sh cnvfclm_ms_ent_adr.sh 1903 clm
+   condition:       s(CNV_CLM_MS_ENT_ADR_L_CONV)
+   description:     "Ent Adr claims FASR"
+
+  /* ----------------- CNV_CLM_MS_ENT_ID ----------------- */
+
+  insert_job:      CNV_CLM_MS_ENT_ID
+  job_type:        b
+  box_name:        CNV_CLM
+  condition:       s(CNV_CLM_MS_ENT_ADR_F)
+  description:     "Claim ENT"
+
+   /* ----------------- CNV_CLM_MS_ENT_ID_S ----------------- */
+
+   insert_job:      CNV_CLM_MS_ENT_ID_S
+   job_type:        c
+   box_name:        CNV_CLM_MS_ENT_ID
+   command:         cnv_autojob.sh cnvsclm_ms_ent_id.sh 1903
+   condition:       s(CNV_CLM_MS_ENT_ADR_F)
+   description:     "Ent id claims source"
+
+   /* ----------------- CNV_CLM_MS_ENT_ID_H ----------------- */
+
+   insert_job:      CNV_CLM_MS_ENT_ID_H
+   job_type:        c
+   box_name:        CNV_CLM_MS_ENT_ID
+   command:         cnv_autojob.sh cnvhclm_ms_ent_id.sh 1903
+   condition:       s(CNV_CLM_MS_ENT_ID_S)
+   description:     "Claim ENT BDB"
+
+   /* ----------------- CNV_CLM_MS_ENT_ID_J ----------------- */
+
+   insert_job:      CNV_CLM_MS_ENT_ID_J
+   job_type:        c
+   box_name:        CNV_CLM_MS_ENT_ID
+   command:         cnv_autojob.sh cnvjclm_ms_ent_id.sh 1903
+   condition:       s(CNV_CLM_MS_ENT_ID_H)
+   description:     "Claim ENT job"
+
+   /* ----------------- CNV_CLM_MS_ENT_ID_M ----------------- */
+
+   insert_job:      CNV_CLM_MS_ENT_ID_M
+   job_type:        c
+   box_name:        CNV_CLM_MS_ENT_ID
+   command:         cnv_autojob.sh Ent id claims message 1903
+   condition:       s(CNV_CLM_MS_ENT_ID_J)
+   description:     "Claim MS ENT message"
+
+   /* ----------------- CNV_CLM_MS_ENT_ID_N ----------------- */
+
+   insert_job:      CNV_CLM_MS_ENT_ID_N
+   job_type:        c
+   box_name:        CNV_CLM_MS_ENT_ID
+   command:         cnv_autojob.sh cnvnclm_ms_ent_id.sh 1903
+   condition:       s(CNV_CLM_MS_ENT_ID_M)
+   description:     "Check for null fields"
+
+   /* ----------------- CNV_CLM_MS_ENT_ID_L_CONV ----------------- */
+
+   insert_job:      CNV_CLM_MS_ENT_ID_L_CONV
+   job_type:        c
+   box_name:        CNV_CLM_MS_ENT_ID
+   command:         cnv_autojob.sh cnvlclm_ms_ent_id.sh 1903 CONV
+   condition:       s(CNV_CLM_MS_ENT_ID_N)
+   description:     "Ent ID Claims conversion for 201404"
+
+   /* ----------------- CNV_CLM_MS_ENT_ID_F ----------------- */
+
+   insert_job:      CNV_CLM_MS_ENT_ID_F
+   job_type:        c
+   box_name:        CNV_CLM_MS_ENT_ID
+   command:         cnv_autojob.sh cnvfclm_ms_ent_id.sh 1903 clm
+   condition:       s(CNV_CLM_MS_ENT_ID_L_CONV)
+   description:     "Ent ID Claims conversion for 201501"
+
+ /* ----------------- CNV_TPL_PART2 ----------------- */
+
+ insert_job:      CNV_TPL_PART2
+ job_type:        b
+ box_name:        MS_CONV_CYCLE
+ condition:       s(CNV_CLM_SHARED_LOOKUP_H)
+ description:     "TPL Conversion"
+
+  /* ----------------- CNV_TPL_MS_UNLOAD_PART2 ----------------- */
+
+  insert_job:      CNV_TPL_MS_UNLOAD_PART2
+  job_type:        b
+  box_name:        CNV_TPL_PART2
+  condition:       s(CNV_CLM_SHARED_LOOKUP_H)
+  description:     "TPL source unload part 2"
+
+   /* ----------------- CNV_TPL_MS_CASUALTY_CASE_S ----------------- */
+
+   insert_job:      CNV_TPL_MS_CASUALTY_CASE_S
+   job_type:        c
+   box_name:        CNV_TPL_MS_UNLOAD_PART2
+   command:         cnv_autojob.sh cnvs
+   condition:       s(CNV_CLM_SHARED_LOOKUP_H)
+   description:     "source Unload"
+
+   /* ----------------- CNV_TPL_MS_AR_HEALTH_S ----------------- */
+
+   insert_job:      CNV_TPL_MS_AR_HEALTH_S
+   job_type:        c
+   box_name:        CNV_TPL_MS_UNLOAD_PART2
+   command:         cnv_autojob.sh cnvs
+   condition:       s(CNV_TPL_MS_CASUALTY_CASE_S)
+   description:     "source Unload"
+
+  /* ----------------- CNV_TPL_MS_CASUALTY_CASE ----------------- */
+
+  insert_job:      CNV_TPL_MS_CASUALTY_CASE
+  job_type:        b
+  box_name:        CNV_TPL_PART2
+  condition:       s(CNV_TPL_MS_AR_HEALTH_S)
+  description:     "Casualty Case"
+
+   /* ----------------- CNV_TPL_MS_CASUALTY_CASE_H ----------------- */
+
+   insert_job:      CNV_TPL_MS_CASUALTY_CASE_H
+   job_type:        c
+   box_name:        CNV_TPL_MS_CASUALTY_CASE
+   command:         cnv_autojob.sh cnvh
+   condition:       s(CNV_TPL_MS_AR_HEALTH_S)
+   description:     "BDB Unload"
+
+   /* ----------------- CNV_TPL_MS_CASUALTY_CASE_J ----------------- */
+
+   insert_job:      CNV_TPL_MS_CASUALTY_CASE_J
+   job_type:        c
+   box_name:        CNV_TPL_MS_CASUALTY_CASE
+   command:         cnv_autojob.sh cnvj RUNID
+   condition:       s(CNV_TPL_MS_CASUALTY_CASE_H)
+   description:     "Job"
+
+   /* ----------------- CNV_TPL_MS_CASUALTY_CASE_N ----------------- */
+
+   insert_job:      CNV_TPL_MS_CASUALTY_CASE_N
+   job_type:        c
+   box_name:        CNV_TPL_MS_CASUALTY_CASE
+   command:         cnv_autojob.sh cnvn RUNID
+   condition:       s(CNV_TPL_MS_CASUALTY_CASE_J)
+   description:     "Check for null fields"
+
+   /* ----------------- CNV_TPL_MS_CASUALTY_CASE_L_CONV ----------------- */
+
+   insert_job:      CNV_TPL_MS_CASUALTY_CASE_L_CONV
+   job_type:        c
+   box_name:        CNV_TPL_MS_CASUALTY_CASE
+   command:         cnv_autojob.sh cnvl RUNID CONV
+   condition:       s(CNV_TPL_MS_CASUALTY_CASE_N)
+   description:     "Load"
+
+   /* ----------------- CNV_TPL_MS_CASUALTY_CASE_F ----------------- */
+
+   insert_job:      CNV_TPL_MS_CASUALTY_CASE_F
+   job_type:        c
+   box_name:        CNV_TPL_MS_CASUALTY_CASE
+   command:         cnv_autojob.sh cnvf RUNID tpl
+   condition:       s(CNV_TPL_MS_CASUALTY_CASE_L_CONV)
+   description:     "FASR"
+
+  /* ----------------- CNV_TPL_MS_AR_HEALTH ----------------- */
+
+  insert_job:      CNV_TPL_MS_AR_HEALTH
+  job_type:        b
+  box_name:        CNV_TPL_PART2
+  condition:       s(CNV_TPL_MS_CASUALTY_CASE_F)
+  description:     "AR Health"
+
+   /* ----------------- CNV_TPL_MS_AR_HEALTH_H ----------------- */
+
+   insert_job:      CNV_TPL_MS_AR_HEALTH_H
+   job_type:        c
+   box_name:        CNV_TPL_MS_AR_HEALTH
+   command:         cnv_autojob.sh cnvh
+   condition:       s(CNV_TPL_MS_CASUALTY_CASE_F)
+   description:     "BDB Unload"
+
+   /* ----------------- CNV_TPL_MS_AR_HEALTH_J ----------------- */
+
+   insert_job:      CNV_TPL_MS_AR_HEALTH_J
+   job_type:        c
+   box_name:        CNV_TPL_MS_AR_HEALTH
+   command:         cnv_autojob.sh cnvj RUNID
+   condition:       s(CNV_TPL_MS_AR_HEALTH_H)
+   description:     "Job"
+
+   /* ----------------- CNV_TPL_MS_AR_HEALTH_N ----------------- */
+
+   insert_job:      CNV_TPL_MS_AR_HEALTH_N
+   job_type:        c
+   box_name:        CNV_TPL_MS_AR_HEALTH
+   command:         cnv_autojob.sh cnvn RUNID
+   condition:       s(CNV_TPL_MS_AR_HEALTH_J)
+   description:     "Check for null fields"
+
+   /* ----------------- CNV_TPL_MS_AR_HEALTH_L_CONV ----------------- */
+
+   insert_job:      CNV_TPL_MS_AR_HEALTH_L_CONV
+   job_type:        c
+   box_name:        CNV_TPL_MS_AR_HEALTH
+   command:         cnv_autojob.sh cnvl RUNID CONV
+   condition:       s(CNV_TPL_MS_AR_HEALTH_N)
+   description:     "Load"
+
+   /* ----------------- CNV_TPL_MS_AR_HEALTH_F ----------------- */
+
+   insert_job:      CNV_TPL_MS_AR_HEALTH_F
+   job_type:        c
+   box_name:        CNV_TPL_MS_AR_HEALTH
+   command:         cnv_autojob.sh cnvf RUNID tpl
+   condition:       s(CNV_TPL_MS_AR_HEALTH_L_CONV)
+   description:     "FASR"
+
+  /* ----------------- CNV_TPL_MS_MSG_PART2 ----------------- */
+
+  insert_job:      CNV_TPL_MS_MSG_PART2
+  job_type:        b
+  box_name:        CNV_TPL_PART2
+  description:     "TPL message part 2"
+
+   /* ----------------- CNV_TPL_MS_CASUALTY_CASE_M ----------------- */
+
+   insert_job:      CNV_TPL_MS_CASUALTY_CASE_M
+   job_type:        c
+   box_name:        CNV_TPL_MS_MSG_PART2
+   command:         cnv_autojob.sh cnvm RUNID
+   condition:       s(CNV_TPL_MS_CASUALTY_CASE_J)
+   description:     "Load messages"
+
+   /* ----------------- CNV_TPL_MS_AR_HEALTH_M ----------------- */
+
+   insert_job:      CNV_TPL_MS_AR_HEALTH_M
+   job_type:        c
+   box_name:        CNV_TPL_MS_MSG_PART2
+   command:         cnv_autojob.sh cnvm RUNID
+   condition:       s(CNV_TPL_MS_AR_HEALTH_J)
+   description:     "Load messages"
+
+ /* ----------------- CNV_BUY ----------------- */
+
+ insert_job:      CNV_BUY
+ job_type:        b
+ box_name:        MS_CONV_CYCLE
+ condition:       s(CNV_ALL_COPY_MANUAL)
+ description:     "Buyin conversion"
+
+  /* ----------------- CNV_BUY_MS_UNLOAD ----------------- */
+
+  insert_job:      CNV_BUY_MS_UNLOAD
+  job_type:        b
+  box_name:        CNV_BUY
+  condition:       s(CNV_ALL_COPY_MANUAL)
+  description:     "Buyin unloads"
+
+   /* ----------------- CNV_BUY_MS_MASTER_S ----------------- */
+
+   insert_job:      CNV_BUY_MS_MASTER_S
+   job_type:        c
+   box_name:        CNV_BUY_MS_UNLOAD
+   command:         cnv_autojob.sh cnvs
+   condition:       s(CNV_ALL_COPY_MANUAL)
+   description:     "source Unload"
+
+   /* ----------------- CNV_BUY_MS_MMA_RESPONSE_S ----------------- */
+
+   insert_job:      CNV_BUY_MS_MMA_RESPONSE_S
+   job_type:        c
+   box_name:        CNV_BUY_MS_UNLOAD
+   command:         cnv_autojob.sh cnvs
+   condition:       s(CNV_BUY_MS_MASTER_S)
+   description:     "source Unload"
+
+   /* ----------------- CNV_BUY_MS_OUTBOUND_S ----------------- */
+
+   insert_job:      CNV_BUY_MS_OUTBOUND_S
+   job_type:        c
+   box_name:        CNV_BUY_MS_UNLOAD
+   command:         cnv_autojob.sh cnvs
+   condition:       s(CNV_BUY_MS_MMA_RESPONSE_S)
+   description:     "source Unload"
+
+  /* ----------------- CNV_BUY_MS_MASTER ----------------- */
+
+  insert_job:      CNV_BUY_MS_MASTER
+  job_type:        b
+  box_name:        CNV_BUY
+  condition:       s(CNV_BUY_MS_MASTER_S) & s(CNV_MBR_MS_SHARED_LOOKUP_H)
+  description:     "Buy Master"
+
+   /* ----------------- CNV_BUY_MS_MASTER_H ----------------- */
+
+   insert_job:      CNV_BUY_MS_MASTER_H
+   job_type:        c
+   box_name:        CNV_BUY_MS_MASTER
+   command:         cnv_autojob.sh cnvh
+   condition:       s(CNV_BUY_MS_MASTER_S) & s(CNV_MBR_MS_SHARED_LOOKUP_H)
+   description:     "BDB Unload"
+
+   /* ----------------- CNV_BUY_MS_MASTER_J ----------------- */
+
+   insert_job:      CNV_BUY_MS_MASTER_J
+   job_type:        c
+   box_name:        CNV_BUY_MS_MASTER
+   command:         cnv_autojob.sh cnvj RUNID
+   condition:       s(CNV_BUY_MS_MASTER_H)
+   description:     "Job"
+
+   /* ----------------- CNV_BUY_MS_MASTER_N ----------------- */
+
+   insert_job:      CNV_BUY_MS_MASTER_N
+   job_type:        c
+   box_name:        CNV_BUY_MS_MASTER
+   command:         cnv_autojob.sh cnvn RUNID
+   condition:       s(CNV_BUY_MS_MASTER_J)
+   description:     "Check for null fields"
+
+   /* ----------------- CNV_BUY_MS_MASTER_L_CONV ----------------- */
+
+   insert_job:      CNV_BUY_MS_MASTER_L_CONV
+   job_type:        c
+   box_name:        CNV_BUY_MS_MASTER
+   command:         cnv_autojob.sh cnvl RUNID CONV
+   condition:       s(CNV_BUY_MS_MASTER_N)
+   description:     "Load"
+
+   /* ----------------- CNV_BUY_MS_MASTER_F ----------------- */
+
+   insert_job:      CNV_BUY_MS_MASTER_F
+   job_type:        c
+   box_name:        CNV_BUY_MS_MASTER
+   command:         cnv_autojob.sh cnvf RUNID buy
+   condition:       s(CNV_BUY_MS_MASTER_L_CONV)
+   description:     "FASR"
+
+  /* ----------------- CNV_BUY_MS_MMA_RESPONSE ----------------- */
+
+  insert_job:      CNV_BUY_MS_MMA_RESPONSE
+  job_type:        b
+  box_name:        CNV_BUY
+  condition:       s(CNV_MBR_MS_SHARED_LOOKUP_H) & s(CNV_BUY_MS_MASTER_F)
+  description:     "Buy MMA Response"
+
+   /* ----------------- CNV_BUY_MS_MMA_RESPONSE_H ----------------- */
+
+   insert_job:      CNV_BUY_MS_MMA_RESPONSE_H
+   job_type:        c
+   box_name:        CNV_BUY_MS_MMA_RESPONSE
+   command:         cnv_autojob.sh cnvh
+   condition:       s(CNV_MBR_MS_SHARED_LOOKUP_H) & s(CNV_BUY_MS_MASTER_F)
+   description:     "BDB Unload"
+
+   /* ----------------- CNV_BUY_MS_MMA_RESPONSE_J ----------------- */
+
+   insert_job:      CNV_BUY_MS_MMA_RESPONSE_J
+   job_type:        c
+   box_name:        CNV_BUY_MS_MMA_RESPONSE
+   command:         cnv_autojob.sh cnvj RUNID
+   condition:       s(CNV_BUY_MS_MMA_RESPONSE_H)
+   description:     "Job"
+
+   /* ----------------- CNV_BUY_MS_MMA_RESPONSE_N ----------------- */
+
+   insert_job:      CNV_BUY_MS_MMA_RESPONSE_N
+   job_type:        c
+   box_name:        CNV_BUY_MS_MMA_RESPONSE
+   command:         cnv_autojob.sh cnvn RUNID
+   condition:       s(CNV_BUY_MS_MMA_RESPONSE_J)
+   description:     "Check for null fields"
+
+   /* ----------------- CNV_BUY_MS_MMA_RESPONSE_L_CONV ----------------- */
+
+   insert_job:      CNV_BUY_MS_MMA_RESPONSE_L_CONV
+   job_type:        c
+   box_name:        CNV_BUY_MS_MMA_RESPONSE
+   command:         cnv_autojob.sh cnvl RUNID CONV
+   condition:       s(CNV_BUY_MS_MMA_RESPONSE_N)
+   description:     "Load"
+
+   /* ----------------- CNV_BUY_MS_MMA_RESPONSE_F ----------------- */
+
+   insert_job:      CNV_BUY_MS_MMA_RESPONSE_F
+   job_type:        c
+   box_name:        CNV_BUY_MS_MMA_RESPONSE
+   command:         cnv_autojob.sh cnvf RUNID buy
+   condition:       s(CNV_BUY_MS_MMA_RESPONSE_L_CONV)
+   description:     "FASR"
+
+  /* ----------------- CNV_BUY_MS_OUTBOUND ----------------- */
+
+  insert_job:      CNV_BUY_MS_OUTBOUND
+  job_type:        b
+  box_name:        CNV_BUY
+  condition:       s(CNV_BUY_MS_OUTBOUND_S) & s(CNV_MBR_MS_SHARED_LOOKUP_H)
+  description:     "Buy Outbound"
+
+   /* ----------------- CNV_BUY_MS_OUTBOUND_H ----------------- */
+
+   insert_job:      CNV_BUY_MS_OUTBOUND_H
+   job_type:        c
+   box_name:        CNV_BUY_MS_OUTBOUND
+   command:         cnv_autojob.sh cnvh
+   condition:       s(CNV_BUY_MS_OUTBOUND_S) & s(CNV_MBR_MS_SHARED_LOOKUP_H)
+   description:     "BDB Unload"
+
+   /* ----------------- CNV_BUY_MS_OUTBOUND_J ----------------- */
+
+   insert_job:      CNV_BUY_MS_OUTBOUND_J
+   job_type:        c
+   box_name:        CNV_BUY_MS_OUTBOUND
+   command:         cnv_autojob.sh cnvj RUNID
+   condition:       s(CNV_BUY_MS_OUTBOUND_H)
+   description:     "Job"
+
+   /* ----------------- CNV_BUY_MS_OUTBOUND_N ----------------- */
+
+   insert_job:      CNV_BUY_MS_OUTBOUND_N
+   job_type:        c
+   box_name:        CNV_BUY_MS_OUTBOUND
+   command:         cnv_autojob.sh cnvn RUNID
+   condition:       s(CNV_BUY_MS_OUTBOUND_J)
+   description:     "Check for null fields"
+
+   /* ----------------- CNV_BUY_MS_OUTBOUND_L_CONV ----------------- */
+
+   insert_job:      CNV_BUY_MS_OUTBOUND_L_CONV
+   job_type:        c
+   box_name:        CNV_BUY_MS_OUTBOUND
+   command:         cnv_autojob.sh cnvl RUNID CONV
+   condition:       s(CNV_BUY_MS_OUTBOUND_N)
+   description:     "Load"
+
+   /* ----------------- CNV_BUY_MS_OUTBOUND_F ----------------- */
+
+   insert_job:      CNV_BUY_MS_OUTBOUND_F
+   job_type:        c
+   box_name:        CNV_BUY_MS_OUTBOUND
+   command:         cnv_autojob.sh cnvf RUNID buy
+   condition:       s(CNV_BUY_MS_OUTBOUND_L_CONV)
+   description:     "FASR"
+
+  /* ----------------- CNV_BUY_MS_MSG ----------------- */
+
+  insert_job:      CNV_BUY_MS_MSG
+  job_type:        b
+  box_name:        CNV_BUY
+  description:     "Buyin message"
+
+   /* ----------------- CNV_BUY_MS_MASTER_M ----------------- */
+
+   insert_job:      CNV_BUY_MS_MASTER_M
+   job_type:        c
+   box_name:        CNV_BUY_MS_MSG
+   command:         cnv_autojob.sh cnvm RUNID
+   condition:       s(CNV_BUY_MS_MASTER_J)
+   description:     "Message load"
+
+   /* ----------------- CNV_BUY_MS_MMA_RESPONSE_M ----------------- */
+
+   insert_job:      CNV_BUY_MS_MMA_RESPONSE_M
+   job_type:        c
+   box_name:        CNV_BUY_MS_MSG
+   command:         cnv_autojob.sh cnvm RUNID
+   condition:       s(CNV_BUY_MS_MMA_RESPONSE_J)
+   description:     "Message load"
+
+   /* ----------------- CNV_BUY_MS_OUTBOUND_M ----------------- */
+
+   insert_job:      CNV_BUY_MS_OUTBOUND_M
+   job_type:        c
+   box_name:        CNV_BUY_MS_MSG
+   command:         cnv_autojob.sh cnvm RUNID
+   condition:       s(CNV_BUY_MS_OUTBOUND_J)
+   description:     "Message load"
+
+ /* ----------------- CNV_FIN_PART2 ----------------- */
+
+ insert_job:      CNV_FIN_PART2
+ job_type:        b
+ box_name:        MS_CONV_CYCLE
+ condition:       s(CNV_MGD_MS_REBUILD_ALL_INDEXES_CONV)
+ description:     "FIN conversion part 2"
+
+  /* ----------------- CNV_FIN_MS_PRESAK_PART2 ----------------- */
+
+  insert_job:      CNV_FIN_MS_PRESAK_PART2
+  job_type:        b
+  box_name:        CNV_FIN_PART2
+  condition:       s(CNV_MGD_MS_REBUILD_ALL_INDEXES_CONV)
+  description:     "FIN Presak part2"
+
+   /* ----------------- CNV_FIN_MS_PRESAK_ACCT_J ----------------- */
+
+   insert_job:      CNV_FIN_MS_PRESAK_ACCT_J
+   job_type:        c
+   box_name:        CNV_FIN_MS_PRESAK_PART2
+   command:         cnv_autojob.sh cnvjfin_acct_saking.sh
+   condition:       s(CNV_MGD_MS_REBUILD_ALL_INDEXES_CONV)
+   description:     "FIN Presak acct "
+
+   /* ----------------- CNV_FIN_MS_PRESAK_WITHHOLD_J ----------------- */
+
+   insert_job:      CNV_FIN_MS_PRESAK_WITHHOLD_J
+   job_type:        c
+   box_name:        CNV_FIN_MS_PRESAK_PART2
+   command:         cnv_autojob.sh cnvjfin_withhold_saking.sh
+   condition:       s(CNV_MGD_MS_REBUILD_ALL_INDEXES_CONV)
+   description:     "FIN Presak withholding"
+
+  /* ----------------- CNV_FIN_SHARED_LOOKUP2 ----------------- */
+
+  insert_job:      CNV_FIN_SHARED_LOOKUP2
+  job_type:        b
+  box_name:        CNV_FIN_PART2
+  condition:       s(CNV_FIN_MS_PRESAK_WITHHOLD_J) & s(CNV_FIN_MS_PRESAK_ACCT_J)
+  description:     "Shared lookup"
+
+   /* ----------------- CNV_FIN_SHARED_LOOKUP2_S ----------------- */
+
+   insert_job:      CNV_FIN_SHARED_LOOKUP2_S
+   job_type:        c
+   box_name:        CNV_FIN_SHARED_LOOKUP2
+   command:         cnv_autojob.sh cnvs
+   condition:       s(CNV_FIN_MS_PRESAK_WITHHOLD_J) & s(CNV_FIN_MS_PRESAK_ACCT_J)
+   description:     "source Unload"
+
+   /* ----------------- CNV_FIN_SHARED_LOOKUP2_H ----------------- */
+
+   insert_job:      CNV_FIN_SHARED_LOOKUP2_H
+   job_type:        c
+   box_name:        CNV_FIN_SHARED_LOOKUP2
+   command:         cnv_autojob.sh cnvh
+   condition:       s(CNV_FIN_SHARED_LOOKUP2_S)
+   description:     "bdb Unload"
+
+  /* ----------------- CNV_FIN_MS_UNLOAD_PART2 ----------------- */
+
+  insert_job:      CNV_FIN_MS_UNLOAD_PART2
+  job_type:        b
+  box_name:        CNV_FIN_PART2
+  condition:       s(CNV_FIN_SHARED_LOOKUP2_H)
+  description:     "Fin unload source part 2"
+
+   /* ----------------- CNV_FIN_MS_ACCT_REC_S ----------------- */
+
+   insert_job:      CNV_FIN_MS_ACCT_REC_S
+   job_type:        c
+   box_name:        CNV_FIN_MS_UNLOAD_PART2
+   command:         cnv_autojob.sh cnvs
+   condition:       s(CNV_FIN_SHARED_LOOKUP2_H)
+   description:     "source Unload"
+
+  /* ----------------- CNV_FIN_MS_ACCT_REC ----------------- */
+
+  insert_job:      CNV_FIN_MS_ACCT_REC
+  job_type:        b
+  box_name:        CNV_FIN_PART2
+  condition:       s(CNV_FIN_MS_ACCT_REC_S)
+  description:     "Acct Rec"
+
+   /* ----------------- CNV_FIN_MS_ACCT_REC_H ----------------- */
+
+   insert_job:      CNV_FIN_MS_ACCT_REC_H
+   job_type:        c
+   box_name:        CNV_FIN_MS_ACCT_REC
+   command:         cnv_autojob.sh cnvh
+   condition:       s(CNV_FIN_MS_ACCT_REC_S)
+   description:     "BDB Unload"
+
+   /* ----------------- CNV_FIN_MS_ACCT_REC_J ----------------- */
+
+   insert_job:      CNV_FIN_MS_ACCT_REC_J
+   job_type:        c
+   box_name:        CNV_FIN_MS_ACCT_REC
+   command:         cnv_autojob.sh cnvj RUNID
+   condition:       s(CNV_FIN_MS_ACCT_REC_H)
+   description:     "Job"
+
+   /* ----------------- CNV_FIN_MS_ACCT_REC_N ----------------- */
+
+   insert_job:      CNV_FIN_MS_ACCT_REC_N
+   job_type:        c
+   box_name:        CNV_FIN_MS_ACCT_REC
+   command:         cnv_autojob.sh cnvn RUNID
+   condition:       s(CNV_FIN_MS_ACCT_REC_J)
+   description:     "Check for null fields"
+
+   /* ----------------- CNV_FIN_MS_ACCT_REC_L_CONV ----------------- */
+
+   insert_job:      CNV_FIN_MS_ACCT_REC_L_CONV
+   job_type:        c
+   box_name:        CNV_FIN_MS_ACCT_REC
+   command:         cnv_autojob.sh cnvl RUNID CONV
+   condition:       s(CNV_FIN_MS_ACCT_REC_N)
+   description:     "Load"
+
+   /* ----------------- CNV_FIN_MS_ACCT_REC_F ----------------- */
+
+   insert_job:      CNV_FIN_MS_ACCT_REC_F
+   job_type:        c
+   box_name:        CNV_FIN_MS_ACCT_REC
+   command:         cnv_autojob.sh cnvf RUNID fin
+   condition:       s(CNV_FIN_MS_ACCT_REC_L_CONV)
+   description:     "FASR"
+
+  /* ----------------- CNV_FIN_MS_MSG_PART2 ----------------- */
+
+  insert_job:      CNV_FIN_MS_MSG_PART2
+  job_type:        b
+  box_name:        CNV_FIN_PART2
+  condition:       s(CNV_FIN_MS_ACCT_REC_J)
+  description:     "Fin message part 2"
+
+   /* ----------------- CNV_FIN_MS_ACCT_REC_M ----------------- */
+
+   insert_job:      CNV_FIN_MS_ACCT_REC_M
+   job_type:        c
+   box_name:        CNV_FIN_MS_MSG_PART2
+   command:         cnv_autojob.sh cnvm RUNID
+   condition:       s(CNV_FIN_MS_ACCT_REC_J)
+   description:     "Load messages"
+
+ /* ----------------- CNV_POST_PROCESS ----------------- */
+
+ insert_job:      CNV_POST_PROCESS
+ job_type:        b
+ box_name:        MS_CONV_CYCLE
+ description:     "Post conversion process"
+
+  /* ----------------- CNV_SYSTEM_TEST ----------------- */
+
+  insert_job:      CNV_SYSTEM_TEST
+  job_type:        b
+  box_name:        CNV_POST_PROCESS
+  description:     "Conversion System Testing"
+
+   /* ----------------- CNV_REF_SYSTEM_TEST ----------------- */
+
+   insert_job:      CNV_REF_SYSTEM_TEST
+   job_type:        c
+   box_name:        CNV_SYSTEM_TEST
+   command:         cnv_autojob.sh run_validation.sh -f ref -i RUNID -d CONV
+   condition:       s(CNV_REF_PART2)
+   description:     "System test"
+
+   /* ----------------- CNV_MBR_SYSTEM_TEST ----------------- */
+
+   insert_job:      CNV_MBR_SYSTEM_TEST
+   job_type:        c
+   box_name:        CNV_SYSTEM_TEST
+   command:         cnv_autojob.sh run_validation.sh -f mbr -i RUNID -d CONV
+   condition:       s(CNV_MBR)
+   description:     "System test"
+
+   /* ----------------- CNV_PRV_SYSTEM_TEST ----------------- */
+
+   insert_job:      CNV_PRV_SYSTEM_TEST
+   job_type:        c
+   box_name:        CNV_SYSTEM_TEST
+   command:         cnv_autojob.sh run_validation.sh -f prv -i RUNID -d CONV
+   condition:       s(CNV_PRV)
+   description:     "System test"
+
+   /* ----------------- CNV_MGD_SYSTEM_TEST ----------------- */
+
+   insert_job:      CNV_MGD_SYSTEM_TEST
+   job_type:        c
+   box_name:        CNV_SYSTEM_TEST
+   command:         cnv_autojob.sh run_validation.sh -f mgd -i RUNID -d CONV
+   condition:       s(CNV_MGD)
+   description:     "System test"
+
+   /* ----------------- CNV_FIN_SYSTEM_TEST ----------------- */
+
+   insert_job:      CNV_FIN_SYSTEM_TEST
+   job_type:        c
+   box_name:        CNV_SYSTEM_TEST
+   command:         cnv_autojob.sh run_validation.sh -f fin -i RUNID -d CONV
+   condition:       s(CNV_FIN_PART2)
+   description:     "System test"
+
+   /* ----------------- CNV_PAU_SYSTEM_TEST ----------------- */
+
+   insert_job:      CNV_PAU_SYSTEM_TEST
+   job_type:        c
+   box_name:        CNV_SYSTEM_TEST
+   command:         cnv_autojob.sh run_validation.sh -f pau -i RUNID -d CONV
+   condition:       s(CNV_PAU)
+   description:     "System test"
+
+   /* ----------------- CNV_TPL_SYSTEM_TEST ----------------- */
+
+   insert_job:      CNV_TPL_SYSTEM_TEST
+   job_type:        c
+   box_name:        CNV_SYSTEM_TEST
+   command:         cnv_autojob.sh run_validation.sh -f tpl -i RUNID -d CONV
+   condition:       s(CNV_TPL_PART2)
+   description:     "System test"
+
+   /* ----------------- CNV_RBT_SYSTEM_TEST ----------------- */
+
+   insert_job:      CNV_RBT_SYSTEM_TEST
+   job_type:        c
+   box_name:        CNV_SYSTEM_TEST
+   command:         cnv_autojob.sh run_validation.sh -f rbt -i RUNID -d CONV
+   condition:       s(CNV_RBT_SHARED_LOOKUP)
+   description:     "System test"
+
+   /* ----------------- CNV_BUY_SYSTEM_TEST ----------------- */
+
+   insert_job:      CNV_BUY_SYSTEM_TEST
+   job_type:        c
+   box_name:        CNV_SYSTEM_TEST
+   command:         cnv_autojob.sh run_validation.sh -f buy -i RUNID -d CONV
+   condition:       s(CNV_BUY)
+   description:     "System test"
+
+   /* ----------------- CNV_CLM_SYSTEM_TEST ----------------- */
+
+   insert_job:      CNV_CLM_SYSTEM_TEST
+   job_type:        c
+   box_name:        CNV_SYSTEM_TEST
+   command:         cnv_autojob.sh run_validation.sh -f clm -i RUNID -d CONV
+   condition:       s(CNV_CLM)
+   description:     "System test"
+
+  /* ----------------- CNV_PREPFASR ----------------- */
+
+  insert_job:      CNV_PREPFASR
+  job_type:        b
+  box_name:        CNV_POST_PROCESS
+  condition:       s(CNV_CLM_SYSTEM_TEST)
+  description:     "Prepare FASR report"
+
+   /* ----------------- CNV_SWD_SYSTEM_TEST ----------------- */
+
+   insert_job:      CNV_SWD_SYSTEM_TEST
+   job_type:        c
+   box_name:        CNV_PREPFASR
+   command:         cnv_autojob.sh run_validation.sh -f swd -i RUNID -d CONV
+   condition:       s(CNV_CLM_SYSTEM_TEST)
+   description:     "System test"
+
+   /* ----------------- CNV_UPDATE_CFG_NOTIFY ----------------- */
+
+   insert_job:      CNV_UPDATE_CFG_NOTIFY
+   job_type:        c
+   box_name:        CNV_PREPFASR
+   command:         cnv_autojob.sh cnv_send_msg.sh Update the config file with the run information found /usr/local/conv/opt/gencode2/job/fasr.cfg
+   condition:       s(CNV_SWD_SYSTEM_TEST)
+   description:     "Update config file"
+
+   /* ----------------- CNV_PREP_FASR_J ----------------- */
+
+   insert_job:      CNV_PREP_FASR_J
+   job_type:        c
+   box_name:        CNV_PREPFASR
+   command:         cnv_autojob.sh prepfasr RUNID
+   condition:       s(CNV_UPDATE_CFG_NOTIFY)
+   description:     "Prepfasr job"
+
+   /* ----------------- CNV_PREPARE_FASR_J ----------------- */
+
+   insert_job:      CNV_PREPARE_FASR_J
+   job_type:        c
+   box_name:        CNV_PREPFASR
+   command:         cnv_autojob.sh prepare_fasr.sh RUNID
+   condition:       s(CNV_PREP_FASR_J)
+   description:     "prepare fasr script"
+
+/* ----------------- MAPPING_NEED_APPROVAL ----------------- */
+
+insert_job:      MAPPING_NEED_APPROVAL
+job_type:        b
+description:     "Generate mappings that need approval document."
+
+ /* ----------------- CNV_ALL_MAP_NEED_APPROVE_RPT ----------------- */
+
+ insert_job:      CNV_ALL_MAP_NEED_APPROVE_RPT
+ job_type:        c
+ box_name:        MAPPING_NEED_APPROVAL
+ command:         cnv_autojob.sh cnvj_gen_des_app all V
+ description:     "Generate mappings that need approval document."
+
+ /* ----------------- CNV_REF_MAP_NEED_APPROVE_RPT ----------------- */
+
+ insert_job:      CNV_REF_MAP_NEED_APPROVE_RPT
+ job_type:        c
+ box_name:        MAPPING_NEED_APPROVAL
+ command:         cnv_autojob.sh cnvj_gen_des_app ref V
+ description:     "Generate mappings that need approval document."
+
+ /* ----------------- CNV_MBR_MAP_NEED_APPROVE_RPT ----------------- */
+
+ insert_job:      CNV_MBR_MAP_NEED_APPROVE_RPT
+ job_type:        c
+ box_name:        MAPPING_NEED_APPROVAL
+ command:         cnv_autojob.sh cnvj_gen_des_app mbr V
+ description:     "Generate mappings that need approval document."
+
+ /* ----------------- CNV_PRV_MAP_NEED_APPROVE_RPT ----------------- */
+
+ insert_job:      CNV_PRV_MAP_NEED_APPROVE_RPT
+ job_type:        c
+ box_name:        MAPPING_NEED_APPROVAL
+ command:         cnv_autojob.sh cnvj_gen_des_app prv V
+ description:     "Generate mappings that need approval document."
+
+ /* ----------------- CNV_MGD_MAP_NEED_APPROVE_RPT ----------------- */
+
+ insert_job:      CNV_MGD_MAP_NEED_APPROVE_RPT
+ job_type:        c
+ box_name:        MAPPING_NEED_APPROVAL
+ command:         cnv_autojob.sh cnvj_gen_des_app mgd V
+ description:     "Generate mappings that need approval document."
+
+ /* ----------------- CNV_FIN_MAP_NEED_APPROVE_RPT ----------------- */
+
+ insert_job:      CNV_FIN_MAP_NEED_APPROVE_RPT
+ job_type:        c
+ box_name:        MAPPING_NEED_APPROVAL
+ command:         cnv_autojob.sh cnvj_gen_des_app fin V
+ description:     "Generate mappings that need approval document."
+
+ /* ----------------- CNV_PAU_MAP_NEED_APPROVE_RPT ----------------- */
+
+ insert_job:      CNV_PAU_MAP_NEED_APPROVE_RPT
+ job_type:        c
+ box_name:        MAPPING_NEED_APPROVAL
+ command:         cnv_autojob.sh cnvj_gen_des_app pau V
+ description:     "Generate mappings that need approval document."
+
+ /* ----------------- CNV_TPL_MAP_NEED_APPROVE_RPT ----------------- */
+
+ insert_job:      CNV_TPL_MAP_NEED_APPROVE_RPT
+ job_type:        c
+ box_name:        MAPPING_NEED_APPROVAL
+ command:         cnv_autojob.sh cnvj_gen_des_app tpl V
+ description:     "Generate mappings that need approval document."
+
+ /* ----------------- CNV_RBT_MAP_NEED_APPROVE_RPT ----------------- */
+
+ insert_job:      CNV_RBT_MAP_NEED_APPROVE_RPT
+ job_type:        c
+ box_name:        MAPPING_NEED_APPROVAL
+ command:         cnv_autojob.sh cnvj_gen_des_app rbt V
+ description:     "Generate mappings that need approval document."
+
+ /* ----------------- CNV_BUY_MAP_NEED_APPROVE_RPT ----------------- */
+
+ insert_job:      CNV_BUY_MAP_NEED_APPROVE_RPT
+ job_type:        c
+ box_name:        MAPPING_NEED_APPROVAL
+ command:         cnv_autojob.sh cnvj_gen_des_app buy V
+ description:     "Generate mappings that need approval document."
+
+ /* ----------------- CNV_CLM_MAP_NEED_APPROVE_RPT ----------------- */
+
+ insert_job:      CNV_CLM_MAP_NEED_APPROVE_RPT
+ job_type:        c
+ box_name:        MAPPING_NEED_APPROVAL
+ command:         cnv_autojob.sh cnvj_gen_des_app clm V
+ description:     "Generate mappings that need approval document."
+
+/* ----------------- MS_CONV_DASHBOARD ----------------- */
+
+insert_job:      MS_CONV_DASHBOARD
+job_type:        c
+command:         cnv_autojob.sh cnvj_cnvdash Y A
+description:     "Generates the conversion dashboard"
+date_conditions: 1
+days_of_week:    mo,tu,we,th,fr
+start_times:     "4:00"
+
+/* ----------------- CNV_ALL_UPD_MAP_STAT_SUB_TO_STATE ----------------- */
+
+insert_job:      CNV_ALL_UPD_MAP_STAT_SUB_TO_STATE
+job_type:        c
+command:         cnv_autojob.sh cnvxsql updmapstatussubtost.sql MAP
+description:     "Updates mappings from ready for state review to submitted to state for current date."
+date_conditions: 1
+days_of_week:    fr
+start_times:     "18:00"
+
+/* ----------------- CNV_ALL_EXPORT_MAP_RFSA ----------------- */
+
+insert_job:      CNV_ALL_EXPORT_MAP_RFSA
+job_type:        b
+description:     "Export mappings ready for state approval and update dte_updated in mappings"
+date_conditions: 1
+days_of_week:    fr
+start_times:     "2:30"
+
+ /* ----------------- CNV_ALL_MAP_NEED_APRV_CLIENT ----------------- */
+
+ insert_job:      CNV_ALL_MAP_NEED_APRV_CLIENT
+ job_type:        c
+ box_name:        CNV_ALL_EXPORT_MAP_RFSA
+ command:         cnv_autojob.sh cnvj_gen_des_app all V Y
+ description:     "Generates mappings that need to be approved by the client."
+
+ /* ----------------- CNV_ALL_UPD_MAP_DTE_UPDATED ----------------- */
+
+ insert_job:      CNV_ALL_UPD_MAP_DTE_UPDATED
+ job_type:        c
+ box_name:        CNV_ALL_EXPORT_MAP_RFSA
+ command:         cnv_autojob.sh cnvxsql $SYNPATHD/updmapstatussubtost.sql CUST
+ condition:       s(CNV_ALL_MAP_NEED_APRV_CLIENT)
+ description:     "Update dte_updated in mapping to current date and time for exported mappings"
+
