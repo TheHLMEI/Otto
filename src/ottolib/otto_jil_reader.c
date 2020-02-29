@@ -49,6 +49,7 @@ int jil_reserved_word(BUF_st *b);
 int add_insert_job(JOB *item, BUF_st *b);
 int add_update_job(JOB *item, BUF_st *b);
 int add_delete_item(JOB *item, BUF_st *b, char *kind);
+void set_jil_joblist_levels(JOBLIST *joblist);
 
 
 
@@ -122,6 +123,9 @@ parse_jil(BUF_st *b, JOBLIST *joblist)
 			advance_word(b);
 		}
 	}
+
+	if(retval == OTTO_SUCCESS)
+		set_jil_joblist_levels(joblist);
 
 	return(retval);
 }
@@ -240,6 +244,7 @@ add_insert_job(JOB *item, BUF_st *b)
 		fprintf(stderr, "ERROR for job: %s < invalid value \"%c\" for JIL keyword: \"auto_hold\" >.\n", item->name, auto_holdp[0]);
 		retval = OTTO_FAIL;
 	}
+	item->base_auto_hold = item->auto_hold;
 
 	// check if a valid comination of date conditions attributes was specified
 	if(date_conditionsp != NULL) date_check |= DTECOND_BIT;
@@ -461,6 +466,62 @@ jil_reserved_word(BUF_st *b)
 	}
 
 	return(retval);
+}
+
+
+
+void
+set_jil_joblist_levels(JOBLIST *joblist)
+{
+	int b, current_level=0, i, one_changed=OTTO_TRUE;
+
+	if(joblist != NULL)
+	{
+		// set up initial level states
+		for(i=0; i<joblist->nitems; i++)
+		{
+			switch(joblist->item[i].opcode)
+			{
+				case CREATE_JOB:
+					if(joblist->item[i].box_name[0] == '\0')
+						joblist->item[i].level = 0;
+					else
+						joblist->item[i].level = -1;
+					break;
+				case UPDATE_JOB:
+				case DELETE_BOX:
+				case DELETE_JOB:
+					joblist->item[i].level = 0;
+					break;
+			}
+		}
+
+		while(one_changed == OTTO_TRUE)
+		{
+			one_changed = OTTO_FALSE;
+			// look for a box at the current level and try to find its child jobs
+			for(b=0; b<joblist->nitems; b++)
+			{
+				if(joblist->item[b].opcode == CREATE_JOB &&
+					joblist->item[b].type   == OTTO_BOX   &&
+					joblist->item[b].level  == current_level)
+				{
+					// found a box, look for its children
+					for(i=0; i<joblist->nitems; i++)
+					{
+						if(i != b &&
+							joblist->item[i].opcode == CREATE_JOB &&
+							strcmp(joblist->item[i].box_name, joblist->item[b].name) == 0)
+						{
+							joblist->item[i].level = current_level + 1;
+							one_changed = OTTO_TRUE;
+						}
+					}
+				}
+			}
+			current_level++;
+		}
+	}
 }
 
 

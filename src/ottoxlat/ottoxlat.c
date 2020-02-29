@@ -257,6 +257,11 @@ ottoxlat(void)
 		}
 	}
 
+	if(retval == OTTO_SUCCESS && jobname != NULL)
+	{
+		retval = ottojob_reduce_list(&joblist, jobname);
+	}
+
 	if(retval == OTTO_SUCCESS)
 	{
 		switch(output_type)

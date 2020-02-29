@@ -77,6 +77,8 @@ int ottojob_copy_start_times(int64_t *output, char *start_times);
 int ottojob_copy_type(char *output, char *type, int outlen);
 
 void ottojob_log_job_layout();
+int  ottojob_reduce_list(JOBLIST *joblist, char *name);
+
 
 #endif
 //

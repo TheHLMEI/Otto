@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "ottobits.h"
 #include "ottocfg.h"
@@ -919,6 +920,66 @@ ottojob_log_job_layout()
 	lsprintf(CATI, "gpflag          at %4d for %4d type char        notnull\n", offsetof(JOB, gpflag),          sizeof(j.gpflag));
 	lsprintf(CATI, "bitmask         at %4d for %4d type integer(4)  notnull\n", offsetof(JOB, bitmask),         sizeof(j.bitmask));
 	lsprintf(END, "");
+}
+
+
+
+int
+ottojob_reduce_list(JOBLIST *joblist, char *name)
+{
+	int retval = OTTO_SUCCESS;
+	JOBLIST tmplist;
+	int i, n;
+
+	if(joblist == NULL || joblist->nitems <= 0)
+		retval = OTTO_FAIL;
+
+	tmplist.nitems = 0;
+	if(retval == OTTO_SUCCESS)
+	{
+		if((tmplist.item = (JOB *)calloc(joblist->nitems, sizeof(JOB))) == NULL)
+			retval = OTTO_FAIL;
+	}
+
+	if(retval == OTTO_SUCCESS)
+	{
+		// find the jobname specified on the command line
+		for(i=0; i<=joblist->nitems; i++)
+		{
+			if(strcmp(joblist->item[i].name, name) == 0)
+				break;
+		}
+		if(i == joblist->nitems)
+			retval = OTTO_FAIL;
+	}
+
+	if(retval == OTTO_SUCCESS)
+	{
+		// add the item to the tmplist
+		memcpy(&tmplist.item[tmplist.nitems++], &joblist->item[i], sizeof(JOB));
+
+		// loop through remaining jobs adding them if appropriate
+		for(n=i+1; n<=joblist->nitems; n++)
+		{
+			if(joblist->item[n].level <= joblist->item[i].level)
+				break;
+			memcpy(&tmplist.item[tmplist.nitems++], &joblist->item[n], sizeof(JOB));
+		}
+	}
+
+	// copy the tmplist back to the joblist
+	if(tmplist.item != NULL)
+	{
+		memcpy(joblist->item, tmplist.item, sizeof(JOB)*joblist->nitems);
+		free(tmplist.item);
+	}
+	else
+	{
+		memset(joblist->item, 0, sizeof(JOB)*joblist->nitems);
+	}
+	joblist->nitems = tmplist.nitems;
+
+	return(retval);
 }
 
 
