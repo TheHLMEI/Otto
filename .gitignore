@@ -1,6 +1,10 @@
 # Ignore all
 *
 
+# Unignore all make files
+!Makefile
+!makefile
+
 # Unignore all files with extenions
 !*.*
 
