@@ -3,14 +3,14 @@
 
 // stdin read buffer
 #pragma pack(1)
-typedef struct _buf
+typedef struct _dynbuf
 {
-	char    *buf;
+	char    *buffer;
 	char    *s;
-	int     buflen;
+	int     bufferlen;
 	int     eob;
 	int     line;
-} BUF_st;
+} DYNBUF;
 #pragma pack()
 
 void  output_xml(char *s);
@@ -24,11 +24,11 @@ int   xmltoi(char *source);
 void  xmlcpy(char *t, char *s);
 int   xmlchr(char *s, int c);
 int   xmlcmp(char *s1, char *s2);
-int   read_stdin(BUF_st *b, char *prompt);
-void  remove_jil_comments(BUF_st *b);
-void  advance_word(BUF_st *b);
-void  advance_jilword(BUF_st *b);
-void  regress_word(BUF_st *b);
+int   read_stdin(DYNBUF *b, char *prompt);
+void  remove_jil_comments(DYNBUF *b);
+void  advance_word(DYNBUF *b);
+void  advance_jilword(DYNBUF *b);
+void  regress_word(DYNBUF *b);
 
 int   strwcmp(char *pTameText, char *pWildText);
 

@@ -57,12 +57,12 @@ void  output_xml_tasks(int16_t id, char *level);
 void  output_xml_task(int i, char *outline);
 void  output_xml_predecessors(int i);
 void  output_xml_postamble();
-void  buffer_jil_preamble(BUF_st *o);
-void  buffer_jil_task(BUF_st *o, int i);
-void  buffer_name(BUF_st *o, char *buf);
-void  buffer_xml(BUF_st *o, char *s);
+void  buffer_jil_preamble(DYNBUF *o);
+void  buffer_jil_task(DYNBUF *o, int i);
+void  buffer_name(DYNBUF *o, char *buf);
+void  buffer_xml(DYNBUF *o, char *s);
 void  report_xml(char *s);
-int   bprintf(BUF_st *b, char *format, ...);
+int   bprintf(DYNBUF *b, char *format, ...);
 
 
 
@@ -269,7 +269,7 @@ int
 ottomsp(void)
 {
 	int      retval = OTTO_SUCCESS;
-   BUF_st  b;
+   DYNBUF  b;
 	JOBLIST joblist;
 
 	switch(action)

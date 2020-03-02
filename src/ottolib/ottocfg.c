@@ -149,17 +149,17 @@ read_cfgfile()
 	char  *word, *word2;
 	FILE  *infile = NULL;
 	off_t islen;
-	struct stat buf;
+	struct stat statbuf;
 
 	if((infile = fopen(cfg.env_ottocfg, "r")) != NULL)
 	{
-		if(fstat(fileno(infile), &buf) != 0)
+		if(fstat(fileno(infile), &statbuf) != 0)
 		{
 			lprintf(MAJR, "Can't stat $OTTOCFG.");
 			retval = OTTO_FAIL;
 		}
 
-		islen = buf.st_size;
+		islen = statbuf.st_size;
 		if((instring = malloc(islen)) == NULL)
 		{
 			lprintf(MAJR, "Can't malloc instring.");
@@ -540,7 +540,7 @@ read_ottoenv()
 	FILE  *infile = NULL;
 	off_t islen;
 	int   i;
-	struct stat buf;
+	struct stat statbuf;
 
 	for(i=0; i<cfg.n_envvar_d; i++)
 		if(cfg.envvar_d[i] != NULL)
@@ -551,7 +551,7 @@ read_ottoenv()
 	{
 		if((infile = fopen(cfg.env_ottoenv, "r")) != NULL)
 		{
-			if(fstat(fileno(infile), &buf) != 0)
+			if(fstat(fileno(infile), &statbuf) != 0)
 			{
 				lprintf(MAJR, "Can't stat $OTTOENV.");
 				retval = OTTO_FAIL;
@@ -559,7 +559,7 @@ read_ottoenv()
 
 			if(retval == OTTO_SUCCESS)
 			{
-				islen = buf.st_size;
+				islen = statbuf.st_size;
 				if((instring = malloc(islen)) == NULL)
 				{
 					lprintf(MAJR, "Can't malloc instring.");

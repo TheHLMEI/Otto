@@ -4,7 +4,7 @@
 #include "ottojob.h"
 #include "ottoutil.h"
 
-int parse_jil(BUF_st *b, JOBLIST *joblist);
+int parse_jil(DYNBUF *b, JOBLIST *joblist);
 
 #endif
 //

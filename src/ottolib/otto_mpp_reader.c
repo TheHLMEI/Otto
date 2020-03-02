@@ -66,9 +66,9 @@ typedef struct _mpp_tasklist
 #pragma pack()
 
 
-int   parse_mpp_xml_attributes(BUF_st *b);
+int   parse_mpp_xml_attributes(DYNBUF *b);
 char *get_extend_def(char *s);
-int   parse_mpp_xml_tasks(BUF_st *b, MPP_TASKLIST *tasklist);
+int   parse_mpp_xml_tasks(DYNBUF *b, MPP_TASKLIST *tasklist);
 char *add_extend_ptr(MPP_TASK *tmptask, char *s);
 char *add_depend_uid(MPP_TASK *tmptask, char *s);
 int   resolve_mpp_xml_dependencies();
@@ -77,7 +77,7 @@ int   validate_and_copy_mpp_xml();
 
 
 int
-parse_mpp_xml(BUF_st *b, JOBLIST *joblist)
+parse_mpp_xml(DYNBUF *b, JOBLIST *joblist)
 {
 	int retval = OTTO_SUCCESS;
 	MPP_TASKLIST tasklist;;
@@ -110,12 +110,12 @@ parse_mpp_xml(BUF_st *b, JOBLIST *joblist)
 
 
 int
-parse_mpp_xml_attributes(BUF_st *b)
+parse_mpp_xml_attributes(DYNBUF *b)
 {
 	int retval = OTTO_SUCCESS;
 	int  intasks = OTTO_FALSE;
 	char code[9];
-	char *s = b->buf;
+	char *s = b->buffer;
 
 	while(*s != '\0' && intasks == OTTO_FALSE)
 	{
@@ -192,13 +192,13 @@ get_extend_def(char *s)
 
 
 int
-parse_mpp_xml_tasks(BUF_st *b, MPP_TASKLIST *tasklist)
+parse_mpp_xml_tasks(DYNBUF *b, MPP_TASKLIST *tasklist)
 {
 	int retval = OTTO_SUCCESS;
 	int        id, intasks=OTTO_FALSE, max_id=-1;
 	char       code[9];
 	MPP_TASK   tmptask;
-	char *     s = b->buf, *tasksp = NULL;
+	char *     s = b->buffer, *tasksp = NULL;
 
 	// find highest <ID> value inside <Tasks> container to allocate task array
 	while(*s != '\0')

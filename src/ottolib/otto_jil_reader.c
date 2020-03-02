@@ -45,16 +45,16 @@ enum JIL_KEYWORDS
 
 
 
-int jil_reserved_word(BUF_st *b);
-int add_insert_job(JOB *item, BUF_st *b);
-int add_update_job(JOB *item, BUF_st *b);
-int add_delete_item(JOB *item, BUF_st *b, char *kind);
+int jil_reserved_word(DYNBUF *b);
+int add_insert_job(JOB *item, DYNBUF *b);
+int add_update_job(JOB *item, DYNBUF *b);
+int add_delete_item(JOB *item, DYNBUF *b, char *kind);
 void set_jil_joblist_levels(JOBLIST *joblist);
 
 
 
 int
-parse_jil(BUF_st *b, JOBLIST *joblist)
+parse_jil(DYNBUF *b, JOBLIST *joblist)
 {
 	int retval = OTTO_SUCCESS;
 	int i = 0;
@@ -68,7 +68,7 @@ parse_jil(BUF_st *b, JOBLIST *joblist)
 		memset(joblist, 0, sizeof(JOBLIST));
 
 		b->line = 0;
-		b->s    = b->buf;
+		b->s    = b->buffer;
 		while(b->s[0] != '\0')
 		{
 			switch(jil_reserved_word(b))
@@ -100,7 +100,7 @@ parse_jil(BUF_st *b, JOBLIST *joblist)
 	if(retval == OTTO_SUCCESS)
 	{
 		b->line = 0;
-		b->s    = b->buf;
+		b->s    = b->buffer;
 		while(b->s[0] != '\0')
 		{
 			switch(jil_reserved_word(b))
@@ -133,7 +133,7 @@ parse_jil(BUF_st *b, JOBLIST *joblist)
 
 
 int
-add_insert_job(JOB *item, BUF_st *b)
+add_insert_job(JOB *item, DYNBUF *b)
 {
 	int     retval       = OTTO_SUCCESS;
 	int     exit_loop    = OTTO_FALSE;
@@ -335,7 +335,7 @@ add_insert_job(JOB *item, BUF_st *b)
 
 
 int
-add_update_job(JOB *item, BUF_st *b)
+add_update_job(JOB *item, DYNBUF *b)
 {
 	int retval = OTTO_FAIL;
 
@@ -345,7 +345,7 @@ add_update_job(JOB *item, BUF_st *b)
 
 
 int
-add_delete_item(JOB *item, BUF_st *b, char *kind)
+add_delete_item(JOB *item, DYNBUF *b, char *kind)
 {
 	int retval = OTTO_SUCCESS;
 	int rc;
@@ -377,7 +377,7 @@ add_delete_item(JOB *item, BUF_st *b, char *kind)
 
 
 int
-jil_reserved_word(BUF_st *b)
+jil_reserved_word(DYNBUF *b)
 {
 	int retval = JIL_UNKNOWN;
 	int c, i;

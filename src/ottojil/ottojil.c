@@ -171,7 +171,7 @@ int
 ottojil(void)
 {
 	int retval = OTTO_SUCCESS;
-	BUF_st b;
+	DYNBUF b;
 	JOBLIST joblist;
 	int i;
 
@@ -197,8 +197,8 @@ ottojil(void)
 		}
 	}
 
-	if(b.buf != NULL)
-		free(b.buf);
+	if(b.buffer != NULL)
+		free(b.buffer);
 
 	if(joblist.item != NULL)
 		free(joblist.item);

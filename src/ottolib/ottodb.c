@@ -260,7 +260,7 @@ open_ottodb(int type)
 	int   actual_size, desired_size;
 	char *filename;
 	int16_t dbversion = -1;
-	struct stat buf;
+	struct stat statbuf;
 
 	desired_size = sizeof(JOB)*(cfg.ottodb_maxjobs+1);
 
@@ -280,10 +280,10 @@ open_ottodb(int type)
 	// check if file exists and we can access it, get actual size and format
 	if(retval != OTTO_FAIL)
 	{
-		switch(stat(filename, &buf))
+		switch(stat(filename, &statbuf))
 		{
 			case 0:
-				actual_size = buf.st_size;
+				actual_size = statbuf.st_size;
 				if((fd = open(filename, testflags)) == -1)
 				{
 					printf("$OTTODB exists but can't be opened in read/write mode\n");
@@ -351,8 +351,8 @@ open_ottodb(int type)
 			if((retval = migrate_db(dbversion)) != OTTO_FAIL)
 			{
 				// get the new actual size after migration
-				stat(filename, &buf);
-				actual_size = buf.st_size;
+				stat(filename, &statbuf);
+				actual_size = statbuf.st_size;
 			}
 		}
 	}
@@ -442,8 +442,8 @@ open_ottodb(int type)
 	if(retval != OTTO_FAIL)
 	{
 		// store the inode of the ottodb file for verification
-		stat(filename, &buf);
-		ottodb_inode = buf.st_ino;
+		stat(filename, &statbuf);
+		ottodb_inode = statbuf.st_ino;
 	}
 
 	return(retval);

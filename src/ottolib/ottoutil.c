@@ -270,7 +270,7 @@ xmlcmp(char *s1, char *s2)
 
 
 int
-read_stdin(BUF_st *b, char *prompt)
+read_stdin(DYNBUF *b, char *prompt)
 {
 	int retval = OTTO_SUCCESS;
    int nread;
@@ -279,7 +279,7 @@ read_stdin(BUF_st *b, char *prompt)
 
 	if(b != NULL)
 	{
-		memset(b, 0, sizeof(BUF_st));
+		memset(b, 0, sizeof(DYNBUF));
 
 		if(isatty(STDIN_FILENO))
 		{
@@ -295,16 +295,16 @@ read_stdin(BUF_st *b, char *prompt)
 		while(retval == OTTO_SUCCESS && fgets(buffer, 8192, stdin) != NULL)
 		{
 			nread = strlen(buffer);
-			b->buflen += nread + 1;
-			b->buf = realloc(b->buf, b->buflen);
-			if(b->buf == NULL)
+			b->bufferlen += nread + 1;
+			b->buffer = realloc(b->buffer, b->bufferlen);
+			if(b->buffer == NULL)
 			{
 				lperror(MAJR, "Failed to reallocate buf");
 				retval = OTTO_FAIL;
 			}
-			memcpy(&b->buf[b->eob], buffer, nread);
+			memcpy(&b->buffer[b->eob], buffer, nread);
 			b->eob += nread;
-			b->buf[b->eob] = '\0';
+			b->buffer[b->eob] = '\0';
 			if(display_prompt == OTTO_TRUE)
 			{
 				printf("%s> ", prompt);
@@ -312,7 +312,7 @@ read_stdin(BUF_st *b, char *prompt)
 			}
 		}
 
-		b->s = b->buf;
+		b->s = b->buffer;
 
 		if(display_prompt == OTTO_TRUE)
 		{
@@ -320,7 +320,7 @@ read_stdin(BUF_st *b, char *prompt)
 			fflush(stdout);
 		}
 
-		if(b->buflen == 0)
+		if(b->bufferlen == 0)
 			retval = OTTO_FAIL;
 	}
 	else
@@ -335,14 +335,14 @@ read_stdin(BUF_st *b, char *prompt)
 
 
 void
-remove_jil_comments(BUF_st *b)
+remove_jil_comments(DYNBUF *b)
 {
 	char *s, last_char;
 
 	// remove comments from buffer
 	last_char = '\n';
 
-	s = b->buf;
+	s = b->buffer;
 	while(*s != '\0')
 	{
 		if(last_char == '\n')
@@ -404,7 +404,7 @@ remove_jil_comments(BUF_st *b)
 
 
 void
-advance_word(BUF_st *b)
+advance_word(DYNBUF *b)
 {
 	// consume non-space
 	while(!isspace(*(b->s)) && *(b->s) != '\0')
@@ -422,7 +422,7 @@ advance_word(BUF_st *b)
 
 
 void
-advance_jilword(BUF_st *b)
+advance_jilword(DYNBUF *b)
 {
 	// consume non-space
 	while(!isspace(*(b->s)) && *(b->s) != ':' && *(b->s) != '\0')
@@ -440,9 +440,9 @@ advance_jilword(BUF_st *b)
 
 
 void
-regress_word(BUF_st *b)
+regress_word(DYNBUF *b)
 {
-	if(b->s != b->buf)
+	if(b->s != b->buffer)
 	{
 		b->s--;
 		if(*(b->s) == '\n')

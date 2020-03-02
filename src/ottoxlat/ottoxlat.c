@@ -236,7 +236,7 @@ int
 ottoxlat(void)
 {
 	int     retval = OTTO_SUCCESS;
-   BUF_st  b;
+   DYNBUF  b;
 	JOBLIST joblist;
 
 	retval = read_stdin(&b, "ottoxlat");
