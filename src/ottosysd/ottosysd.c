@@ -992,8 +992,6 @@ int
 run_job(int id)
 {
 	pid_t pid;
-	int i;
-	char *env[6+MAX_ENVVAR];
 	char auto_job_name[NAMLEN+15];
 	
 	if(job[id].on_noexec == OTTO_TRUE)
@@ -1036,20 +1034,12 @@ run_job(int id)
 			chdir(getenv("HOME"));
 
 			// build environment including
-			// AUTO_JOB_NAME, HOME, LOGNAME, USER, PATH
+			// HOME, LOGNAME, USER, PATH, and environment variables read form the OTTOCFG and OTTOENV files
+			rebuild_environment();
+
+			// add the job name at the top of the list
 			sprintf(auto_job_name, "AUTO_JOB_NAME=%s", job[id].name);
-			env[0] = auto_job_name;
-			env[1] = cfg.env_home;
-			env[2] = cfg.env_logname;
-			env[3] = cfg.env_user;
-			env[4] = cfg.env_path;
-
-			// add envvars from config file
-			for(i=0; i<cfg.n_envvar; i++)
-				env[5+i] = cfg.envvar[i];
-
-			// terminate list
-			env[5+i] = NULL;
+			cfg.envvar[0] = auto_job_name;
 
 			// ensure file descriptors are closed on exec
 			fcntl(0,        F_SETFD, FD_CLOEXEC);  // stdin
@@ -1061,7 +1051,7 @@ run_job(int id)
 			//	fcntl(csock, F_SETFD, FD_CLOEXEC);  // client socket
 
 			// overlay a shell to execute the command
-			execle("/bin/sh", "/bin/sh", "-c", job[id].command, NULL, env);
+			execle("/bin/sh", "/bin/sh", "-c", job[id].command, NULL, cfg.envvar);
 
 			lprintf(MAJR, "execle failed for %s.\n", job[id].name);
 		}

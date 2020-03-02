@@ -1,5 +1,6 @@
 #include <ctype.h>
 #include <libgen.h>
+#include <limits.h>
 #include <pwd.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -17,6 +18,27 @@
 #include "ottolog.h"
 #include "ottoutil.h"
 
+enum VARS
+{
+	AUTO_JOB_NAMEVAR,
+	HOMEVAR,
+	USERVAR,
+	LOGNAMEVAR,
+	PATHVAR,
+	VAR_TOTAL
+};
+
+char *strvars[VAR_TOTAL+1] =
+{
+	"AUTO_JOB_NAME=",
+	"HOME=",
+	"USER=",
+	"LOGNAME=",
+	"PATH=",
+	"VAR_TOTAL"
+};
+
+
 #define COMPLAIN           OTTO_TRUE
 #define DONT_COMPLAIN      OTTO_FALSE
 #define KEEP_VARNAME       OTTO_TRUE
@@ -28,7 +50,8 @@ int  get_cfg_int(char *parm, char *val, int lowval, int highval, int defval);
 int  get_cfg_bool(char *parm, char *val, int defval);
 int  get_cfg_envvar(char *word);
 int  get_envvar(char **envvar, char *envvarname, int complain, int keep_varname);
-int  get_ottoenv(char *word);
+int  read_ottoenv(void);
+int  get_dyn_envvar(char *word);
 
 
 
@@ -65,10 +88,10 @@ init_cfg(int argc, char **argv)
 	pw = getpwuid(getuid());
 	cfg.euid = pw->pw_uid;
 
-	if(get_envvar(&cfg.env_home,    "HOME",    COMPLAIN, KEEP_VARNAME)      == OTTO_FAIL) retval = OTTO_FAIL;
-	if(get_envvar(&cfg.env_user,    "USER",    COMPLAIN, KEEP_VARNAME)      == OTTO_FAIL) retval = OTTO_FAIL;
-	if(get_envvar(&cfg.env_path,    "PATH",    COMPLAIN, KEEP_VARNAME)      == OTTO_FAIL) retval = OTTO_FAIL;
-	if(get_envvar(&cfg.env_logname, "LOGNAME", COMPLAIN, KEEP_VARNAME)      == OTTO_FAIL) retval = OTTO_FAIL;
+	if(get_envvar(&cfg.envvar_s[HOMEVAR],    "HOME",    COMPLAIN, KEEP_VARNAME) == OTTO_FAIL) retval = OTTO_FAIL;
+	if(get_envvar(&cfg.envvar_s[USERVAR],    "USER",    COMPLAIN, KEEP_VARNAME) == OTTO_FAIL) retval = OTTO_FAIL;
+	if(get_envvar(&cfg.envvar_s[LOGNAMEVAR], "LOGNAME", COMPLAIN, KEEP_VARNAME) == OTTO_FAIL) retval = OTTO_FAIL;
+	if(get_envvar(&cfg.envvar_s[PATHVAR],    "PATH",    COMPLAIN, KEEP_VARNAME) == OTTO_FAIL) retval = OTTO_FAIL;
 	if(get_envvar(&cfg.env_ottocfg, "OTTOCFG", COMPLAIN, DONT_KEEP_VARNAME) == OTTO_FAIL) retval = OTTO_FAIL;
 	if(get_envvar(&cfg.env_ottolog, "OTTOLOG", COMPLAIN, DONT_KEEP_VARNAME) == OTTO_FAIL) retval = OTTO_FAIL;
 
@@ -311,208 +334,276 @@ get_cfg_envvar(char *word)
 	if((name = strdup(word)) == NULL)
 	{
 		fprintf(stderr, "name strdup failed.\n");
-		exit(-1);
+		retval = OTTO_FALSE;
 	}
 
-	// find equal sign
-	retval = OTTO_FAIL;
-	for(i=0; name[i] != '\0'; i++)
+	if(retval == OTTO_SUCCESS)
 	{
-		if(name[i] == '=')
+		// find equal sign
+		retval = OTTO_FAIL;
+		for(i=0; name[i] != '\0'; i++)
 		{
-			name[i] = '\0';
-			retval = OTTO_SUCCESS;
-			break;
-		}
-	}
-
-	if(retval == OTTO_FAIL)
-	{
-		lprintf(MAJR, "Malformed envvar '%s'. No equal found\n", word);
-		return(retval);
-	}
-
-	// validate name character set
-	for(i=0; name[i] != '\0'; i++)
-	{
-		switch(i)
-		{
-			case 0:
-				if(name[i] != '_' && !isalpha(name[i]))
-				{
-					lprintf(MAJR, "Malformed envvar '%s'. Bad initial character\n", name);
-					return(OTTO_FAIL);
-				}
-				break;
-			default:
-				if(name[i] != '_' && !isalnum(name[i]))
-				{
-					lprintf(MAJR, "Malformed envvar '%s'. Bad character\n", name);
-					return(OTTO_FAIL);
-				}
-				break;
-		}
-	}
-
-	// trap attempts to override derived environment variables
-	strcat(name, "=");
-	if(strcmp(name, "HOME=") == 0)
-	{
-		lprintf(MAJR, "Denying override of $HOME in config file\n");
-		return(OTTO_FAIL);
-	}
-
-	if(strcmp(name, "USER=") == 0)
-	{
-		lprintf(MAJR, "Denying override of $USER in config file\n");
-		return(OTTO_FAIL);
-	}
-
-	if(strcmp(name, "LOGNAME=") == 0)
-	{
-		lprintf(MAJR, "Denying override of $LOGNAME in config file\n");
-		return(OTTO_FAIL);
-	}
-
-	if(strcmp(name, "AUTO_JOB_NAME=") == 0)
-	{
-		lprintf(MAJR, "Denying override of $AUTO_JOB_NAME in config file\n");
-		return(OTTO_FAIL);
-	}
-
-	// allow PATH to be overridden
-	if(strcmp(name, "PATH=") == 0)
-	{
-		if(cfg.env_path != NULL)
-		{
-			free(cfg.env_path);
-			cfg.env_path = NULL;
-		}
-		if((cfg.env_path = strdup(word)) == NULL)
-		{
-			lprintf(MAJR, "Error overriding env_path.\n");
-			return(OTTO_FAIL);
-		}
-		else
-		{
-			cfg.path_overridden = OTTO_TRUE;
-		}
-	}
-	else
-	{
-		// override any envvar already set up
-		for(i=0; i<cfg.n_envvar; i++)
-		{
-			if(strncmp(cfg.envvar[i], name, strlen(name)) == 0)
+			if(name[i] == '=')
 			{
-				free(cfg.envvar[i]);
-				if((cfg.envvar[i] = strdup(word)) == NULL)
-				{
-					lprintf(MAJR, "Error overriding %*.*s.\n", strlen(name)-1, strlen(name)-1, name);
-					return(OTTO_FAIL);
-				}
+				name[i] = '\0';
+				retval = OTTO_SUCCESS;
+				break;
 			}
 		}
+	}
 
-		// if the envvar wasn't found add it
-		if(i == cfg.n_envvar)
+	if(retval != OTTO_SUCCESS)
+	{
+		lprintf(MAJR, "Malformed envvar '%s'. No equal found\n", word);
+		retval = OTTO_FALSE;
+	}
+
+	if(retval == OTTO_SUCCESS)
+	{
+		// validate name character set
+		for(i=0; name[i] != '\0'; i++)
 		{
-			if(cfg.n_envvar < MAX_ENVVAR)
+			switch(i)
 			{
-				cfg.envvar[cfg.n_envvar] = strdup(word);
-				if(cfg.envvar[cfg.n_envvar] == NULL)
+				case 0:
+					if(name[i] != '_' && !isalpha(name[i]))
+					{
+						lprintf(MAJR, "Malformed envvar '%s'. Bad initial character\n", name);
+						retval = OTTO_FALSE;
+					}
+					break;
+				default:
+					if(name[i] != '_' && !isalnum(name[i]))
+					{
+						lprintf(MAJR, "Malformed envvar '%s'. Bad character\n", name);
+						retval = OTTO_FALSE;
+					}
+					break;
+			}
+		}
+	}
+
+	if(retval == OTTO_SUCCESS)
+	{
+		// trap attempts to override derived environment variables
+		strcat(name, "=");
+		for(i=AUTO_JOB_NAMEVAR; i<PATHVAR; i++)
+		{
+			if(strcmp(name, strvars[i]) == 0)
+			{
+				lprintf(MAJR, "Denying override of %*.*s in config file.\n", strlen(name)-1, strlen(name)-1, name);
+				retval = OTTO_FALSE;
+			}
+		}
+	}
+
+	if(retval == OTTO_SUCCESS)
+	{
+		// allow any other environment variables (including PATH) to be overridden
+		// override any envvar already set up
+		for(i=PATHVAR+1; i<cfg.n_envvar_s; i++)
+		{
+			if(strncmp(cfg.envvar_s[i], name, strlen(name)) == 0)
+			{
+				free(cfg.envvar_s[i]);
+				if((cfg.envvar_s[i] = strdup(word)) == NULL)
 				{
-					lprintf(MAJR, "Error mallocing envvar %d.\n", cfg.n_envvar);
-					return(OTTO_FAIL);
+					lprintf(MAJR, "Error overriding %*.*s.\n", strlen(name)-1, strlen(name)-1, name);
+					retval = OTTO_FALSE;
 				}
 				else
 				{
-					cfg.n_envvar++;
+					if(strcmp(name, "PATH=") == 0)
+						cfg.path_overridden = OTTO_TRUE;
+				}
+			}
+		}
+	}
+
+	if(retval == OTTO_SUCCESS)
+	{
+		// if the envvar wasn't found add it
+		if(i == cfg.n_envvar_s)
+		{
+			if(cfg.n_envvar_s < MAX_ENVVAR)
+			{
+				cfg.envvar_s[cfg.n_envvar_s] = strdup(word);
+				if(cfg.envvar_s[cfg.n_envvar_s] == NULL)
+				{
+					lprintf(MAJR, "Error mallocing envvar %d.\n", cfg.n_envvar_s);
+					retval = OTTO_FALSE;
+				}
+				else
+				{
+					cfg.n_envvar_s++;
 				}
 			}
 			else
 			{
-				lprintf(MAJR, "Error exceeding number of allowed envvars %d.\n", cfg.n_envvar);
-				return(OTTO_FAIL);
+				lprintf(MAJR, "Error exceeding number of allowed static envvars %d.\n", cfg.n_envvar_s);
+				retval = OTTO_FALSE;
 			}
 		}
 	}
 
-	free(name);
+	if(name != NULL)
+		free(name);
 
 	return(retval);
 }
 
 
 
-#ifdef NOT_NOW
+void
+rebuild_environment()
+{
+	struct stat statbuf;
+	char name[PATH_MAX];
+	int i, j;
+	int environment_changed = OTTO_FALSE;
+
+	// check if the dynamic environment changed
+	if(cfg.env_ottoenv != NULL && stat(cfg.env_ottoenv, &statbuf) != -1)
+	{
+		if(cfg.ottoenv_mtime < statbuf.st_mtime)
+		{
+			read_ottoenv();
+			cfg.ottoenv_mtime = statbuf.st_mtime;
+			environment_changed = OTTO_TRUE;
+
+			if(cfg.n_envvar_d > 0)
+			{
+				lsprintf(INFO, "Dynamic Environment:\n");
+				for(i=0; i<cfg.n_envvar_d; i++)
+					lsprintf(CATI, "envvar:      %s\n", cfg.envvar_d[i]);
+				lsprintf(END, "");
+			}
+		}
+	}
+
+	// only rebuild it if it's the first time through or the dynamic environment changed
+	if(cfg.n_envvar == 0 ||	environment_changed == OTTO_TRUE)
+	{
+		// clear out current environment
+		for(i=0; i<MAX_ENVVAR; i++)
+			cfg.envvar[i] = NULL;
+
+		// add static environment
+		for(i=0; i<cfg.n_envvar_s; i++)
+			cfg.envvar[i] = cfg.envvar_s[i];
+		cfg.n_envvar = cfg.n_envvar_s;
+
+		// add dynamic environment
+		// allow any other environment variables to be overridden
+		// override any envvar already set up
+		for(i=0; i<cfg.n_envvar_d; i++)
+		{
+			// get the enviroonment variable name and the equal sign
+			for(j=0; j<strlen(cfg.envvar_d[i]); j++)
+			{
+				name[j] = cfg.envvar_d[i][j];
+				if(name[j] == '=')
+				{
+					name[++j] = '\0';
+					break;
+				}
+			}
+
+			// allow override of anything but the derived values (including PATH)
+			for(j=PATHVAR; j<cfg.n_envvar; j++)
+			{
+				// replace the value if it's found
+				if(strncmp(cfg.envvar[j], name, strlen(name)) == 0)
+				{
+					cfg.envvar[j] = cfg.envvar_d[i];
+					break;
+				}
+			}
+			// add it
+			if(j == cfg.n_envvar)
+			{
+				cfg.envvar_d[cfg.n_envvar] = cfg.envvar_d[i];
+				cfg.n_envvar++;
+			}
+		}
+	}
+}
+
+
+
 int
 read_ottoenv()
 {
 	int   retval = OTTO_SUCCESS;
-	char  *instring, *s, *e;
-	char  *word, *word2;
+	char  *instring=NULL, *s, *e;
+	char  *word=NULL, *word2=NULL;
 	FILE  *infile = NULL;
 	off_t islen;
-	int   tempint;
+	int   i;
 	struct stat buf;
 
-	if((infile = fopen(env_ottoenv, "r")) != NULL)
+	for(i=0; i<cfg.n_envvar_d; i++)
+		if(cfg.envvar_d[i] != NULL)
+			free(cfg.envvar_d[i]);
+	cfg.n_envvar_d = 0;
+
+	if(cfg.env_ottoenv != NULL)
 	{
-		if(fstat(fileno(infile), &buf) != 0)
+		if((infile = fopen(cfg.env_ottoenv, "r")) != NULL)
 		{
-			lprintf(MAJR, "Can't stat $OTTOCFG.");
-			retval = OTTO_FAIL;
-		}
-
-		islen = buf.st_size;
-		if((instring = malloc(islen)) == NULL)
-		{
-			lprintf(MAJR, "Can't malloc instring.");
-			retval = OTTO_FAIL;
-		}
-		if((word = malloc(islen)) == NULL)
-		{
-			lprintf(MAJR, "Can't malloc word.");
-			retval = OTTO_FAIL;
-		}
-		if((word2 = malloc(islen)) == NULL)
-		{
-			lprintf(MAJR, "Can't malloc word2.");
-			retval = OTTO_FAIL;
-		}
-
-		if(retval == OTTO_SUCCESS)
-		{
-			while(fgets(instring, islen, infile) != NULL)
+			if(fstat(fileno(infile), &buf) != 0)
 			{
-				s = instring;
-				while(isspace(*s) && *s != '\0')
-					s++;
+				lprintf(MAJR, "Can't stat $OTTOENV.");
+				retval = OTTO_FAIL;
+			}
 
-				s = copy_word(word, s);
-				if(word[0] != '#')
+			if(retval == OTTO_SUCCESS)
+			{
+				islen = buf.st_size;
+				if((instring = malloc(islen)) == NULL)
 				{
-					e = s;
-					s = copy_word(word2, s);
-					if(word2[0] == '\0')
-						continue;
+					lprintf(MAJR, "Can't malloc instring.");
+					retval = OTTO_FAIL;
+				}
+				if((word = malloc(islen)) == NULL)
+				{
+					lprintf(MAJR, "Can't malloc word.");
+					retval = OTTO_FAIL;
+				}
+				if((word2 = malloc(islen)) == NULL)
+				{
+					lprintf(MAJR, "Can't malloc word2.");
+					retval = OTTO_FAIL;
+				}
+			}
 
-					if(strcmp(word, "envvar") == 0)
+			if(retval == OTTO_SUCCESS)
+			{
+				while(fgets(instring, islen, infile) != NULL)
+				{
+					s = instring;
+					while(isspace(*s) && *s != '\0')
+						s++;
+
+					s = copy_word(word, s);
+					if(word[0] != '#')
 					{
-						copy_eol(word2, e);
-						get_ottoenv_envvar(word2);
-						continue;
+						e = s;
+						s = copy_word(word2, s);
+						if(word2[0] == '\0')
+							continue;
+
+						if(strcmp(word, "envvar") == 0)
+						{
+							copy_eol(word2, e);
+							get_dyn_envvar(word2);
+							continue;
+						}
 					}
 				}
 			}
 		}
 		fclose(infile);
-	}
-	else
-	{
-		lprintf(MAJR, "Couldn't open $OTTOENV for input.");
-		retval = OTTO_FAIL;
 	}
 
 	if(instring != NULL)
@@ -530,142 +621,129 @@ read_ottoenv()
 
 
 int
-get_ottoenv_envvar(char *word)
+get_dyn_envvar(char *word)
 {
 	int retval = OTTO_SUCCESS;
-	char *name;
+	char *name = NULL;
 	int i;
 
 	if((name = strdup(word)) == NULL)
 	{
 		fprintf(stderr, "name strdup failed.\n");
-		exit(-1);
+		retval = OTTO_FAIL;
 	}
 
-	// find equal sign
-	retval = OTTO_FAIL;
-	for(i=0; name[i] != '\0'; i++)
+	if(retval != OTTO_SUCCESS)
 	{
-		if(name[i] == '=')
+		// find equal sign
+		retval = OTTO_FAIL;
+		for(i=0; name[i] != '\0'; i++)
 		{
-			name[i] = '\0';
-			retval = OTTO_SUCCESS;
-			break;
+			if(name[i] == '=')
+			{
+				name[i] = '\0';
+				retval = OTTO_SUCCESS;
+				break;
+			}
 		}
 	}
 
-	if(retval == OTTO_FAIL)
+	if(retval != OTTO_SUCCESS)
 	{
 		lprintf(MAJR, "Malformed envvar '%s'. No equal found\n", word);
-		return(retval);
+		retval = OTTO_FAIL;
 	}
 
-	// validate name character set
-	for(i=0; name[i] != '\0'; i++)
+	if(retval == OTTO_SUCCESS)
 	{
-		switch(i)
+		// validate name character set
+		for(i=0; name[i] != '\0'; i++)
 		{
-			case 0:
-				if(name[i] != '_' && !isalpha(name[i]))
-				{
-					lprintf(MAJR, "Malformed envvar '%s'. Bad initial character\n", name);
-					return(OTTO_FAIL);
-				}
-				break;
-			default:
-				if(name[i] != '_' && !isalnum(name[i]))
-				{
-					lprintf(MAJR, "Malformed envvar '%s'. Bad character\n", name);
-					return(OTTO_FAIL);
-				}
-				break;
-		}
-	}
-
-	// trap attempts to override derived environment variables
-	strcat(name, "=");
-	for(i=0; i<n_envvar_r; i++)
-	{
-		if(strncmp(envvar_s[i], name, strlen(name)) == 0)
-		{
-			lprintf(MAJR, "Denying override of $*.*s in $OTTOENV file\n", nlen, nlen, name);
-			return(OTTO_FAIL);
-		}
-	}
-
-	if(strcmp(name, "HOME=") == 0)
-	{
-		return(OTTO_FAIL);
-	}
-
-	if(strcmp(name, "USER=") == 0)
-	{
-		lprintf(MAJR, "Denying override of $USER in config file\n");
-		return(OTTO_FAIL);
-	}
-
-	if(strcmp(name, "LOGNAME=") == 0)
-	{
-		lprintf(MAJR, "Denying override of $LOGNAME in config file\n");
-		return(OTTO_FAIL);
-	}
-
-	if(strcmp(name, "AUTO_JOB_NAME=") == 0)
-	{
-		lprintf(MAJR, "Denying override of $AUTO_JOB_NAME in config file\n");
-		return(OTTO_FAIL);
-	}
-
-	if(strcmp(name, "PATH=") == 0)
-	{
-		lprintf(MAJR, "Denying override of $PATH in config file\n");
-		return(OTTO_FAIL);
-	}
-	else
-	{
-		// override any envvar already set up
-		for(i=0; i<n_envvar; i++)
-		{
-			if(strncmp(envvar_s[i], name, strlen(name)) == 0)
+			switch(i)
 			{
-				free(envvar[i]);
-				if((envvar[i] = strdup(word)) == NULL)
+				case 0:
+					if(name[i] != '_' && !isalpha(name[i]))
+					{
+						lprintf(MAJR, "Malformed envvar '%s'. Bad initial character\n", name);
+						retval = OTTO_FAIL;
+					}
+					break;
+				default:
+					if(name[i] != '_' && !isalnum(name[i]))
+					{
+						lprintf(MAJR, "Malformed envvar '%s'. Bad character\n", name);
+						retval = OTTO_FAIL;
+					}
+					break;
+			}
+		}
+	}
+
+	if(retval == OTTO_SUCCESS)
+	{
+		// trap attempts to override derived environment variables
+		strcat(name, "=");
+		for(i=AUTO_JOB_NAMEVAR; i<VAR_TOTAL; i++)
+		{
+			if(strcmp(name, strvars[i]) == 0)
+			{
+				lprintf(MAJR, "Denying override of %*.*s in config file.\n", strlen(name)-1, strlen(name)-1, name);
+				retval = OTTO_FAIL;
+				break;
+			}
+		}
+	}
+
+	if(retval == OTTO_SUCCESS)
+	{
+		// allow any other environment variables to be overridden
+		// override any envvar already set up
+		for(i=0; i<cfg.n_envvar_d; i++)
+		{
+			if(strncmp(cfg.envvar_d[i], name, strlen(name)) == 0)
+			{
+				free(cfg.envvar_d[i]);
+				if((cfg.envvar_d[i] = strdup(word)) == NULL)
 				{
 					lprintf(MAJR, "Error overriding %*.*s.\n", strlen(name)-1, strlen(name)-1, name);
-					return(OTTO_FAIL);
+					retval = OTTO_FAIL;
+					break;
 				}
 			}
 		}
+	}
 
+	if(retval == OTTO_SUCCESS)
+	{
 		// if the envvar wasn't found add it
-		if(i == n_envvar)
+		if(i == cfg.n_envvar_d)
 		{
-			if(n_envvar < MAX_ENVVAR)
+			if(cfg.n_envvar_d < MAX_ENVVAR)
 			{
-				envvar[n_envvar] = strdup(word);
-				if(envvar[n_envvar] == NULL)
+				cfg.envvar_d[cfg.n_envvar_d] = strdup(word);
+				if(cfg.envvar_d[cfg.n_envvar_d] == NULL)
 				{
-					lprintf(MAJR, "Error mallocing envvar %d.\n", n_envvar);
-					return(OTTO_FAIL);
+					lprintf(MAJR, "Error mallocing envvar %d.\n", cfg.n_envvar_d);
+					retval = OTTO_FAIL;
 				}
 				else
 				{
-					n_envvar++;
+					cfg.n_envvar_d++;
 				}
 			}
 			else
 			{
-				lprintf(MAJR, "Error exceeding number of allowed envvars %d.\n", n_envvar);
-				return(OTTO_FAIL);
+				lprintf(MAJR, "Error exceeding number of allowed dynamic envvars %d.\n", cfg.n_envvar_d);
+				retval = OTTO_FAIL;
 			}
 		}
 	}
 
-	free(name);
+	if(name != NULL)
+		free(name);
 
 	return(retval);
 }
-#endif
 
 
 
@@ -705,11 +783,11 @@ log_cfg()
 	lsprintf(CATI, "OTTOCFG=%s\n", cfg.env_ottocfg);
 	lsprintf(CATI, "OTTOLOG=%s\n", cfg.env_ottolog);
 	lsprintf(CATI, "OTTOENV=%s\n", cfg.env_ottoenv == NULL ? "null" : cfg.env_ottoenv);
-	lsprintf(CATI, "%s\n",         cfg.env_home);
-	lsprintf(CATI, "%s\n",         cfg.env_logname);
-	lsprintf(CATI, "%s\n",         cfg.env_user);
+	lsprintf(CATI, "%s\n",         cfg.envvar_s[HOMEVAR]);
+	lsprintf(CATI, "%s\n",         cfg.envvar_s[USERVAR]);
+	lsprintf(CATI, "%s\n",         cfg.envvar_s[LOGNAMEVAR]);
 	if(cfg.path_overridden == OTTO_FALSE)
-		lsprintf(CATI, "%s\n", cfg.env_path);
+		lsprintf(CATI, "%s\n", cfg.envvar_s[PATHVAR]);
 	lsprintf(END, "");
 
 	lsprintf(INFO, "Configuration:\n");
@@ -723,10 +801,10 @@ log_cfg()
 	lsprintf(CATI, "debug:              %5s\n", cfg.debug      == OTTO_TRUE ? "true" : "false");
 
 	// add envvars from config file
-	for(i=0; i<cfg.n_envvar; i++)
-		lsprintf(CATI, "envvar:      %s\n", cfg.envvar[i]);
 	if(cfg.path_overridden == OTTO_TRUE)
-		lsprintf(CATI, "envvar:      %s\n", cfg.env_path);
+		lsprintf(CATI, "envvar:      %s\n", cfg.envvar_s[PATHVAR]);
+	for(i=PATHVAR+1; i<cfg.n_envvar_s; i++)
+		lsprintf(CATI, "envvar:      %s\n", cfg.envvar_s[i]);
 	lsprintf(END, "");
 }
 

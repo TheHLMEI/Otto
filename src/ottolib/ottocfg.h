@@ -30,10 +30,6 @@ typedef struct _ottocfg_st
 	char     *env_ottocfg;
 	char     *env_ottolog;
 	char     *env_ottoenv;
-	char     *env_home;
-	char     *env_logname;
-	char     *env_user;
-	char     *env_path;
 
 	// general variables
 	int       pause;
@@ -43,7 +39,7 @@ typedef struct _ottocfg_st
 	int       path_overridden;
 	time_t    ottoenv_mtime;
 
-	char     *envvar[MAX_ENVVAR];   // static environment from $OTTOCFG
+	char     *envvar[MAX_ENVVAR];   // environment to be passed to child jobs
 	char     *envvar_s[MAX_ENVVAR]; // static environment from $OTTOCFG
 	char     *envvar_d[MAX_ENVVAR]; // dynamic environment from $OTTOENV
 	int       n_envvar;
@@ -55,6 +51,7 @@ extern ottocfg_st cfg;
 
 int  init_cfg(int argc, char **argv);
 int  read_cfgfile(void);
+void rebuild_environment(void);
 void log_initialization(void);
 void log_args(int argc, char **argv);
 void log_cfg(void);
