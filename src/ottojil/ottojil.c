@@ -9,13 +9,14 @@
 #include "ottocfg.h"
 #include "ottodb.h"
 #include "ottoipc.h"
-#include "ottolog.h"
 #include "ottojob.h"
-#include "ottosignal.h"
 #include "ottoutil.h"
+#include "signals.h"
+#include "simplelog.h"
 
 #include "otto_jil_reader.h"
 
+SIMPLELOG *logp = NULL;
 
 int server_socket = -1;
 ottoipc_simple_pdu_st send_pdu;
@@ -37,10 +38,11 @@ main(int argc, char *argv[])
 	int retval = init_cfg(argc, argv);
 
 	if(retval == OTTO_SUCCESS)
-		retval = init_signals(ottojil_exit);
+		init_signals(ottojil_exit);
 
 	if(retval == OTTO_SUCCESS)
-		retval = init_log(cfg.env_ottolog, cfg.progname, INFO, 0);
+		if((logp = simplelog_init(cfg.env_ottolog, cfg.progname, INFO, 0)) == NULL)
+			retval = OTTO_FAIL;
 
 	if(retval == OTTO_SUCCESS)
 	{
@@ -82,25 +84,25 @@ ottojil_exit(int signum)
 
 	if(signum > 0)
 	{
-		lprintf(MAJR, "Shutting down. Caught signal %d (%s).\n", signum, strsignal(signum));
+		lprintf(logp, MAJR, "Shutting down. Caught signal %d (%s).\n", signum, strsignal(signum));
 
 		nptrs   = backtrace(buffer, 100);
 		strings = backtrace_symbols(buffer, nptrs);
 		if(strings == NULL)
 		{
-			lprintf(MAJR, "Error getting backtrace symbols.\n");
+			lprintf(logp, MAJR, "Error getting backtrace symbols.\n");
 		}
 		else
 		{
-			lsprintf(INFO, "Backtrace:\n");
+			lsprintf(logp, INFO, "Backtrace:\n");
 			for (j = 0; j < nptrs; j++)
-				lsprintf(CATI, "  %s\n", strings[j]);
-			lsprintf(END, "");
+				lsprintf(logp, CATI, "  %s\n", strings[j]);
+			lsprintf(logp, END, "");
 		}
 	}
 	else
 	{
-		lprintf(MAJR, "Shutting down. Reason code %d.\n", signum);
+		lprintf(logp, MAJR, "Shutting down. Reason code %d.\n", signum);
 	}
 
 	exit(-1);
@@ -213,7 +215,6 @@ send_create_job(JOB *item)
 {
 	int retval = OTTO_SUCCESS;
 	int feedback_level;
-	ottoipc_pdu_header_st *hdr = (ottoipc_pdu_header_st *)recv_header;
 	ottoipc_create_job_pdu_st pdu;
 	ottoipc_simple_pdu_st *response;
 	int i;
@@ -240,11 +241,11 @@ send_create_job(JOB *item)
 		pdu.start_times[i]  = item->start_times[i];
 	pdu.opcode          = item->opcode;
 
-	lprintf(feedback_level, "Inserting job: %s.\n", pdu.name);
+	lprintf(logp, feedback_level, "Inserting job: %s.\n", pdu.name);
 	pdu.opcode = CREATE_JOB;
 
 	ottoipc_initialize_send();
-	ottoipc_queue_create_job(&pdu);
+	ottoipc_enqueue_create_job(&pdu);
 	retval = ottoipc_send_all(server_socket);
 
 	if(retval == OTTO_SUCCESS)
@@ -255,43 +256,43 @@ send_create_job(JOB *item)
 	if(retval == OTTO_SUCCESS)
 	{
 		// loop over all returned PDUs reporting status
-		response = (ottoipc_simple_pdu_st *)recv_pdus;
-		while(response < (ottoipc_simple_pdu_st *)(recv_pdus + hdr->payload_length))
+		while(ottoipc_dequeue_pdu((void **)&response) == OTTO_SUCCESS)
 		{
+			if(cfg.debug == OTTO_TRUE)
+				log_received_pdu(response);
+
 			switch(response->option)
 			{
 				case JOB_ALREADY_EXISTS:
-					lprintf(feedback_level, "The job already exists.\n");
+					lprintf(logp, feedback_level, "The job already exists.\n");
 					retval = OTTO_FAIL;
 					break;
 				case BOX_NOT_FOUND:
-					lprintf(feedback_level, "The parent job was not found.\n");
+					lprintf(logp, feedback_level, "The parent job was not found.\n");
 					retval = OTTO_FAIL;
 					break;
 				case NO_SPACE_AVAILABLE:
-					lprintf(feedback_level, "No space is available in the job database.\n");
+					lprintf(logp, feedback_level, "No space is available in the job database.\n");
 					retval = OTTO_FAIL;
 					break;
 				case JOB_DEPENDS_ON_MISSING_JOB:
-					lprintf(feedback_level, "The job depends on a missing job.\n");
+					lprintf(logp, feedback_level, "The job depends on a missing job.\n");
 					break;
 				case JOB_DEPENDS_ON_ITSELF:
-					lprintf(feedback_level, "The job depends on itself.\n");
+					lprintf(logp, feedback_level, "The job depends on itself.\n");
 					retval = OTTO_FAIL;
 					break;
 			}
-
-			response = (ottoipc_simple_pdu_st *)((char *)response + ottoipc_pdu_size(response));
 		}
 	}
 
 	if(retval == OTTO_SUCCESS)
 	{
-		lprintf(feedback_level, "Insert was successful.\n");
+		lprintf(logp, feedback_level, "Insert was successful.\n");
 	}
 	else
 	{
-		lprintf(feedback_level, "Insert was not successful.\n");
+		lprintf(logp, feedback_level, "Insert was not successful.\n");
 	}
 
 	return(retval);
@@ -315,7 +316,6 @@ send_delete_item(JOB *item)
 	int retval = OTTO_SUCCESS;
 	int feedback_level;
 	char *kind = "";
-	ottoipc_pdu_header_st *hdr = (ottoipc_pdu_header_st *)recv_header;
 	ottoipc_simple_pdu_st pdu, *response;
 
 	if(cfg.verbose == OTTO_TRUE)
@@ -334,10 +334,10 @@ send_delete_item(JOB *item)
 		case DELETE_JOB: kind = "job"; break;
 	}
 
-	lprintf(feedback_level, "Deleting %s: %s.\n", kind, pdu.name);
+	lprintf(logp, feedback_level, "Deleting %s: %s.\n", kind, pdu.name);
 
 	ottoipc_initialize_send();
-	ottoipc_queue_simple_pdu(&pdu);
+	ottoipc_enqueue_simple_pdu(&pdu);
 	retval = ottoipc_send_all(server_socket);
 
 	if(retval == OTTO_SUCCESS)
@@ -348,39 +348,37 @@ send_delete_item(JOB *item)
 	if(retval == OTTO_SUCCESS)
 	{
 		// loop over all returned PDUs reporting status
-		response = (ottoipc_simple_pdu_st *)recv_pdus;
-		while(response < (ottoipc_simple_pdu_st *)(recv_pdus + hdr->payload_length))
+		while(ottoipc_dequeue_pdu((void **)&response) == OTTO_SUCCESS)
 		{
 			if(cfg.debug == OTTO_TRUE)
-				log_pdu((ottoipc_pdu_header_st *)recv_header, (ottoipc_simple_pdu_st *)response);
+				log_received_pdu(response);
+
 			switch(response->option)
 			{
 				case JOB_NOT_FOUND:
-					lprintf(feedback_level, "Invalid job name: %s Delete not performed.\n", response->name);
+					lprintf(logp, feedback_level, "Invalid job name: %s Delete not performed.\n", response->name);
 					retval = OTTO_FAIL;
 					break;
 				case JOB_DELETED:
-					lprintf(feedback_level, "Deleting job: %s.\n", response->name);
+					lprintf(logp, feedback_level, "Deleting job: %s.\n", response->name);
 					retval = OTTO_FAIL;
 					break;
 				case BOX_NOT_FOUND:
-					lprintf(feedback_level, "Invalid job name: %s Delete not performed.\n", response->name);
+					lprintf(logp, feedback_level, "Invalid job name: %s Delete not performed.\n", response->name);
 					retval = OTTO_FAIL;
 					break;
 				case BOX_DELETED:
-					lprintf(feedback_level, "Deleting box: %s.\n", response->name);
+					lprintf(logp, feedback_level, "Deleting box: %s.\n", response->name);
 					retval = OTTO_FAIL;
 					break;
 			}
-
-			response = (ottoipc_simple_pdu_st *)((char *)response + ottoipc_pdu_size(response));
 		}
 	}
 
 	if(retval == OTTO_SUCCESS)
-		lprintf(feedback_level, "Delete was successful.\n");
+		lprintf(logp, feedback_level, "Delete was successful.\n");
 	else
-		lprintf(feedback_level, "Delete was not successful.\n");
+		lprintf(logp, feedback_level, "Delete was not successful.\n");
 
 	return(retval);
 }

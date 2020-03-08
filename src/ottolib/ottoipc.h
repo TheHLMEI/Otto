@@ -172,30 +172,20 @@ typedef struct _ottoipc_simple_pdu_st ottoipc_delete_job_pdu_st;
 #pragma pack()
 
 
-extern size_t bufferlen;
-
-extern char *send_buffer;
-extern char *send_header;
-extern char *send_pdus;
-
-extern char *recv_buffer;
-extern char *recv_header;
-extern char *recv_pdus;
-
-
 int init_server_ipc(in_port_t port, int backlog);
 int init_client_ipc(char *hostname, in_port_t port);
 
 void ottoipc_initialize_send();
-void ottoipc_queue_simple_pdu(ottoipc_simple_pdu_st *s);
-void ottoipc_queue_create_job(ottoipc_create_job_pdu_st *s);
-void ottoipc_queue_report_job(ottoipc_report_job_pdu_st *s);
-void ottoipc_queue_update_job(ottoipc_update_job_pdu_st *s);
-void ottoipc_queue_delete_job(ottoipc_delete_job_pdu_st *s);
+void ottoipc_enqueue_simple_pdu(ottoipc_simple_pdu_st *s);
+void ottoipc_enqueue_create_job(ottoipc_create_job_pdu_st *s);
+void ottoipc_enqueue_report_job(ottoipc_report_job_pdu_st *s);
+void ottoipc_enqueue_update_job(ottoipc_update_job_pdu_st *s);
+void ottoipc_enqueue_delete_job(ottoipc_delete_job_pdu_st *s);
 int  ottoipc_pdu_size(void *p);
 int  ottoipc_send_all(int socket);
 int  ottoipc_recv_all(int socket);
-void log_pdu(ottoipc_pdu_header_st *header, ottoipc_simple_pdu_st *pdu);
+int  ottoipc_dequeue_pdu(void **response);
+void log_received_pdu(void *p);
 
 char *stropcode(int i);
 char *strresultcode(int i);

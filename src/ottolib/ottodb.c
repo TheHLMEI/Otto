@@ -11,8 +11,9 @@
 #include "ottocfg.h"
 #include "ottocond.h"
 #include "ottodb.h"
-#include "ottolog.h"
+#include "simplelog.h"
 
+extern SIMPLELOG *logp;
 
 JOB   *job = NULL;
 JOB   *root_job = NULL;
@@ -43,7 +44,7 @@ copy_jobwork()
 	{
 		if((jobwork = (JOB *)calloc(cfg.ottodb_maxjobs, sizeof(JOB))) == NULL)
 		{
-			lprintf(MAJR, "Couldn't allocate job array.\n");
+			lprintf(logp, MAJR, "Couldn't allocate job array.\n");
 			exit(-1);
 		}
 	}
@@ -164,7 +165,7 @@ sort_jobwork_by_linked_list()
 
 	if((tmpwork = (JOB *)calloc(cfg.ottodb_maxjobs, sizeof(JOB))) == NULL)
 	{
-		lprintf(MAJR, "Couldn't allocate tmpwork array.\n");
+		lprintf(logp, MAJR, "Couldn't allocate tmpwork array.\n");
 		exit(-1);
 	}
 
@@ -273,7 +274,7 @@ open_ottodb(int type)
 	// check environment variablw
    if((filename = getenv("OTTODB")) == NULL)
    {
-		lprintf(MAJR, "$OTTODB isn't defined.\n");
+		lprintf(logp, MAJR, "$OTTODB isn't defined.\n");
 		retval = OTTO_FAIL;
 	}
 
@@ -397,13 +398,13 @@ open_ottodb(int type)
 				switch(errno)
 				{
 					case ENOMEM:
-						lprintf(MAJR, "Couldn't map $OTTODB (ENOMEM).\n");
+						lprintf(logp, MAJR, "Couldn't map $OTTODB (ENOMEM).\n");
 						break;
 					case EAGAIN:
-						lprintf(MAJR, "Couldn't map $OTTODB (EAGAIN).\n");
+						lprintf(logp, MAJR, "Couldn't map $OTTODB (EAGAIN).\n");
 						break;
 					case EINVAL:
-						lprintf(MAJR, "Couldn't map $OTTODB (EINVAL).\n");
+						lprintf(logp, MAJR, "Couldn't map $OTTODB (EINVAL).\n");
 						break;
 				}
 				retval = OTTO_FAIL;
@@ -434,7 +435,7 @@ open_ottodb(int type)
 		}
 		else
 		{
-			lprintf(MAJR, "Couldn't map $OTTODB (bad open).\n");
+			lprintf(logp, MAJR, "Couldn't map $OTTODB (bad open).\n");
 			retval = OTTO_FAIL;
 		}
 	}
@@ -460,11 +461,11 @@ migrate_db(int16_t dbversion)
 	{
 		default:
 			// print to log file
-			lsprintf(MAJR, "Automatic database migration from version %d to version %d is not supported.\n",
+			lsprintf(logp, MAJR, "Automatic database migration from version %d to version %d is not supported.\n",
 					dbversion, cfg.ottodb_version);
-			lsprintf(CATI, "Check whether there is a supplemental migration program or delete and rebuild\n");
-			lsprintf(CATI, "the database using ottojil.\n");
-			lsprintf(END, "");
+			lsprintf(logp, CATI, "Check whether there is a supplemental migration program or delete and rebuild\n");
+			lsprintf(logp, CATI, "the database using ottojil.\n");
+			lsprintf(logp, END, "");
 
 			// also print to stderr
 			fprintf(stderr, "Automatic database migration from version %d to version %d is not supported.\nCheck whether there is a supplemental migration program or delete and rebuild\nthe database using ottojil.\n\n", dbversion, cfg.ottodb_version);

@@ -5,8 +5,9 @@
 #include "ottocond.h"
 #include "ottodb.h"
 #include "ottojob.h"
-#include "ottolog.h"
+#include "simplelog.h"
 
+extern SIMPLELOG *logp;
 
 
 int
@@ -60,7 +61,7 @@ compile_expression(char *output, char *condition, int outlen)
 								*n++ = *s;
 								if(n - name == NAMLEN)
 								{
-									lprintf(MAJR, "Condition compile name exceeds allowed length (%d bytes).\n", NAMLEN);
+									lprintf(logp, MAJR, "Condition compile name exceeds allowed length (%d bytes).\n", NAMLEN);
 									return(OTTO_FAIL);
 								}
 								break;
@@ -68,7 +69,7 @@ compile_expression(char *output, char *condition, int outlen)
 						s++;
 					}
 					index = find_jobname(name);
-					// lprintf(INFO, "Lookup name = '%s' index = %d id = %d\n", name, index, jobwork[index].id);
+					// lprintf(logp, INFO, "Lookup name = '%s' index = %d id = %d\n", name, index, jobwork[index].id);
 					if(index != -1)
 					{
 						index = jobwork[index].id;
@@ -84,7 +85,7 @@ compile_expression(char *output, char *condition, int outlen)
 				}
 				else
 				{
-					lprintf(MAJR, "Condition exceeds compile buffer (%d bytes).\n", outlen);
+					lprintf(logp, MAJR, "Condition exceeds compile buffer (%d bytes).\n", outlen);
 					return(OTTO_FAIL);
 				}
 				break;

@@ -15,8 +15,10 @@
 #include "ottodb.h"
 #include "ottoipc.h"
 #include "ottojob.h"
-#include "ottolog.h"
+#include "simplelog.h"
 #include "ottoutil.h"
+
+extern SIMPLELOG *logp;
 
 enum VARS
 {
@@ -97,6 +99,8 @@ init_cfg(int argc, char **argv)
 
 	get_envvar(&cfg.env_ottoenv, "OTTOENV", DONT_COMPLAIN, DONT_KEEP_VARNAME);
 
+   cfg.n_envvar_s = PATHVAR + 1;
+
 	return(retval);
 }
 
@@ -155,24 +159,24 @@ read_cfgfile()
 	{
 		if(fstat(fileno(infile), &statbuf) != 0)
 		{
-			lprintf(MAJR, "Can't stat $OTTOCFG.");
+			lprintf(logp, MAJR, "Can't stat $OTTOCFG.");
 			retval = OTTO_FAIL;
 		}
 
 		islen = statbuf.st_size;
 		if((instring = malloc(islen)) == NULL)
 		{
-			lprintf(MAJR, "Can't malloc instring.");
+			lprintf(logp, MAJR, "Can't malloc instring.");
 			retval = OTTO_FAIL;
 		}
 		if((word = malloc(islen)) == NULL)
 		{
-			lprintf(MAJR, "Can't malloc word.");
+			lprintf(logp, MAJR, "Can't malloc word.");
 			retval = OTTO_FAIL;
 		}
 		if((word2 = malloc(islen)) == NULL)
 		{
-			lprintf(MAJR, "Can't malloc word2.");
+			lprintf(logp, MAJR, "Can't malloc word2.");
 			retval = OTTO_FAIL;
 		}
 
@@ -244,13 +248,13 @@ read_cfgfile()
 	}
 	else
 	{
-		lprintf(MAJR, "Couldn't open $OTTOCFG for input.");
+		lprintf(logp, MAJR, "Couldn't open $OTTOCFG for input.");
 		retval = OTTO_FAIL;
 	}
 
 	if(cfg.server_port == 0)
 	{
-		lprintf(MAJR, "Invalid or missing value for port in $OTTOCFG.");
+		lprintf(logp, MAJR, "Invalid or missing value for port in $OTTOCFG.");
 		retval = OTTO_FAIL;
 	}
 
@@ -281,7 +285,7 @@ get_cfg_int(char *parm, char *val, int lowval, int highval, int defval)
 	}
 	else
 	{
-		lprintf(MAJR, "Invalid value for %s in $OTTOCFG (%d). Defaulting to %d.", parm, tempint, defval);
+		lprintf(logp, MAJR, "Invalid value for %s in $OTTOCFG (%d). Defaulting to %d.", parm, tempint, defval);
 	}
 
 	return(retval);
@@ -306,11 +310,11 @@ get_cfg_bool(char *parm, char *val, int defval)
 			switch(defval)
 			{
 				case OTTO_TRUE:
-					lprintf(MAJR, "Invalid value for %s in $OTTOCFG (%s). Defaulting to 'true'.", parm, val);
+					lprintf(logp, MAJR, "Invalid value for %s in $OTTOCFG (%s). Defaulting to 'true'.", parm, val);
 					retval = OTTO_TRUE;
 					break;
 				case OTTO_FALSE:
-					lprintf(MAJR, "Invalid value for %s in $OTTOCFG (%s). Defaulting to 'false'.", parm, val);
+					lprintf(logp, MAJR, "Invalid value for %s in $OTTOCFG (%s). Defaulting to 'false'.", parm, val);
 					retval = OTTO_FALSE;
 					break;
 			}
@@ -354,7 +358,7 @@ get_cfg_envvar(char *word)
 
 	if(retval != OTTO_SUCCESS)
 	{
-		lprintf(MAJR, "Malformed envvar '%s'. No equal found\n", word);
+		lprintf(logp, MAJR, "Malformed envvar '%s'. No equal found\n", word);
 		retval = OTTO_FALSE;
 	}
 
@@ -368,14 +372,14 @@ get_cfg_envvar(char *word)
 				case 0:
 					if(name[i] != '_' && !isalpha(name[i]))
 					{
-						lprintf(MAJR, "Malformed envvar '%s'. Bad initial character\n", name);
+						lprintf(logp, MAJR, "Malformed envvar '%s'. Bad initial character\n", name);
 						retval = OTTO_FALSE;
 					}
 					break;
 				default:
 					if(name[i] != '_' && !isalnum(name[i]))
 					{
-						lprintf(MAJR, "Malformed envvar '%s'. Bad character\n", name);
+						lprintf(logp, MAJR, "Malformed envvar '%s'. Bad character\n", name);
 						retval = OTTO_FALSE;
 					}
 					break;
@@ -391,7 +395,7 @@ get_cfg_envvar(char *word)
 		{
 			if(strcmp(name, strvars[i]) == 0)
 			{
-				lprintf(MAJR, "Denying override of %*.*s in config file.\n", strlen(name)-1, strlen(name)-1, name);
+				lprintf(logp, MAJR, "Denying override of %*.*s in config file.\n", strlen(name)-1, strlen(name)-1, name);
 				retval = OTTO_FALSE;
 			}
 		}
@@ -408,7 +412,7 @@ get_cfg_envvar(char *word)
 				free(cfg.envvar_s[i]);
 				if((cfg.envvar_s[i] = strdup(word)) == NULL)
 				{
-					lprintf(MAJR, "Error overriding %*.*s.\n", strlen(name)-1, strlen(name)-1, name);
+					lprintf(logp, MAJR, "Error overriding %*.*s.\n", strlen(name)-1, strlen(name)-1, name);
 					retval = OTTO_FALSE;
 				}
 				else
@@ -430,7 +434,7 @@ get_cfg_envvar(char *word)
 				cfg.envvar_s[cfg.n_envvar_s] = strdup(word);
 				if(cfg.envvar_s[cfg.n_envvar_s] == NULL)
 				{
-					lprintf(MAJR, "Error mallocing envvar %d.\n", cfg.n_envvar_s);
+					lprintf(logp, MAJR, "Error mallocing envvar %d.\n", cfg.n_envvar_s);
 					retval = OTTO_FALSE;
 				}
 				else
@@ -440,7 +444,7 @@ get_cfg_envvar(char *word)
 			}
 			else
 			{
-				lprintf(MAJR, "Error exceeding number of allowed static envvars %d.\n", cfg.n_envvar_s);
+				lprintf(logp, MAJR, "Error exceeding number of allowed static envvars %d.\n", cfg.n_envvar_s);
 				retval = OTTO_FALSE;
 			}
 		}
@@ -473,10 +477,10 @@ rebuild_environment()
 
 			if(cfg.n_envvar_d > 0)
 			{
-				lsprintf(INFO, "Dynamic Environment:\n");
+				lsprintf(logp, INFO, "Dynamic Environment:\n");
 				for(i=0; i<cfg.n_envvar_d; i++)
-					lsprintf(CATI, "envvar:      %s\n", cfg.envvar_d[i]);
-				lsprintf(END, "");
+					lsprintf(logp, CATI, "envvar:      %s\n", cfg.envvar_d[i]);
+				lsprintf(logp, END, "");
 			}
 		}
 	}
@@ -522,7 +526,7 @@ rebuild_environment()
 			// add it
 			if(j == cfg.n_envvar)
 			{
-				cfg.envvar_d[cfg.n_envvar] = cfg.envvar_d[i];
+				cfg.envvar[cfg.n_envvar] = cfg.envvar_d[i];
 				cfg.n_envvar++;
 			}
 		}
@@ -553,7 +557,7 @@ read_ottoenv()
 		{
 			if(fstat(fileno(infile), &statbuf) != 0)
 			{
-				lprintf(MAJR, "Can't stat $OTTOENV.");
+				lprintf(logp, MAJR, "Can't stat $OTTOENV.");
 				retval = OTTO_FAIL;
 			}
 
@@ -562,17 +566,17 @@ read_ottoenv()
 				islen = statbuf.st_size;
 				if((instring = malloc(islen)) == NULL)
 				{
-					lprintf(MAJR, "Can't malloc instring.");
+					lprintf(logp, MAJR, "Can't malloc instring.");
 					retval = OTTO_FAIL;
 				}
 				if((word = malloc(islen)) == NULL)
 				{
-					lprintf(MAJR, "Can't malloc word.");
+					lprintf(logp, MAJR, "Can't malloc word.");
 					retval = OTTO_FAIL;
 				}
 				if((word2 = malloc(islen)) == NULL)
 				{
-					lprintf(MAJR, "Can't malloc word2.");
+					lprintf(logp, MAJR, "Can't malloc word2.");
 					retval = OTTO_FAIL;
 				}
 			}
@@ -610,10 +614,10 @@ read_ottoenv()
 		free(instring);
 
 	if(word != NULL)
-		free(instring);
+		free(word);
 
 	if(word2 != NULL)
-		free(instring);
+		free(word2);
 
 	return(retval);
 }
@@ -650,7 +654,7 @@ get_dyn_envvar(char *word)
 
 	if(retval != OTTO_SUCCESS)
 	{
-		lprintf(MAJR, "Malformed envvar '%s'. No equal found\n", word);
+		lprintf(logp, MAJR, "Malformed envvar '%s'. No equal found\n", word);
 		retval = OTTO_FAIL;
 	}
 
@@ -664,14 +668,14 @@ get_dyn_envvar(char *word)
 				case 0:
 					if(name[i] != '_' && !isalpha(name[i]))
 					{
-						lprintf(MAJR, "Malformed envvar '%s'. Bad initial character\n", name);
+						lprintf(logp, MAJR, "Malformed envvar '%s'. Bad initial character\n", name);
 						retval = OTTO_FAIL;
 					}
 					break;
 				default:
 					if(name[i] != '_' && !isalnum(name[i]))
 					{
-						lprintf(MAJR, "Malformed envvar '%s'. Bad character\n", name);
+						lprintf(logp, MAJR, "Malformed envvar '%s'. Bad character\n", name);
 						retval = OTTO_FAIL;
 					}
 					break;
@@ -687,7 +691,7 @@ get_dyn_envvar(char *word)
 		{
 			if(strcmp(name, strvars[i]) == 0)
 			{
-				lprintf(MAJR, "Denying override of %*.*s in config file.\n", strlen(name)-1, strlen(name)-1, name);
+				lprintf(logp, MAJR, "Denying override of %*.*s in config file.\n", strlen(name)-1, strlen(name)-1, name);
 				retval = OTTO_FAIL;
 				break;
 			}
@@ -705,7 +709,7 @@ get_dyn_envvar(char *word)
 				free(cfg.envvar_d[i]);
 				if((cfg.envvar_d[i] = strdup(word)) == NULL)
 				{
-					lprintf(MAJR, "Error overriding %*.*s.\n", strlen(name)-1, strlen(name)-1, name);
+					lprintf(logp, MAJR, "Error overriding %*.*s.\n", strlen(name)-1, strlen(name)-1, name);
 					retval = OTTO_FAIL;
 					break;
 				}
@@ -723,7 +727,7 @@ get_dyn_envvar(char *word)
 				cfg.envvar_d[cfg.n_envvar_d] = strdup(word);
 				if(cfg.envvar_d[cfg.n_envvar_d] == NULL)
 				{
-					lprintf(MAJR, "Error mallocing envvar %d.\n", cfg.n_envvar_d);
+					lprintf(logp, MAJR, "Error mallocing envvar %d.\n", cfg.n_envvar_d);
 					retval = OTTO_FAIL;
 				}
 				else
@@ -733,7 +737,7 @@ get_dyn_envvar(char *word)
 			}
 			else
 			{
-				lprintf(MAJR, "Error exceeding number of allowed dynamic envvars %d.\n", cfg.n_envvar_d);
+				lprintf(logp, MAJR, "Error exceeding number of allowed dynamic envvars %d.\n", cfg.n_envvar_d);
 				retval = OTTO_FAIL;
 			}
 		}
@@ -753,9 +757,9 @@ log_initialization()
 	struct passwd *epw = getpwuid(cfg.euid);
 	struct passwd *rpw = getpwuid(cfg.ruid);
 
-	lsprintf(INFO, "version: %5s\n", cfg.otto_version);
-	lsprintf(CATI, "initialized by: %s (%s)", epw->pw_name, rpw->pw_name);
-	lsprintf(END, "\n");
+	lsprintf(logp, INFO, "version: %5s\n", cfg.otto_version);
+	lsprintf(logp, CATI, "initialized by: %s (%s)", epw->pw_name, rpw->pw_name);
+	lsprintf(logp, END, "\n");
 }
 
 
@@ -765,11 +769,11 @@ log_args(int argc, char **argv)
 {
 	int i;
 
-	lsprintf(INFO, "Command line:\n");
-	lsprintf(CATI, "");
+	lsprintf(logp, INFO, "Command line:\n");
+	lsprintf(logp, CATI, "");
 	for(i=0; i<argc; i++)
-		lsprintf(CAT, "%s ", argv[i]);
-	lsprintf(END, "\n");
+		lsprintf(logp, CAT, "%s ", argv[i]);
+	lsprintf(logp, END, "\n");
 }
 
 
@@ -779,33 +783,33 @@ log_cfg()
 {
 	int i;
 
-	lsprintf(INFO, "Environment:\n");
-	lsprintf(CATI, "OTTOCFG=%s\n", cfg.env_ottocfg);
-	lsprintf(CATI, "OTTOLOG=%s\n", cfg.env_ottolog);
-	lsprintf(CATI, "OTTOENV=%s\n", cfg.env_ottoenv == NULL ? "null" : cfg.env_ottoenv);
-	lsprintf(CATI, "%s\n",         cfg.envvar_s[HOMEVAR]);
-	lsprintf(CATI, "%s\n",         cfg.envvar_s[USERVAR]);
-	lsprintf(CATI, "%s\n",         cfg.envvar_s[LOGNAMEVAR]);
+	lsprintf(logp, INFO, "Environment:\n");
+	lsprintf(logp, CATI, "OTTOCFG=%s\n", cfg.env_ottocfg);
+	lsprintf(logp, CATI, "OTTOLOG=%s\n", cfg.env_ottolog);
+	lsprintf(logp, CATI, "OTTOENV=%s\n", cfg.env_ottoenv == NULL ? "null" : cfg.env_ottoenv);
+	lsprintf(logp, CATI, "%s\n",         cfg.envvar_s[HOMEVAR]);
+	lsprintf(logp, CATI, "%s\n",         cfg.envvar_s[USERVAR]);
+	lsprintf(logp, CATI, "%s\n",         cfg.envvar_s[LOGNAMEVAR]);
 	if(cfg.path_overridden == OTTO_FALSE)
-		lsprintf(CATI, "%s\n", cfg.envvar_s[PATHVAR]);
-	lsprintf(END, "");
+		lsprintf(logp, CATI, "%s\n", cfg.envvar_s[PATHVAR]);
+	lsprintf(logp, END, "");
 
-	lsprintf(INFO, "Configuration:\n");
-	lsprintf(CATI, "server_addr:        %5s\n", cfg.server_addr);
-	lsprintf(CATI, "server_port:        %5d\n", cfg.server_port);
-	lsprintf(CATI, "ottodb_version:     %5d\n", cfg.ottodb_version);
-	lsprintf(CATI, "ottodb_maxjobs:     %5d\n", cfg.ottodb_maxjobs);
-	lsprintf(CATI, "pause:              %5s\n", cfg.pause      == OTTO_TRUE ? "true" : "false");
-	lsprintf(CATI, "verbose:            %5s\n", cfg.verbose    == OTTO_TRUE ? "true" : "false");
-	lsprintf(CATI, "show_sofar:         %5s\n", cfg.show_sofar == OTTO_TRUE ? "true" : "false");
-	lsprintf(CATI, "debug:              %5s\n", cfg.debug      == OTTO_TRUE ? "true" : "false");
+	lsprintf(logp, INFO, "Configuration:\n");
+	lsprintf(logp, CATI, "server_addr:        %5s\n", cfg.server_addr);
+	lsprintf(logp, CATI, "server_port:        %5d\n", cfg.server_port);
+	lsprintf(logp, CATI, "ottodb_version:     %5d\n", cfg.ottodb_version);
+	lsprintf(logp, CATI, "ottodb_maxjobs:     %5d\n", cfg.ottodb_maxjobs);
+	lsprintf(logp, CATI, "pause:              %5s\n", cfg.pause      == OTTO_TRUE ? "true" : "false");
+	lsprintf(logp, CATI, "verbose:            %5s\n", cfg.verbose    == OTTO_TRUE ? "true" : "false");
+	lsprintf(logp, CATI, "show_sofar:         %5s\n", cfg.show_sofar == OTTO_TRUE ? "true" : "false");
+	lsprintf(logp, CATI, "debug:              %5s\n", cfg.debug      == OTTO_TRUE ? "true" : "false");
 
 	// add envvars from config file
 	if(cfg.path_overridden == OTTO_TRUE)
-		lsprintf(CATI, "envvar:      %s\n", cfg.envvar_s[PATHVAR]);
+		lsprintf(logp, CATI, "envvar:      %s\n", cfg.envvar_s[PATHVAR]);
 	for(i=PATHVAR+1; i<cfg.n_envvar_s; i++)
-		lsprintf(CATI, "envvar:      %s\n", cfg.envvar_s[i]);
-	lsprintf(END, "");
+		lsprintf(logp, CATI, "envvar:      %s\n", cfg.envvar_s[i]);
+	lsprintf(logp, END, "");
 }
 
 

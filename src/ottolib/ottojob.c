@@ -9,10 +9,11 @@
 #include "ottobits.h"
 #include "ottocfg.h"
 #include "ottodb.h"
-#include "ottolog.h"
 #include "ottojob.h"
 #include "ottoutil.h"
+#include "simplelog.h"
 
+extern SIMPLELOG *logp;
 
 
 #define OTTO_TERM        0
@@ -90,7 +91,7 @@ ottojob_copy_command(char *output, char *command, int outlen)
 			}
 			else
 			{
-				lprintf(MAJR, "Command exceeds allowed length (%d bytes).\n", outlen);
+				lprintf(logp, MAJR, "Command exceeds allowed length (%d bytes).\n", outlen);
 				retval = OTTO_FAIL;
 			}
 		}
@@ -135,7 +136,7 @@ ottojob_copy_condition(char *output, char *condition, int outlen)
 			}
 			if(t - c.input == VCNDLEN)
 			{
-				lprintf(MAJR, "CONDITION ERROR: Condition exceeds validation buffer (%d bytes).\n", VCNDLEN);
+				lprintf(logp, MAJR, "CONDITION ERROR: Condition exceeds validation buffer (%d bytes).\n", VCNDLEN);
 				return(OTTO_FAIL);
 			}
 		}
@@ -143,7 +144,7 @@ ottojob_copy_condition(char *output, char *condition, int outlen)
 
 		if(paren_count != 0)
 		{
-			lprintf(MAJR, "CONDITION ERROR: Unbalanced parentheses in logical expression.\n");
+			lprintf(logp, MAJR, "CONDITION ERROR: Unbalanced parentheses in logical expression.\n");
 			return(OTTO_FAIL);
 		}
 
@@ -162,7 +163,7 @@ ottojob_copy_condition(char *output, char *condition, int outlen)
 			}
 			else
 			{
-				lprintf(MAJR, "CONDITION ERROR: Condition exceeds allowed length (%d bytes).\n", outlen);
+				lprintf(logp, MAJR, "CONDITION ERROR: Condition exceeds allowed length (%d bytes).\n", outlen);
 				retval = OTTO_FAIL;
 			}
 		}
@@ -213,7 +214,7 @@ ottojob_copy_days_of_week(char *output, char *days_of_week)
 				case cdeSA______:  *output |= OTTO_SAT;  break;
 				case cdeALL_____:  *output |= OTTO_ALL;  break;
 				default:
-					lprintf(MAJR, "DAYS_OF_WEEK ERROR: Unrecognized value (%s).  Value must be in [mo|tu|we|th|fr|sa|su|all].\n", word);
+					lprintf(logp, MAJR, "DAYS_OF_WEEK ERROR: Unrecognized value (%s).  Value must be in [mo|tu|we|th|fr|sa|su|all].\n", word);
 					retval = OTTO_FAIL;
 					break;
 			}
@@ -270,7 +271,7 @@ ottojob_copy_description(char *output, char *description, int outlen)
 			}
 			else
 			{
-				lprintf(MAJR, "Description exceeds allowed length (%d bytes).\n", outlen);
+				lprintf(logp, MAJR, "Description exceeds allowed length (%d bytes).\n", outlen);
 				retval = OTTO_FAIL;
 			}
 		}
@@ -282,7 +283,7 @@ ottojob_copy_description(char *output, char *description, int outlen)
 		}
 		else
 		{
-			lprintf(MAJR, "Description exceeds allowed length (%d bytes).\n", outlen);
+			lprintf(logp, MAJR, "Description exceeds allowed length (%d bytes).\n", outlen);
 			retval = OTTO_FAIL;
 		}
 
@@ -426,7 +427,7 @@ ottojob_copy_start_mins(int64_t *output, char *start_mins)
 			}
 			else
 			{
-				lprintf(MAJR, "START_MINS ERROR: Unrecognized value (%s).  Value must be in [0-59].\n", word);
+				lprintf(logp, MAJR, "START_MINS ERROR: Unrecognized value (%s).  Value must be in [0-59].\n", word);
 				retval = OTTO_FAIL;
 			}
 
@@ -531,7 +532,7 @@ ottojob_copy_start_times(int64_t *output, char *start_times)
 			}
 			else
 			{
-				lprintf(MAJR, "START_TIMES ERROR: Unrecognized value (%s).  Value must be in 24 hour HH:MM format.\n", word);
+				lprintf(logp, MAJR, "START_TIMES ERROR: Unrecognized value (%s).  Value must be in 24 hour HH:MM format.\n", word);
 				retval = OTTO_FAIL;
 			}
 
@@ -625,7 +626,7 @@ ottojob_validate_condition(vcnd_st *c)
 					*(c->t)++ = ')';
 					if(open_paren == OTTO_FALSE)
 					{
-						lprintf(MAJR, "CONDITION ERROR: Unbalanced parentheses in logical expression.\n");
+						lprintf(logp, MAJR, "CONDITION ERROR: Unbalanced parentheses in logical expression.\n");
 						retval = OTTO_FAIL;
 					}
 					exit_loop = OTTO_TRUE;
@@ -642,7 +643,7 @@ ottojob_validate_condition(vcnd_st *c)
 					}
 					else
 					{
-						lprintf(MAJR, "CONDITION ERROR: Logical operator must have 2 operands.\n");
+						lprintf(logp, MAJR, "CONDITION ERROR: Logical operator must have 2 operands.\n");
 						retval = OTTO_FAIL;
 					}
 					break;
@@ -658,7 +659,7 @@ ottojob_validate_condition(vcnd_st *c)
 					}
 					else
 					{
-						lprintf(MAJR, "CONDITION ERROR: Logical operator must have 2 operands.\n");
+						lprintf(logp, MAJR, "CONDITION ERROR: Logical operator must have 2 operands.\n");
 						retval = OTTO_FAIL;
 					}
 					break;
@@ -678,7 +679,7 @@ ottojob_validate_condition(vcnd_st *c)
 						}
 						else
 						{
-							lprintf(MAJR, "CONDITION ERROR: Logical operator must have 2 operands.\n");
+							lprintf(logp, MAJR, "CONDITION ERROR: Logical operator must have 2 operands.\n");
 							retval = OTTO_FAIL;
 						}
 					}
@@ -699,7 +700,7 @@ ottojob_validate_condition(vcnd_st *c)
 						}
 						else
 						{
-							lprintf(MAJR, "CONDITION ERROR: Logical operator must have 2 operands.\n");
+							lprintf(logp, MAJR, "CONDITION ERROR: Logical operator must have 2 operands.\n");
 							retval = OTTO_FAIL;
 						}
 					}
@@ -725,7 +726,7 @@ ottojob_validate_condition(vcnd_st *c)
 
 									if(*(c->s) == ')')
 									{
-										lprintf(MAJR, "CONDITION ERROR: Invalid job_name: < job_name is missing >.\n");
+										lprintf(logp, MAJR, "CONDITION ERROR: Invalid job_name: < job_name is missing >.\n");
 										retval = OTTO_FAIL;
 									}
 									else
@@ -741,7 +742,7 @@ ottojob_validate_condition(vcnd_st *c)
 											}
 											else
 											{
-												lprintf(MAJR, "CONDITION ERROR: Invalid job_name: < job_name contains one or more invalid characters or symbols >.\n");
+												lprintf(logp, MAJR, "CONDITION ERROR: Invalid job_name: < job_name contains one or more invalid characters or symbols >.\n");
 												retval = OTTO_FAIL;
 												break;
 											}
@@ -749,7 +750,7 @@ ottojob_validate_condition(vcnd_st *c)
 
 										if(namelen > NAMLEN)
 										{
-											lprintf(MAJR, "CONDITION ERROR: Invalid job_name: < job_name exceeds allowed length (%d bytes) >.\n", NAMLEN);
+											lprintf(logp, MAJR, "CONDITION ERROR: Invalid job_name: < job_name exceeds allowed length (%d bytes) >.\n", NAMLEN);
 											retval = OTTO_FAIL;
 										}
 
@@ -762,7 +763,7 @@ ottojob_validate_condition(vcnd_st *c)
 										}
 										else
 										{
-											lprintf(MAJR, "CONDITION ERROR: Invalid job_name: < job_name contains one or more invalid characters or symbols >.\n");
+											lprintf(logp, MAJR, "CONDITION ERROR: Invalid job_name: < job_name contains one or more invalid characters or symbols >.\n");
 											retval = OTTO_FAIL;
 										}
 									}
@@ -771,13 +772,13 @@ ottojob_validate_condition(vcnd_st *c)
 							}
 							else
 							{
-								lprintf(MAJR, "CONDITION ERROR: Logical operator must have 2 operands.\n");
+								lprintf(logp, MAJR, "CONDITION ERROR: Logical operator must have 2 operands.\n");
 								retval = OTTO_FAIL;
 							}
 							break;
 						default:
 							ottojob_copy_condition_word(tmpstr, c->s, sizeof(tmpstr));
-							lprintf(MAJR, "CONDITION ERROR: Invalid key word: %s.\n", tmpstr);
+							lprintf(logp, MAJR, "CONDITION ERROR: Invalid key word: %s.\n", tmpstr);
 							retval = OTTO_FAIL;
 							break;
 					}
@@ -785,7 +786,7 @@ ottojob_validate_condition(vcnd_st *c)
 
 				default:
 					ottojob_copy_condition_word(tmpstr, c->s, sizeof(tmpstr));
-					lprintf(MAJR, "CONDITION ERROR: Invalid key word: %s.\n", tmpstr);
+					lprintf(logp, MAJR, "CONDITION ERROR: Invalid key word: %s.\n", tmpstr);
 					retval = OTTO_FAIL;
 					break;
 			}
@@ -799,13 +800,13 @@ ottojob_validate_condition(vcnd_st *c)
 
 	if(and_count > 0 && or_count > 0)
 	{
-		lprintf(MAJR, "CONDITION ERROR: Using both ANDs and ORs requires the use of parenthesis.\n");
+		lprintf(logp, MAJR, "CONDITION ERROR: Using both ANDs and ORs requires the use of parenthesis.\n");
 		retval = OTTO_FAIL;
 	}
 
 	if(last == OTTO_CONJUNCTION && strlen(c->output) != 0)
 	{
-		lprintf(MAJR, "CONDITION ERROR: Logical operator must have 2 operands.\n");
+		lprintf(logp, MAJR, "CONDITION ERROR: Logical operator must have 2 operands.\n");
 		retval = OTTO_FAIL;
 	}
 
@@ -888,38 +889,38 @@ ottojob_log_job_layout()
 {
 	JOB j;
 
-	lsprintf(INFO, "Job structure layout:\n");
-	lsprintf(CATI, "id              at %4d for %4d type integer(4)  notnull\n", offsetof(JOB, id),              sizeof(j.id));
-	lsprintf(CATI, "parent          at %4d for %4d type integer(4)  notnull\n", offsetof(JOB, parent),          sizeof(j.parent));
-	lsprintf(CATI, "head            at %4d for %4d type integer(4)  notnull\n", offsetof(JOB, head),            sizeof(j.head));
-	lsprintf(CATI, "tail            at %4d for %4d type integer(4)  notnull\n", offsetof(JOB, tail),            sizeof(j.tail));
-	lsprintf(CATI, "prev            at %4d for %4d type integer(4)  notnull\n", offsetof(JOB, prev),            sizeof(j.prev));
-	lsprintf(CATI, "next            at %4d for %4d type integer(4)  notnull\n", offsetof(JOB, next),            sizeof(j.next));
-	lsprintf(CATI, "level           at %4d for %4d type integer(4)  notnull\n", offsetof(JOB, level),           sizeof(j.level));
-	lsprintf(CATI, "name            at %4d for %4d type char        notnull\n", offsetof(JOB, name),            sizeof(j.name));
-	lsprintf(CATI, "type            at %4d for %4d type char        notnull\n", offsetof(JOB, type),            sizeof(j.type));
-	lsprintf(CATI, "box_name        at %4d for %4d type char        notnull\n", offsetof(JOB, box_name),        sizeof(j.box_name));
-	lsprintf(CATI, "description     at %4d for %4d type char        notnull\n", offsetof(JOB, description),     sizeof(j.description));
-	lsprintf(CATI, "command         at %4d for %4d type char        notnull\n", offsetof(JOB, command),         sizeof(j.command));
-	lsprintf(CATI, "condition       at %4d for %4d type char        notnull\n", offsetof(JOB, condition),       sizeof(j.condition));
-	lsprintf(CATI, "expression      at %4d for %4d type char        notnull\n", offsetof(JOB, expression),      sizeof(j.expression));
-	lsprintf(CATI, "expr_fail       at %4d for %4d type char        notnull\n", offsetof(JOB, expr_fail),       sizeof(j.expr_fail));
-	lsprintf(CATI, "auto_hold       at %4d for %4d type char        notnull\n", offsetof(JOB, auto_hold),       sizeof(j.auto_hold));
-	lsprintf(CATI, "date_conditions at %4d for %4d type char        notnull\n", offsetof(JOB, date_conditions), sizeof(j.date_conditions));
-	lsprintf(CATI, "days_of_week    at %4d for %4d type char        notnull\n", offsetof(JOB, days_of_week),    sizeof(j.days_of_week));
-	lsprintf(CATI, "start_mins      at %4d for %4d type char        notnull\n", offsetof(JOB, start_mins),      sizeof(j.start_mins));
-	lsprintf(CATI, "start_times     at %4d for %4d type char        notnull\n", offsetof(JOB, start_times),     sizeof(j.start_times));
-	lsprintf(CATI, "on_noexec       at %4d for %4d type char        notnull\n", offsetof(JOB, on_noexec),       sizeof(j.on_noexec));
-	lsprintf(CATI, "status          at %4d for %4d type char        notnull\n", offsetof(JOB, status),          sizeof(j.status));
-	lsprintf(CATI, "pid             at %4d for %4d type integer(9)  notnull\n", offsetof(JOB, pid),             sizeof(j.pid));
-	lsprintf(CATI, "exit_status     at %4d for %4d type integer(9)  notnull\n", offsetof(JOB, exit_status),     sizeof(j.exit_status));
-	lsprintf(CATI, "start           at %4d for %4d type integer(10) notnull\n", offsetof(JOB, start),           sizeof(j.start));
-	lsprintf(CATI, "finish          at %4d for %4d type integer(10) notnull\n", offsetof(JOB, finish),          sizeof(j.finish));
-	lsprintf(CATI, "duration        at %4d for %4d type integer(10) notnull\n", offsetof(JOB, duration),        sizeof(j.duration));
-	lsprintf(CATI, "base_auto_hold  at %4d for %4d type char        notnull\n", offsetof(JOB, base_auto_hold),  sizeof(j.base_auto_hold));
-	lsprintf(CATI, "gpflag          at %4d for %4d type char        notnull\n", offsetof(JOB, gpflag),          sizeof(j.gpflag));
-	lsprintf(CATI, "bitmask         at %4d for %4d type integer(4)  notnull\n", offsetof(JOB, bitmask),         sizeof(j.bitmask));
-	lsprintf(END, "");
+	lsprintf(logp, INFO, "Job structure layout:\n");
+	lsprintf(logp, CATI, "id              at %4d for %4d type integer(4)  notnull\n", offsetof(JOB, id),              sizeof(j.id));
+	lsprintf(logp, CATI, "parent          at %4d for %4d type integer(4)  notnull\n", offsetof(JOB, parent),          sizeof(j.parent));
+	lsprintf(logp, CATI, "head            at %4d for %4d type integer(4)  notnull\n", offsetof(JOB, head),            sizeof(j.head));
+	lsprintf(logp, CATI, "tail            at %4d for %4d type integer(4)  notnull\n", offsetof(JOB, tail),            sizeof(j.tail));
+	lsprintf(logp, CATI, "prev            at %4d for %4d type integer(4)  notnull\n", offsetof(JOB, prev),            sizeof(j.prev));
+	lsprintf(logp, CATI, "next            at %4d for %4d type integer(4)  notnull\n", offsetof(JOB, next),            sizeof(j.next));
+	lsprintf(logp, CATI, "level           at %4d for %4d type integer(4)  notnull\n", offsetof(JOB, level),           sizeof(j.level));
+	lsprintf(logp, CATI, "name            at %4d for %4d type char        notnull\n", offsetof(JOB, name),            sizeof(j.name));
+	lsprintf(logp, CATI, "type            at %4d for %4d type char        notnull\n", offsetof(JOB, type),            sizeof(j.type));
+	lsprintf(logp, CATI, "box_name        at %4d for %4d type char        notnull\n", offsetof(JOB, box_name),        sizeof(j.box_name));
+	lsprintf(logp, CATI, "description     at %4d for %4d type char        notnull\n", offsetof(JOB, description),     sizeof(j.description));
+	lsprintf(logp, CATI, "command         at %4d for %4d type char        notnull\n", offsetof(JOB, command),         sizeof(j.command));
+	lsprintf(logp, CATI, "condition       at %4d for %4d type char        notnull\n", offsetof(JOB, condition),       sizeof(j.condition));
+	lsprintf(logp, CATI, "expression      at %4d for %4d type char        notnull\n", offsetof(JOB, expression),      sizeof(j.expression));
+	lsprintf(logp, CATI, "expr_fail       at %4d for %4d type char        notnull\n", offsetof(JOB, expr_fail),       sizeof(j.expr_fail));
+	lsprintf(logp, CATI, "auto_hold       at %4d for %4d type char        notnull\n", offsetof(JOB, auto_hold),       sizeof(j.auto_hold));
+	lsprintf(logp, CATI, "date_conditions at %4d for %4d type char        notnull\n", offsetof(JOB, date_conditions), sizeof(j.date_conditions));
+	lsprintf(logp, CATI, "days_of_week    at %4d for %4d type char        notnull\n", offsetof(JOB, days_of_week),    sizeof(j.days_of_week));
+	lsprintf(logp, CATI, "start_mins      at %4d for %4d type char        notnull\n", offsetof(JOB, start_mins),      sizeof(j.start_mins));
+	lsprintf(logp, CATI, "start_times     at %4d for %4d type char        notnull\n", offsetof(JOB, start_times),     sizeof(j.start_times));
+	lsprintf(logp, CATI, "on_noexec       at %4d for %4d type char        notnull\n", offsetof(JOB, on_noexec),       sizeof(j.on_noexec));
+	lsprintf(logp, CATI, "status          at %4d for %4d type char        notnull\n", offsetof(JOB, status),          sizeof(j.status));
+	lsprintf(logp, CATI, "pid             at %4d for %4d type integer(9)  notnull\n", offsetof(JOB, pid),             sizeof(j.pid));
+	lsprintf(logp, CATI, "exit_status     at %4d for %4d type integer(9)  notnull\n", offsetof(JOB, exit_status),     sizeof(j.exit_status));
+	lsprintf(logp, CATI, "start           at %4d for %4d type integer(10) notnull\n", offsetof(JOB, start),           sizeof(j.start));
+	lsprintf(logp, CATI, "finish          at %4d for %4d type integer(10) notnull\n", offsetof(JOB, finish),          sizeof(j.finish));
+	lsprintf(logp, CATI, "duration        at %4d for %4d type integer(10) notnull\n", offsetof(JOB, duration),        sizeof(j.duration));
+	lsprintf(logp, CATI, "base_auto_hold  at %4d for %4d type char        notnull\n", offsetof(JOB, base_auto_hold),  sizeof(j.base_auto_hold));
+	lsprintf(logp, CATI, "gpflag          at %4d for %4d type char        notnull\n", offsetof(JOB, gpflag),          sizeof(j.gpflag));
+	lsprintf(logp, CATI, "bitmask         at %4d for %4d type integer(4)  notnull\n", offsetof(JOB, bitmask),         sizeof(j.bitmask));
+	lsprintf(logp, END, "");
 }
 
 

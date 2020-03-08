@@ -8,8 +8,10 @@
 
 #include "ottobits.h"
 #include "ottocfg.h"
-#include "ottolog.h"
 #include "ottoutil.h"
+#include "simplelog.h"
+
+extern SIMPLELOG *logp;
 
 #define cdeAMP_____     ((i64)'A'<<56 | (i64)'M'<<48 | (i64)'P'<<40 | (i64)';'<<32 | ' '<<24 | ' '<<16 | ' '<<8 | ' ')
 #define cdeAPOS____     ((i64)'A'<<56 | (i64)'P'<<48 | (i64)'O'<<40 | (i64)'S'<<32 | ';'<<24 | ' '<<16 | ' '<<8 | ' ')
@@ -299,7 +301,7 @@ read_stdin(DYNBUF *b, char *prompt)
 			b->buffer = realloc(b->buffer, b->bufferlen);
 			if(b->buffer == NULL)
 			{
-				lperror(MAJR, "Failed to reallocate buf");
+				lperror(logp, MAJR, "Failed to reallocate buf");
 				retval = OTTO_FAIL;
 			}
 			memcpy(&b->buffer[b->eob], buffer, nread);
@@ -325,7 +327,7 @@ read_stdin(DYNBUF *b, char *prompt)
 	}
 	else
 	{
-		lperror(MAJR, "buffer is null");
+		lperror(logp, MAJR, "buffer is null");
 		retval = OTTO_FAIL;
 	}
 

@@ -8,7 +8,6 @@
 #include "ottocrud.h"
 #include "ottodb.h"
 #include "ottoipc.h"
-#include "ottolog.h"
 #include "ottoutil.h"
 
 
@@ -31,7 +30,7 @@ create_job(ottoipc_create_job_pdu_st *pdu)
 	if(find_jobname(pdu->name) != -1)
 	{
 		pdu->option = JOB_ALREADY_EXISTS;
-		ottoipc_queue_simple_pdu((ottoipc_simple_pdu_st *)pdu);
+		ottoipc_enqueue_simple_pdu((ottoipc_simple_pdu_st *)pdu);
 		retval = OTTO_FAIL;
 	}
 
@@ -40,7 +39,7 @@ create_job(ottoipc_create_job_pdu_st *pdu)
 		(parent=find_jobname(pdu->box_name)) == -1)
 	{
 		pdu->option = BOX_NOT_FOUND;
-		ottoipc_queue_simple_pdu((ottoipc_simple_pdu_st *)pdu);
+		ottoipc_enqueue_simple_pdu((ottoipc_simple_pdu_st *)pdu);
 		retval = OTTO_FAIL;
 	}
 
@@ -52,7 +51,7 @@ create_job(ottoipc_create_job_pdu_st *pdu)
 		if(rc & SELF_REFERENCE)
 		{
 			pdu->option = JOB_DEPENDS_ON_ITSELF;
-			ottoipc_queue_simple_pdu((ottoipc_simple_pdu_st *)pdu);
+			ottoipc_enqueue_simple_pdu((ottoipc_simple_pdu_st *)pdu);
 			retval = OTTO_FAIL;
 		}
 
@@ -60,7 +59,7 @@ create_job(ottoipc_create_job_pdu_st *pdu)
 		if(rc & MISS_REFERENCE)
 		{
 			pdu->option = JOB_DEPENDS_ON_MISSING_JOB;
-			ottoipc_queue_simple_pdu((ottoipc_simple_pdu_st *)pdu);
+			ottoipc_enqueue_simple_pdu((ottoipc_simple_pdu_st *)pdu);
 		}
 	}
 
@@ -74,7 +73,7 @@ create_job(ottoipc_create_job_pdu_st *pdu)
 		if(jobwork[id].name[0] != '\0')
 		{
 			pdu->option = NO_SPACE_AVAILABLE;
-			ottoipc_queue_simple_pdu((ottoipc_simple_pdu_st *)pdu);
+			ottoipc_enqueue_simple_pdu((ottoipc_simple_pdu_st *)pdu);
 			retval = OTTO_FAIL;
 		}
 	}
@@ -143,7 +142,7 @@ create_job(ottoipc_create_job_pdu_st *pdu)
 		}
 		save_jobwork();
 		pdu->option = JOB_CREATED;
-		ottoipc_queue_simple_pdu((ottoipc_simple_pdu_st *)pdu);
+		ottoipc_enqueue_simple_pdu((ottoipc_simple_pdu_st *)pdu);
 	}
 
 	return(retval);
@@ -155,7 +154,7 @@ void
 report_job(ottoipc_simple_pdu_st *pdu)
 {
 	pdu->option = NACK;
-	ottoipc_queue_simple_pdu(pdu);
+	ottoipc_enqueue_simple_pdu(pdu);
 }
 
 
@@ -164,7 +163,7 @@ void
 update_job(ottoipc_update_job_pdu_st *pdu)
 {
 	pdu->option = NACK;
-	ottoipc_queue_simple_pdu((ottoipc_simple_pdu_st *)pdu);
+	ottoipc_enqueue_simple_pdu((ottoipc_simple_pdu_st *)pdu);
 }
 
 
@@ -181,7 +180,7 @@ delete_job(ottoipc_simple_pdu_st *pdu)
 	if((id = find_jobname(pdu->name)) == -1 || jobwork[id].type == 'b')
 	{
 		pdu->option = JOB_NOT_FOUND;
-		ottoipc_queue_simple_pdu(pdu);
+		ottoipc_enqueue_simple_pdu(pdu);
 	}
 	else
 	{
@@ -229,7 +228,7 @@ delete_job(ottoipc_simple_pdu_st *pdu)
 		clear_jobwork(id);
 		save_jobwork();
 		pdu->option = JOB_DELETED;
-		ottoipc_queue_simple_pdu(pdu);
+		ottoipc_enqueue_simple_pdu(pdu);
 	}
 }
 
@@ -247,7 +246,7 @@ delete_box(ottoipc_simple_pdu_st *pdu)
 	if((id = find_jobname(pdu->name)) == -1 || jobwork[id].type != 'b')
 	{
 		pdu->option = JOB_NOT_FOUND;
-		ottoipc_queue_simple_pdu(pdu);
+		ottoipc_enqueue_simple_pdu(pdu);
 	}
 	else
 	{
@@ -295,7 +294,7 @@ delete_box(ottoipc_simple_pdu_st *pdu)
 		head = jobwork[id].head;
 		clear_jobwork(id);
 		pdu->option = BOX_DELETED;
-		ottoipc_queue_simple_pdu(pdu);
+		ottoipc_enqueue_simple_pdu(pdu);
 		delete_box_chain(head);
 		save_jobwork();
 	}
@@ -324,7 +323,7 @@ delete_box_chain(int id)
 			pdu.opcode  = DELETE_BOX;
 			pdu.option  = BOX_DELETED;
 		}
-		ottoipc_queue_simple_pdu(&pdu);
+		ottoipc_enqueue_simple_pdu(&pdu);
 
 		clear_jobwork(id);
 

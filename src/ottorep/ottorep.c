@@ -11,9 +11,9 @@
 #include "ottocond.h"
 #include "ottodb.h"
 #include "ottoipc.h"
-#include "ottolog.h"
-#include "ottosignal.h"
 #include "ottoutil.h"
+#include "signals.h"
+#include "simplelog.h"
 
 #include "otto_dtl_writer.h"
 #include "otto_jil_writer.h"
@@ -30,6 +30,8 @@ enum REPORT
 	PID_REPORT,
 	REPORT_TOTAL
 };
+
+SIMPLELOG *logp = NULL;
 
 // ottorep variables
 int     report_type;
@@ -51,10 +53,11 @@ main(int argc, char *argv[])
 	int retval = init_cfg(argc, argv);
 
 	if(retval == OTTO_SUCCESS)
-		retval = init_signals(ottorep_exit);
+		init_signals(ottorep_exit);
 
 	if(retval == OTTO_SUCCESS)
-		retval = init_log(cfg.env_ottolog, cfg.progname, INFO, 0);
+		if((logp = simplelog_init(cfg.env_ottolog, cfg.progname, INFO, 0)) == NULL)
+			retval = OTTO_FAIL;
 
 	if(retval == OTTO_SUCCESS)
 	{
@@ -88,25 +91,25 @@ ottorep_exit(int signum)
 
 	if(signum > 0)
 	{
-		lprintf(MAJR, "Shutting down. Caught signal %d (%s).\n", signum, strsignal(signum));
+		lprintf(logp, MAJR, "Shutting down. Caught signal %d (%s).\n", signum, strsignal(signum));
 
 		nptrs   = backtrace(buffer, 100);
 		strings = backtrace_symbols(buffer, nptrs);
 		if(strings == NULL)
 		{
-			lprintf(MAJR, "Error getting backtrace symbols.\n");
+			lprintf(logp, MAJR, "Error getting backtrace symbols.\n");
 		}
 		else
 		{
-			lsprintf(INFO, "Backtrace:\n");
+			lsprintf(logp, INFO, "Backtrace:\n");
 			for (j = 0; j < nptrs; j++)
-				lsprintf(CATI, "  %s\n", strings[j]);
-			lsprintf(END, "");
+				lsprintf(logp, CATI, "  %s\n", strings[j]);
+			lsprintf(logp, END, "");
 		}
 	}
 	else
 	{
-		lprintf(MAJR, "Shutting down. Reason code %d.\n", signum);
+		lprintf(logp, MAJR, "Shutting down. Reason code %d.\n", signum);
 	}
 
 	exit(-1);

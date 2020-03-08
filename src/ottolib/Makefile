@@ -16,13 +16,13 @@ SRCS = ottocfg.c         \
        otto_jil_reader.c \
        otto_jil_writer.c \
        ottojob.c         \
-       ottolog.c         \
        otto_mpp_reader.c \
        otto_mpp_writer.c \
        otto_pid_writer.c \
-       ottosignal.c      \
        otto_sum_writer.c \
-       ottoutil.c
+       ottoutil.c        \
+       signals.c         \
+       simplelog.c
 
 OBJS = $(SRCS:.c=.o)
 

@@ -1,12 +1,10 @@
 #include <signal.h>
 #include <stdio.h>
 
-#include "ottobits.h"
-#include "ottocfg.h"
-#include "ottosignal.h"
+#include "signals.h"
 
 /*--------------------------- signal support functions ---------------------------*/
-int
+void
 init_signals(void (* func)(int))
 {
 	sig_set(SIGTERM,   func);
@@ -31,8 +29,6 @@ init_signals(void (* func)(int))
 	sig_set(SIGVTALRM, func);
 	sig_set(SIGPROF,   func);
 	sig_set(SIGPWR,    func);
-
-	return(OTTO_SUCCESS);
 }
 
 

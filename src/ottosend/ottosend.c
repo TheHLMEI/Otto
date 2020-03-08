@@ -8,10 +8,11 @@
 #include "ottobits.h"
 #include "ottocfg.h"
 #include "ottoipc.h"
-#include "ottolog.h"
 #include "ottojob.h"
-#include "ottosignal.h"
+#include "signals.h"
+#include "simplelog.h"
 
+SIMPLELOG *logp = NULL;
 
 int server_socket = -1;
 ottoipc_simple_pdu_st send_pdu;
@@ -37,10 +38,11 @@ main(int argc, char *argv[])
 	int retval = init_cfg(argc, argv);
 
 	if(retval == OTTO_SUCCESS)
-		retval = init_signals(ottosend_exit);
+		init_signals(ottosend_exit);
 
 	if(retval == OTTO_SUCCESS)
-		retval = init_log(cfg.env_ottolog, cfg.progname, INFO, 0);
+		if((logp = simplelog_init(cfg.env_ottolog, cfg.progname, INFO, 0)) == NULL)
+			retval = OTTO_FAIL;
 
 	if(retval == OTTO_SUCCESS)
 	{
@@ -82,25 +84,25 @@ ottosend_exit(int signum)
 
 	if(signum > 0)
 	{
-		lprintf(MAJR, "Shutting down. Caught signal %d (%s).\n", signum, strsignal(signum));
+		lprintf(logp, MAJR, "Shutting down. Caught signal %d (%s).\n", signum, strsignal(signum));
 
 		nptrs   = backtrace(buffer, 100);
 		strings = backtrace_symbols(buffer, nptrs);
 		if(strings == NULL)
 		{
-			lprintf(MAJR, "Error getting backtrace symbols.\n");
+			lprintf(logp, MAJR, "Error getting backtrace symbols.\n");
 		}
 		else
 		{
-			lsprintf(INFO, "Backtrace:\n");
+			lsprintf(logp, INFO, "Backtrace:\n");
 			for (j = 0; j < nptrs; j++)
-				lsprintf(CATI, "  %s\n", strings[j]);
-			lsprintf(END, "");
+				lsprintf(logp, CATI, "  %s\n", strings[j]);
+			lsprintf(logp, END, "");
 		}
 	}
 	else
 	{
-		lprintf(MAJR, "Shutting down. Reason code %d.\n", signum);
+		lprintf(logp, MAJR, "Shutting down. Reason code %d.\n", signum);
 	}
 
 	exit(-1);
@@ -296,28 +298,30 @@ int
 ottosend(void)
 {
 	int retval = OTTO_SUCCESS;
-	ottoipc_pdu_header_st *header = (ottoipc_pdu_header_st *)recv_header;
-	ottoipc_simple_pdu_st *pdu    = (ottoipc_simple_pdu_st *)recv_pdus;
+	ottoipc_simple_pdu_st *pdu;
 
 	ottoipc_initialize_send();
-	ottoipc_queue_simple_pdu(&send_pdu);
+	ottoipc_enqueue_simple_pdu(&send_pdu);
 
 	if((retval = ottoipc_send_all(server_socket)) == OTTO_FAIL)
 	{
-		lprintf(MAJR, "send failed.\n");
+		lprintf(logp, MAJR, "send failed.\n");
 	}
 	else
 	{
 		if((retval = ottoipc_recv_all(server_socket)) == OTTO_SUCCESS)
 		{
-			if(cfg.debug == OTTO_TRUE)
+			if(ottoipc_dequeue_pdu((void **)&pdu) == OTTO_SUCCESS)
 			{
-				log_pdu(header, pdu);
-			}
+				if(cfg.debug == OTTO_TRUE)
+				{
+					log_received_pdu(pdu);
+				}
 
-			if(pdu->opcode == PING && pdu->option == ACK)
-			{
-				lprintf(MAJR, "ottosysd is responding\n");
+				if(pdu->opcode == PING && pdu->option == ACK)
+				{
+					lprintf(logp, MAJR, "ottosysd is responding\n");
+				}
 			}
 		}
 	}

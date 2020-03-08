@@ -13,20 +13,22 @@
 #include "ottobits.h"
 #include "ottocfg.h"
 #include "ottocond.h"
-#include "ottolog.h"
 #include "ottoipc.h"
+#include "simplelog.h"
+
+extern SIMPLELOG *logp;
 
 
+size_t ipc_bufferlen = 0;
 
-size_t bufferlen = 0;
+char   *send_buffer  = NULL;
+char   *send_header  = NULL;
+char   *send_pdus    = NULL;
 
-char *send_buffer = NULL;
-char *send_header = NULL;
-char *send_pdus   = NULL;
-
-char *recv_buffer = NULL;
-char *recv_header = NULL;
-char *recv_pdus   = NULL;
+char   *recv_buffer  = NULL;
+char   *recv_header  = NULL;
+char   *recv_pdus    = NULL;
+char   *dequeued_pdu = NULL;
 
 
 #define MAX(a,b) (((a)>(b))?(a):(b))
@@ -39,7 +41,7 @@ int MAX_PDU_LENGTH=MAX(sizeof(ottoipc_simple_pdu_st),
 
 
 int allocate_ipc_buffers(void);
-int ottoipc_recv_some(int socket, char *buffer, size_t bufferlen);
+int ottoipc_recv_some(int socket, char *buffer, size_t ipc_bufferlen);
 
 int
 init_server_ipc(in_port_t port, int backlog)
@@ -209,14 +211,14 @@ allocate_ipc_buffers()
 {
 	int retval = OTTO_SUCCESS;
 
-	bufferlen = (2*MAX_PDU_LENGTH*cfg.ottodb_maxjobs) + sizeof(ottoipc_pdu_header_st);
+	ipc_bufferlen = (2*MAX_PDU_LENGTH*cfg.ottodb_maxjobs) + sizeof(ottoipc_pdu_header_st);
 
 	if(cfg.debug == OTTO_TRUE)
-		lprintf(INFO, "IPC bufferlen = %lu\n", bufferlen);
+		lprintf(logp, INFO, "IPC buffer length = %lu\n", ipc_bufferlen);
 
 	// allocate send buffer
 	if(retval == OTTO_SUCCESS &&
-		(send_buffer = malloc(bufferlen)) == NULL)
+		(send_buffer = malloc(ipc_bufferlen)) == NULL)
 	{
 		perror("sendbuffer malloc() failed");
 		retval = OTTO_FAIL;
@@ -229,7 +231,7 @@ allocate_ipc_buffers()
 
 	// allocate recv buffer
 	if(retval == OTTO_SUCCESS &&
-		(recv_buffer = malloc(bufferlen)) == NULL)
+		(recv_buffer = malloc(ipc_bufferlen)) == NULL)
 	{
 		perror("recvbuffer malloc() failed");
 		free(send_buffer);
@@ -261,7 +263,7 @@ ottoipc_initialize_send()
 
 
 void
-ottoipc_queue_simple_pdu(ottoipc_simple_pdu_st *s)
+ottoipc_enqueue_simple_pdu(ottoipc_simple_pdu_st *s)
 {
 	ottoipc_pdu_header_st *h       = (ottoipc_pdu_header_st *)send_header;
 	ottoipc_simple_pdu_st *t = (ottoipc_simple_pdu_st *)&send_pdus[h->payload_length];
@@ -275,7 +277,7 @@ ottoipc_queue_simple_pdu(ottoipc_simple_pdu_st *s)
 
 
 void
-ottoipc_queue_create_job(ottoipc_create_job_pdu_st *s)
+ottoipc_enqueue_create_job(ottoipc_create_job_pdu_st *s)
 {
 	ottoipc_pdu_header_st *h       = (ottoipc_pdu_header_st *)send_header;
 	ottoipc_create_job_pdu_st *t = (ottoipc_create_job_pdu_st *)&send_pdus[h->payload_length];
@@ -289,7 +291,7 @@ ottoipc_queue_create_job(ottoipc_create_job_pdu_st *s)
 
 
 void
-ottoipc_queue_report_job(ottoipc_report_job_pdu_st *s)
+ottoipc_enqueue_report_job(ottoipc_report_job_pdu_st *s)
 {
 	ottoipc_pdu_header_st *h       = (ottoipc_pdu_header_st *)send_header;
 	ottoipc_report_job_pdu_st *t = (ottoipc_report_job_pdu_st *)&send_pdus[h->payload_length];
@@ -303,7 +305,7 @@ ottoipc_queue_report_job(ottoipc_report_job_pdu_st *s)
 
 
 void
-ottoipc_queue_update_job(ottoipc_update_job_pdu_st *s)
+ottoipc_enqueue_update_job(ottoipc_update_job_pdu_st *s)
 {
 	ottoipc_pdu_header_st *h       = (ottoipc_pdu_header_st *)send_header;
 	ottoipc_update_job_pdu_st *t = (ottoipc_update_job_pdu_st *)&send_pdus[h->payload_length];
@@ -317,7 +319,7 @@ ottoipc_queue_update_job(ottoipc_update_job_pdu_st *s)
 
 
 void
-ottoipc_queue_delete_job(ottoipc_delete_job_pdu_st *s)
+ottoipc_enqueue_delete_job(ottoipc_delete_job_pdu_st *s)
 {
 	ottoipc_pdu_header_st *h       = (ottoipc_pdu_header_st *)send_header;
 	ottoipc_delete_job_pdu_st *t = (ottoipc_delete_job_pdu_st *)&send_pdus[h->payload_length];
@@ -390,13 +392,15 @@ ottoipc_recv_all(int socket)
 		retval = ottoipc_recv_some(socket, &recv_buffer[sizeof(ottoipc_pdu_header_st)], h->payload_length);
 	}
 
+	dequeued_pdu = recv_pdus;
+
 	return(retval);
 }
 
 
 
 int
-ottoipc_recv_some(int socket, char *buffer, size_t bufferlen)
+ottoipc_recv_some(int socket, char *buffer, size_t ipc_bufferlen)
 {
 	int retval = OTTO_SUCCESS;
 	int exit_loop = OTTO_FALSE;
@@ -406,24 +410,24 @@ ottoipc_recv_some(int socket, char *buffer, size_t bufferlen)
 	// get requested length
 	while(exit_loop == OTTO_FALSE)
 	{
-		n = recv(socket, &buffer[total], (bufferlen - total), 0);
+		n = recv(socket, &buffer[total], (ipc_bufferlen - total), 0);
 		switch(n)
 		{
 
 			case -1: // interrupted log it and exit loop
 				switch(errno)
 				{
-					case EAGAIN:       lprintf(MAJR, "recv returned EAGAIN\n");       break;
-					case EBADF:        lprintf(MAJR, "recv returned EBADF\n");        break;
-					case ECONNREFUSED: lprintf(MAJR, "recv returned ECONNREFUSED\n"); break;
-					case ECONNRESET:   lprintf(MAJR, "recv returned ECONNRESET\n");   break;
-					case EFAULT:       lprintf(MAJR, "recv returned EFAULT\n");       break;
-					case EINTR:        lprintf(MAJR, "recv returned EINTR\n");        break;
-					case EINVAL:       lprintf(MAJR, "recv returned EINVAL\n");       break;
-					case ENOMEM:       lprintf(MAJR, "recv returned ENOMEN\n");       break;
-					case ENOTCONN:     lprintf(MAJR, "recv returned ENOTCONN\n");     break;
-					case ENOTSOCK:     lprintf(MAJR, "recv returned ENOTSOCK\n");     break;
-					default:           lprintf(MAJR, "recv returned (%d)\n", errno);  break;
+					case EAGAIN:       lprintf(logp, MAJR, "recv returned EAGAIN\n");       break;
+					case EBADF:        lprintf(logp, MAJR, "recv returned EBADF\n");        break;
+					case ECONNREFUSED: lprintf(logp, MAJR, "recv returned ECONNREFUSED\n"); break;
+					case ECONNRESET:   lprintf(logp, MAJR, "recv returned ECONNRESET\n");   break;
+					case EFAULT:       lprintf(logp, MAJR, "recv returned EFAULT\n");       break;
+					case EINTR:        lprintf(logp, MAJR, "recv returned EINTR\n");        break;
+					case EINVAL:       lprintf(logp, MAJR, "recv returned EINVAL\n");       break;
+					case ENOMEM:       lprintf(logp, MAJR, "recv returned ENOMEN\n");       break;
+					case ENOTCONN:     lprintf(logp, MAJR, "recv returned ENOTCONN\n");     break;
+					case ENOTSOCK:     lprintf(logp, MAJR, "recv returned ENOTSOCK\n");     break;
+					default:           lprintf(logp, MAJR, "recv returned (%d)\n", errno);  break;
 				}
 				exit_loop = OTTO_TRUE;
 				retval    = OTTO_FAIL;
@@ -434,7 +438,7 @@ ottoipc_recv_some(int socket, char *buffer, size_t bufferlen)
 				break;
 			default:
 				total += n;
-				if(total == bufferlen)
+				if(total == ipc_bufferlen)
 					exit_loop = OTTO_TRUE;
 				break;
 		}
@@ -445,9 +449,34 @@ ottoipc_recv_some(int socket, char *buffer, size_t bufferlen)
 
 
 
-void
-log_pdu(ottoipc_pdu_header_st *header, ottoipc_simple_pdu_st *pdu)
+int
+ottoipc_dequeue_pdu(void **response)
 {
+	int retval = OTTO_SUCCESS;
+	ottoipc_pdu_header_st *h = (ottoipc_pdu_header_st *)recv_header;
+
+	if(dequeued_pdu < (recv_pdus + h->payload_length))
+	{
+		*response = (void *)dequeued_pdu;
+		dequeued_pdu = (dequeued_pdu + ottoipc_pdu_size(dequeued_pdu));
+	}
+	else
+	{
+		*response = NULL;
+		retval = OTTO_FAIL;
+	}
+
+return(retval);
+}
+
+
+
+
+void
+log_received_pdu(void *p)
+{
+	ottoipc_pdu_header_st *header = (ottoipc_pdu_header_st *)recv_header;
+	ottoipc_simple_pdu_st *pdu    = (ottoipc_simple_pdu_st *)p;
 	struct passwd *epw;
 	struct passwd *rpw;
 	char ename[512], rname[512];
@@ -461,28 +490,28 @@ log_pdu(ottoipc_pdu_header_st *header, ottoipc_simple_pdu_st *pdu)
 	if((rpw = getpwuid(header->ruid)) != NULL)
 		strcpy(rname, rpw->pw_name);
 
-	lsprintf(INFO, "Received PDU:\n");
-	lsprintf(CATI, "  user   = %s (%s)\n", ename, rname);
-	lsprintf(CATI, "  type   = %s\n", strpdutype(pdu->pdu_type));
-	lsprintf(CATI, "  opcode = %s\n", stropcode(pdu->opcode));
-	lsprintf(CATI, "  name   = %s\n", pdu->name);
+	lsprintf(logp, INFO, "Received PDU:\n");
+	lsprintf(logp, CATI, "  user   = %s (%s)\n", ename, rname);
+	lsprintf(logp, CATI, "  type   = %s\n", strpdutype(pdu->pdu_type));
+	lsprintf(logp, CATI, "  opcode = %s\n", stropcode(pdu->opcode));
+	lsprintf(logp, CATI, "  name   = %s\n", pdu->name);
 	if(pdu->option < NO_STATUS)
-		lsprintf(CATI, "  option = %s\n", strsignal(pdu->option));
+		lsprintf(logp, CATI, "  option = %s\n", strsignal(pdu->option));
 	else if(pdu->option < ACK)
 	{
 		if(pdu->option > NO_STATUS && pdu->option < STATUS_TOTAL)
-			lsprintf(CATI, "  option = %s\n", strstatus(pdu->option));
+			lsprintf(logp, CATI, "  option = %s\n", strstatus(pdu->option));
 		else
-			lsprintf(CATI, "  option = Undefined status code\n");
+			lsprintf(logp, CATI, "  option = Undefined status code\n");
 	}
 	else
 	{
 		if(pdu->option >= ACK && pdu->option < RESULTCODE_TOTAL)
-			lsprintf(CATI, "  option = %s\n", strresultcode(pdu->option));
+			lsprintf(logp, CATI, "  option = %s\n", strresultcode(pdu->option));
 		else
-			lsprintf(CATI, "  option = Undefined result code\n");
+			lsprintf(logp, CATI, "  option = Undefined result code\n");
 	}
-	lsprintf(END, "");
+	lsprintf(logp, END, "");
 }
 
 

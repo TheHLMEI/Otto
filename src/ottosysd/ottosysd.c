@@ -4,13 +4,10 @@
 #include <fcntl.h>
 #include <limits.h>
 #include <poll.h>
-//#include <pwd.h>
-//#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/time.h>
-//#include <sys/types.h>
 #include <sys/wait.h>
 #include <time.h>
 #include <unistd.h>
@@ -21,8 +18,10 @@
 #include "ottocrud.h"
 #include "ottodb.h"
 #include "ottoipc.h"
-#include "ottolog.h"
-#include "ottosignal.h"
+#include "signals.h"
+#include "simplelog.h"
+
+SIMPLELOG *logp = NULL;
 
 #define OFF 0
 #define ON  1
@@ -45,9 +44,9 @@ int   write_pidfile ();
 void  delete_pidfile ();
 /*------------------------------ event based functions ----------------------------*/
 int   handle_ipc(int fd);
-void  handle_crud_pdu();
-void  handle_scheduler_pdu();
-void  handle_daemon_pdu();
+void  handle_crud_pdu(ottoipc_simple_pdu_st *pdu);
+void  handle_scheduler_pdu(ottoipc_simple_pdu_st *pdu);
+void  handle_daemon_pdu(ottoipc_simple_pdu_st *pdu);
 void  check_dependencies ();
 void  compile_dependencies ();
 /*------------------------------ time based functions -----------------------------*/
@@ -86,10 +85,11 @@ main(int argc, char *argv[])
 		retval = write_pidfile();
 
 	if(retval == OTTO_SUCCESS)
-		retval = init_signals(ottosysd_exit);
+		init_signals(ottosysd_exit);
 
 	if(retval == OTTO_SUCCESS)
-		retval = init_log(cfg.env_ottolog, cfg.progname, INFO, 0);
+		if((logp = simplelog_init(cfg.env_ottolog, cfg.progname, INFO, 0)) == NULL)
+			retval = OTTO_FAIL;
 
 	if(retval == OTTO_SUCCESS)
 		retval = read_cfgfile();
@@ -137,25 +137,25 @@ ottosysd_exit(int signum)
 
 	if(signum > 0)
 	{
-		lprintf(MAJR, "Shutting down. Caught signal %d (%s).\n", signum, strsignal(signum));
+		lprintf(logp, MAJR, "Shutting down. Caught signal %d (%s).\n", signum, strsignal(signum));
 
 		nptrs   = backtrace(buffer, 100);
 		strings = backtrace_symbols(buffer, nptrs);
 		if(strings == NULL)
 		{
-			lprintf(MAJR, "Error getting backtrace symbols.\n");
+			lprintf(logp, MAJR, "Error getting backtrace symbols.\n");
 		}
 		else
 		{
-			lsprintf(INFO, "Backtrace:\n");
+			lsprintf(logp, INFO, "Backtrace:\n");
 			for (j = 0; j < nptrs; j++)
-				lsprintf(CATI, "  %s\n", strings[j]);
-			lsprintf(END, "");
+				lsprintf(logp, CATI, "  %s\n", strings[j]);
+			lsprintf(logp, END, "");
 		}
 	}
 	else
 	{
-		lprintf(MAJR, "Shutting down. Reason code %d.\n", signum);
+		lprintf(logp, MAJR, "Shutting down. Reason code %d.\n", signum);
 	}
 
 	delete_pidfile();
@@ -256,7 +256,7 @@ ottosysd(void)
 			{
 				if(cfg.debug == OTTO_TRUE)
 				{
-					lprintf(INFO, "errno == EINTR\n");
+					lprintf(logp, INFO, "errno == EINTR\n");
 				}
 				continue;
 			}
@@ -264,7 +264,7 @@ ottosysd(void)
 			{
 				if(cfg.debug == OTTO_TRUE)
 				{
-					lprintf(INFO, "poll failed\n");
+					lprintf(logp, INFO, "poll failed\n");
 				}
 			}
 			break;
@@ -291,7 +291,7 @@ ottosysd(void)
 				{
 					if(cfg.debug == OTTO_TRUE)
 					{
-						lprintf(INFO, "revents for connection %d %s%s%s", fds[i].fd,
+						lprintf(logp, INFO, "revents for connection %d %s%s%s", fds[i].fd,
 						fds[i].revents & POLLHUP  ? " POLLHUP"  : "",
 						fds[i].revents & POLLERR  ? " POLLERR"  : "",
 						fds[i].revents & POLLNVAL ? " POLLNVAL" : "");
@@ -321,7 +321,7 @@ ottosysd(void)
 							{
 								if(cfg.debug == OTTO_TRUE)
 								{
-									lprintf(INFO, "accept() failed");
+									lprintf(logp, INFO, "accept() failed");
 								}
 							}
 							break;
@@ -330,7 +330,7 @@ ottosysd(void)
 						// Add the new incoming connection to the pollfd structure
 						if(cfg.debug == OTTO_TRUE)
 						{
-							lprintf(INFO, "New incoming connection - %d\n", new_sd);
+							lprintf(logp, INFO, "New incoming connection - %d\n", new_sd);
 						}
 						fds[nfds].fd     = new_sd;
 						fds[nfds].events = POLLIN;
@@ -393,7 +393,7 @@ get_msec_to_next_minute()
 	retval += (1000 - now.tv_usec/1000);
 
 	if(cfg.debug == OTTO_TRUE)
-		lprintf(INFO, "msec to next minute %d\n", retval);
+		lprintf(logp, INFO, "msec to next minute %d\n", retval);
 	
 	return(retval);
 }
@@ -436,7 +436,7 @@ handle_timeout()
 
 	if(cfg.debug == OTTO_TRUE)
 	{
-		lprintf(INFO, "last_check_time = %d-%2d:%2d  now = %d-%2d:%2d\n",
+		lprintf(logp, INFO, "last_check_time = %d-%2d:%2d  now = %d-%2d:%2d\n",
 				last_check_day, last_check_hour, last_check_min,
 				parts->tm_wday, parts->tm_hour, parts->tm_min);
 	}
@@ -462,7 +462,7 @@ handle_timeout()
 
 		if(cfg.debug == OTTO_TRUE)
 		{
-			lprintf(INFO, "checking time %d-%2d:%2d\n", last_check_day, last_check_hour, last_check_min);
+			lprintf(logp, INFO, "checking time %d-%2d:%2d\n", last_check_day, last_check_hour, last_check_min);
 		}
 
 		// only do work if this minute on this day has a job to fire off
@@ -470,7 +470,7 @@ handle_timeout()
 		{
 			if(cfg.debug == OTTO_TRUE)
 			{
-				lprintf(INFO, "something is scheduled for %d-%2d:%2d\n", last_check_day, last_check_hour, last_check_min);
+				lprintf(logp, INFO, "something is scheduled for %d-%2d:%2d\n", last_check_day, last_check_hour, last_check_min);
 			}
 
 			// only copy and sort on the first iteration
@@ -478,7 +478,7 @@ handle_timeout()
 			{
 				if(cfg.debug == OTTO_TRUE)
 				{
-					lprintf(INFO, "copying jobwork\n");
+					lprintf(logp, INFO, "copying jobwork\n");
 				}
 
 				copy_jobwork();
@@ -494,7 +494,7 @@ handle_timeout()
 
 	if(minutes_caught_up > 1)
 	{
-		lprintf(INFO, "Caught up %d minutes.", minutes_caught_up);
+		lprintf(logp, INFO, "Caught up %d minutes.", minutes_caught_up);
 	}
 
 	// Release the hold on the child signal to resume normal processing
@@ -517,7 +517,7 @@ fire_this_minute(int this_wday, int this_hour, int this_min)
 		{
 			if(cfg.debug == OTTO_TRUE)
 			{
-				lprintf(INFO, "name %s date_conditions %d\n", jobwork[i].name, jobwork[i].date_conditions);
+				lprintf(logp, INFO, "name %s date_conditions %d\n", jobwork[i].name, jobwork[i].date_conditions);
 			}
 
 			if(jobwork[i].name[0] == '\0' || jobwork[i].date_conditions == 0)
@@ -583,7 +583,7 @@ int
 handle_ipc(int fd)
 {
 	int retval = OTTO_SUCCESS;
-	ottoipc_simple_pdu_st *pdu    = (ottoipc_simple_pdu_st *)recv_pdus;
+	ottoipc_simple_pdu_st *pdu;
 
 	// Hold child signals while reading from the socket
 	sig_hold(SIGCLD);
@@ -591,22 +591,28 @@ handle_ipc(int fd)
 	// read the incoming message
 	if((retval = ottoipc_recv_all(fd)) == OTTO_SUCCESS)
 	{
-		if(pdu->opcode > 0)
+		if(ottoipc_dequeue_pdu((void **)&pdu) == OTTO_SUCCESS)
 		{
-			if(pdu->opcode < CRUD_TOTAL)
+			if(pdu->opcode > 0)
 			{
-				handle_crud_pdu();
+				if(pdu->opcode != PING)
+					log_received_pdu(pdu);
+
+				if(pdu->opcode < CRUD_TOTAL)
+				{
+					handle_crud_pdu(pdu);
+				}
+				else if(pdu->opcode < SCHED_TOTAL)
+				{
+					handle_scheduler_pdu(pdu);
+				}
+				else
+				{
+					handle_daemon_pdu(pdu);
+				}
+				compile_dependencies();
+				check_dependencies();
 			}
-			else if(pdu->opcode < SCHED_TOTAL)
-			{
-				handle_scheduler_pdu();
-			}
-			else
-			{
-				handle_daemon_pdu();
-			}
-			compile_dependencies();
-			check_dependencies();
 		}
 	}
 	else
@@ -623,13 +629,8 @@ handle_ipc(int fd)
 
 
 void
-handle_crud_pdu()
+handle_crud_pdu(ottoipc_simple_pdu_st *pdu)
 {
-	ottoipc_pdu_header_st *header = (ottoipc_pdu_header_st *)recv_header;
-	ottoipc_simple_pdu_st *pdu    = (ottoipc_simple_pdu_st *)recv_pdus;
-
-	log_pdu(header, pdu);
-
 	switch(pdu->opcode)
 	{
 		case CREATE_JOB: create_job((ottoipc_create_job_pdu_st *)pdu); break;
@@ -640,25 +641,20 @@ handle_crud_pdu()
 		default:
 							  pdu->option = NOOP;
 							  ottoipc_initialize_send();
-							  ottoipc_queue_simple_pdu(pdu);
+							  ottoipc_enqueue_simple_pdu(pdu);
 							  break;
 	}
 
 	if(pdu->opcode != REPORT_JOB)
 		set_levels();
-
 }
 
 
 
 void
-handle_scheduler_pdu()
+handle_scheduler_pdu(ottoipc_simple_pdu_st *pdu)
 {
 	int id, jobwork_id, option;
-	ottoipc_pdu_header_st *header = (ottoipc_pdu_header_st *)recv_header;
-	ottoipc_simple_pdu_st *pdu    = (ottoipc_simple_pdu_st *)recv_pdus;
-
-	log_pdu(header, pdu);
 
 	copy_jobwork();
 	sort_jobwork(BY_NAME);
@@ -694,20 +690,14 @@ handle_scheduler_pdu()
 	}
 
 	ottoipc_initialize_send();
-	ottoipc_queue_simple_pdu(pdu);
+	ottoipc_enqueue_simple_pdu(pdu);
 }
 
 
 
 void
-handle_daemon_pdu()
+handle_daemon_pdu(ottoipc_simple_pdu_st *pdu)
 {
-	ottoipc_pdu_header_st *header = (ottoipc_pdu_header_st *)recv_header;
-	ottoipc_simple_pdu_st *pdu    = (ottoipc_simple_pdu_st *)recv_pdus;
-
-	if(pdu->opcode != PING)
-		log_pdu(header, pdu);
-
 	pdu->option = ACK;
 	switch(pdu->opcode)
 	{
@@ -727,7 +717,7 @@ handle_daemon_pdu()
 	}
 
 	ottoipc_initialize_send();
-	ottoipc_queue_simple_pdu(pdu);
+	ottoipc_enqueue_simple_pdu(pdu);
 }
 
 
@@ -846,7 +836,7 @@ compile_dependencies()
 							check_times[d][h] |= jobwork[i].start_times[h];
 							if(cfg.debug == OTTO_TRUE)
 							{
-								lprintf(INFO, "Adding %d-%2d to check_times for %s\n", d, h, jobwork[i].name);
+								lprintf(logp, INFO, "Adding %d-%2d to check_times for %s\n", d, h, jobwork[i].name);
 								minutes[0] = '\0';
 								for(dmin=0; dmin<60; dmin++)
 								{
@@ -856,7 +846,7 @@ compile_dependencies()
 										strcat(minutes, minute);
 									}
 								}
-								lprintf(INFO, "check_times[%d][%d] minutes now%s\n", d, h, minutes);
+								lprintf(logp, INFO, "check_times[%d][%d] minutes now%s\n", d, h, minutes);
 							}
 						}
 					}
@@ -1001,12 +991,16 @@ run_job(int id)
 		job[id].finish   = job[id].start;
 		job[id].duration = 0;
 		job[id].status   = STAT_SU;
-		lprintf(INFO, "%s started (on_noexec)\n", job[id].name);
+		lprintf(logp, INFO, "%s started (on_noexec)\n", job[id].name);
 		if(job[id].parent != -1)
 			finish_box(job[id].parent, job[id].finish);
 
 		return(0);
 	}
+
+	// rebuild the environment to be passed to the child job (if necessary)
+	// Including HOME, LOGNAME, USER, PATH, and "envvar" lines read from OTTOCFG and OTTOENV
+	rebuild_environment();
 
 	pid = fork();       
 	if(pid > 0)
@@ -1020,22 +1014,18 @@ run_job(int id)
 		job[id].exit_status = 0;
 		job[id].status      = STAT_RU;
 		setpgid(pid, 0); 
-		lprintf(INFO, "%s started\n", job[id].name);
+		lprintf(logp, INFO, "%s started\n", job[id].name);
 	}
 	else
 	{
 		if(pid < 0)
 		{
-			lprintf(MAJR, "Couldn't create a child process for %s.\n", job[id].name);
+			lprintf(logp, MAJR, "Couldn't create a child process for %s.\n", job[id].name);
 		}
 		else
 		{ 
 			// change directory to $HOME before overlaying the process since PWD is inherited
 			chdir(getenv("HOME"));
-
-			// build environment including
-			// HOME, LOGNAME, USER, PATH, and environment variables read form the OTTOCFG and OTTOENV files
-			rebuild_environment();
 
 			// add the job name at the top of the list
 			sprintf(auto_job_name, "AUTO_JOB_NAME=%s", job[id].name);
@@ -1053,7 +1043,7 @@ run_job(int id)
 			// overlay a shell to execute the command
 			execle("/bin/sh", "/bin/sh", "-c", job[id].command, NULL, cfg.envvar);
 
-			lprintf(MAJR, "execle failed for %s.\n", job[id].name);
+			lprintf(logp, MAJR, "execle failed for %s.\n", job[id].name);
 		}
 	}
 		
@@ -1092,7 +1082,7 @@ finish_job(int sigNum)
 				{
 					job[id].exit_status = WTERMSIG(status);
 				}
-				lprintf(INFO, "%s ended with return code %d\n", job[id].name, status);
+				lprintf(logp, INFO, "%s ended with return code %d\n", job[id].name, status);
 				job[id].pid = 0;
 				if(job[id].exit_status == 0)
 					job[id].status = STAT_SU;
