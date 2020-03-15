@@ -8,21 +8,6 @@
 
 #include "otto_jil_reader.h"
 
-// ottojil defines
-#define cdeSU______     ((i64)'S'<<56 | (i64)'U'<<48 | (i64)' '<<40 | (i64)' '<<32 | ' '<<24 | ' '<<16 | ' '<<8 | ' ')
-#define cdeMO______     ((i64)'M'<<56 | (i64)'O'<<48 | (i64)' '<<40 | (i64)' '<<32 | ' '<<24 | ' '<<16 | ' '<<8 | ' ')
-#define cdeTU______     ((i64)'T'<<56 | (i64)'U'<<48 | (i64)' '<<40 | (i64)' '<<32 | ' '<<24 | ' '<<16 | ' '<<8 | ' ')
-#define cdeWE______     ((i64)'W'<<56 | (i64)'E'<<48 | (i64)' '<<40 | (i64)' '<<32 | ' '<<24 | ' '<<16 | ' '<<8 | ' ')
-#define cdeTH______     ((i64)'T'<<56 | (i64)'H'<<48 | (i64)' '<<40 | (i64)' '<<32 | ' '<<24 | ' '<<16 | ' '<<8 | ' ')
-#define cdeFR______     ((i64)'F'<<56 | (i64)'R'<<48 | (i64)' '<<40 | (i64)' '<<32 | ' '<<24 | ' '<<16 | ' '<<8 | ' ')
-#define cdeSA______     ((i64)'S'<<56 | (i64)'A'<<48 | (i64)' '<<40 | (i64)' '<<32 | ' '<<24 | ' '<<16 | ' '<<8 | ' ')
-#define cdeALL_____     ((i64)'A'<<56 | (i64)'L'<<48 | (i64)'L'<<40 | (i64)' '<<32 | ' '<<24 | ' '<<16 | ' '<<8 | ' ')
-
-#define DTECOND_BIT      (1L)
-#define DYSOFWK_BIT (1L << 1)
-#define STRTMNS_BIT (1L << 2)
-#define STRTTMS_BIT (1L << 3)
-
 enum JIL_KEYWORDS
 {
 	JIL_UNKNOWN,
@@ -45,11 +30,19 @@ enum JIL_KEYWORDS
 
 
 
-int jil_reserved_word(DYNBUF *b);
-int add_insert_job(JOB *item, DYNBUF *b);
-int add_update_job(JOB *item, DYNBUF *b);
-int add_delete_item(JOB *item, DYNBUF *b, char *kind);
+int  jil_reserved_word(char *s);
+int  add_insert_job(JOB *item, DYNBUF *b);
+int  add_update_job(JOB *item, DYNBUF *b);
+int  add_delete_item(JOB *item, DYNBUF *b, char *kind);
 void set_jil_joblist_levels(JOBLIST *joblist);
+int  validate_and_copy_jil_name(JOB *item, char *namep);
+int  validate_and_copy_jil_type(JOB *item, char *typep);
+int  validate_and_copy_jil_box_name(JOB *item, char *box_namep);
+int  validate_and_copy_jil_command(JOB *item, char *commandp);
+int  validate_and_copy_jil_condition(JOB *item, char *conditionp);
+int  validate_and_copy_jil_description(JOB *item, char *descriptionp);
+int  validate_and_copy_jil_auto_hold(JOB *item, char *auto_holdp);
+int  validate_and_copy_jil_date_conditions(JOB *item, char *date_conditionsp, char *days_of_weekp, char *start_minsp, char *start_timesp);
 
 
 
@@ -71,7 +64,7 @@ parse_jil(DYNBUF *b, JOBLIST *joblist)
 		b->s    = b->buffer;
 		while(b->s[0] != '\0')
 		{
-			switch(jil_reserved_word(b))
+			switch(jil_reserved_word(b->s))
 			{
 				case JIL_INS_JOB:
 				case JIL_UPD_JOB:
@@ -103,7 +96,7 @@ parse_jil(DYNBUF *b, JOBLIST *joblist)
 		b->s    = b->buffer;
 		while(b->s[0] != '\0')
 		{
-			switch(jil_reserved_word(b))
+			switch(jil_reserved_word(b->s))
 			{
 				case JIL_INS_JOB:
 					retval = add_insert_job(&joblist->item[i++], b);
@@ -135,32 +128,26 @@ parse_jil(DYNBUF *b, JOBLIST *joblist)
 int
 add_insert_job(JOB *item, DYNBUF *b)
 {
-	int     retval       = OTTO_SUCCESS;
-	int     exit_loop    = OTTO_FALSE;
-	int     rc;
-	char    *namep            = NULL;
-	char    *typep            = NULL;
-	char    *auto_holdp       = NULL;
-	char    *box_namep        = NULL;
-	char    *commandp         = NULL;
-	char    *conditionp       = NULL;
-	char    *descriptionp     = NULL;
-	char    date_conditions   = 0;
-	char    *date_conditionsp = NULL;
-	char    days_of_week      = 0;
-	char    *days_of_weekp    = NULL;
-	char    *start_minsp      = NULL;
-	char    *start_timesp     = NULL;
-	int64_t start_mins=0;
-	int64_t start_times[24]={0};
-	int i, date_check = 0, parse_date_conditions = OTTO_FALSE;
+	int     retval                = OTTO_SUCCESS;
+	int     exit_loop             = OTTO_FALSE;
+	char    *namep                = NULL;
+	char    *typep                = NULL;
+	char    *auto_holdp           = NULL;
+	char    *box_namep            = NULL;
+	char    *commandp             = NULL;
+	char    *conditionp           = NULL;
+	char    *descriptionp         = NULL;
+	char    *date_conditionsp     = NULL;
+	char    *days_of_weekp        = NULL;
+	char    *start_minsp          = NULL;
+	char    *start_timesp         = NULL;
 
 	advance_jilword(b);
 	namep = b->s;
 
 	while(exit_loop == OTTO_FALSE)
 	{
-		switch(jil_reserved_word(b))
+		switch(jil_reserved_word(b->s))
 		{
 			case JIL_JOBTYPE: advance_jilword(b); typep            = b->s; break;
 			case JIL_BOXNAME: advance_jilword(b); box_namep        = b->s; break;
@@ -175,6 +162,7 @@ add_insert_job(JOB *item, DYNBUF *b)
 			case JIL_DEL_BOX:
 			case JIL_DEL_JOB:
 			case JIL_INS_JOB:
+			case JIL_UPD_JOB:
 			case JIL_UNSUPPD: exit_loop = OTTO_TRUE; break;
 			default:          advance_word(b);       break;
 		}
@@ -183,149 +171,28 @@ add_insert_job(JOB *item, DYNBUF *b)
 			exit_loop = OTTO_TRUE;
 	}
 
-	if((rc = ottojob_copy_name(item->name, namep, NAMLEN)) != OTTO_SUCCESS) retval = OTTO_FAIL;
-	if(rc & OTTO_INVALID_NAME_CHARS)
-	{
-		fprintf(stderr, "ERROR for job: %s < job_name contains one or more invalid characters or symbols >.\n", item->name);
-		retval = OTTO_FAIL;
-	}
-
-	if(rc & OTTO_INVALID_NAME_LENGTH)
-	{
-		fprintf(stderr, "ERROR for job: %s < job_name exceeds allowed length (%d bytes) >.\n", item->name, NAMLEN);
-		retval = OTTO_FAIL;
-	}
-
-	if((rc = ottojob_copy_type(&item->type, typep, TYPLEN)) != OTTO_SUCCESS) retval = OTTO_FAIL;
-	if(rc == OTTO_INVALID_VALUE)
-	{
-		fprintf(stderr, "ERROR for job: %s < invalid value \"%c\" for JIL keyword: \"job_type\" >.\n", item->name, typep[0]);
-		retval = OTTO_FAIL;
-	}
-
-	if((rc = ottojob_copy_name(item->box_name, box_namep, NAMLEN)) != OTTO_SUCCESS) retval = OTTO_FAIL;
-	if(rc & OTTO_INVALID_NAME_CHARS)
-	{
-		fprintf(stderr, "ERROR for job: %s < box_name %s contains one or more invalid characters or symbols >.\n", item->name, item->box_name);
-		retval = OTTO_FAIL;
-	}
-
-	if(rc & OTTO_INVALID_NAME_LENGTH)
-	{
-		fprintf(stderr, "ERROR for job: %s < box_name %s exceeds allowed length (%d bytes) >.\n", item->name, item->box_name, NAMLEN);
-		retval = OTTO_FAIL;
-	}
-
-	if(item->type == 'b' && strcmp(item->name, item->box_name) == '\0')
-	{
-		fprintf(stderr, "ERROR for job: %s < job_name and box_name cannot be same >.\n", item->name);
-		retval = OTTO_FAIL;
-	}
-
-	if((rc = ottojob_copy_command(item->command, commandp, CMDLEN)) != OTTO_SUCCESS) retval = OTTO_FAIL;
-	if(item->type == 'c' && item->command[0] == '\0')
-	{
-		fprintf(stderr, "ERROR for job: %s < required JIL keyword \"command\" is missing >.\n", item->name);
-		retval = OTTO_FAIL;
-	}
-
-	if((rc = ottojob_copy_condition(item->condition, conditionp, CNDLEN)) != OTTO_SUCCESS) retval = OTTO_FAIL;
-	if(rc != OTTO_SUCCESS)
-	{
-		fprintf(stderr, "ERROR for job: %s < condition statement contains errors >.\n", item->name);
-		retval = OTTO_FAIL;
-	}
-
-	if((rc = ottojob_copy_description(item->description, descriptionp, DSCLEN)) != OTTO_SUCCESS) retval = OTTO_FAIL;
-
-	if((rc = ottojob_copy_flag(&item->auto_hold, auto_holdp, FLGLEN)) != OTTO_SUCCESS) retval = OTTO_FAIL;
-	if(rc == OTTO_INVALID_VALUE)
-	{
-		fprintf(stderr, "ERROR for job: %s < invalid value \"%c\" for JIL keyword: \"auto_hold\" >.\n", item->name, auto_holdp[0]);
-		retval = OTTO_FAIL;
-	}
-	item->base_auto_hold = item->auto_hold;
-
-	// check if a valid comination of date conditions attributes was specified
-	if(date_conditionsp != NULL) date_check |= DTECOND_BIT;
-	if(days_of_weekp    != NULL) date_check |= DYSOFWK_BIT;
-	if(start_minsp      != NULL) date_check |= STRTMNS_BIT;
-	if(start_timesp     != NULL) date_check |= STRTTMS_BIT;
-
-	switch(date_check)
-	{
-		case 0:
-			// do nothing
-			break;
-		case (DTECOND_BIT | DYSOFWK_BIT | STRTMNS_BIT):
-		case (DTECOND_BIT | DYSOFWK_BIT | STRTTMS_BIT):
-			if(box_namep != NULL)
-			{
-				fprintf(stderr, "ERROR for job: %s < invalid application of date conditions >.\n", item->name);
-				fprintf(stderr, "Otto only allows date conditions on objects at level 0. (i.e. no parent box).\n");
-			}
-			else
-			{
-				parse_date_conditions = OTTO_TRUE;
-			}
-			break;
-		default:
-			fprintf(stderr, "ERROR for job: %s < invalid combination of date conditions >.\n", item->name);
-			fprintf(stderr, "You must specify date_conditions, days_of_week, and either start_mins or start_times.\n");
-			break;
-	}
-
-	if(parse_date_conditions == OTTO_TRUE)
-	{
-		if((rc = ottojob_copy_flag(&date_conditions, date_conditionsp, FLGLEN)) != OTTO_SUCCESS) retval = OTTO_FAIL;
-		if(rc == OTTO_INVALID_VALUE)
-		{
-			fprintf(stderr, "ERROR for job: %s < invalid value \"%c\" for JIL keyword: \"date_conditions\" >.\n", item->name, date_conditionsp[0]);
-			retval = OTTO_FAIL;
-		}
-
-		if((rc = ottojob_copy_days_of_week(&days_of_week, days_of_weekp)) != OTTO_SUCCESS) retval = OTTO_FAIL;
-		if(rc == OTTO_INVALID_VALUE)
-		{
-			fprintf(stderr, "ERROR for job: %s < days_of_week attribute contains errors >.\n", item->name);
-			retval = OTTO_FAIL;
-		}
-
-		if((rc = ottojob_copy_start_mins(&start_mins, start_minsp)) != OTTO_SUCCESS) retval = OTTO_FAIL;
-		if(rc == OTTO_INVALID_VALUE)
-		{
-			fprintf(stderr, "ERROR for job: %s < start_mins attribute contains errors >.\n", item->name);
-			retval = OTTO_FAIL;
-		}
-
-		if((rc = ottojob_copy_start_times(start_times, start_timesp)) != OTTO_SUCCESS) retval = OTTO_FAIL;
-		if(rc == OTTO_INVALID_VALUE)
-		{
-			fprintf(stderr, "ERROR for job: %s < start_times attribute contains errors >.\n", item->name);
-			retval = OTTO_FAIL;
-		}
-	}
-
-	if(parse_date_conditions == OTTO_TRUE)
-	{
-		// assume we're using start times
-		item->date_conditions = OTTO_USE_STARTTIMES;
-
-		// modify if we're using start_mins
-		if(start_minsp != NULL)
-		{
-			item->date_conditions = OTTO_USE_STARTMINS;
-			for(i=0; i<24; i++)
-				start_times[i] = start_mins;
-		}
-
-		// copy the data to the structure
-		item->days_of_week = days_of_week;
-		item->start_mins   = start_mins;
-		memcpy(item->start_times, start_times, sizeof(start_times));
-	}
-
+	memset(item, 0, sizeof(JOB));
 	item->opcode = CREATE_JOB;
+
+	if(validate_and_copy_jil_name(item, namep) != OTTO_SUCCESS)
+		retval = OTTO_FAIL;
+	if(validate_and_copy_jil_type(item, typep) != OTTO_SUCCESS)
+		retval = OTTO_FAIL;
+	if(validate_and_copy_jil_box_name(item, box_namep) != OTTO_SUCCESS)
+		retval = OTTO_FAIL;
+	if(validate_and_copy_jil_command(item, commandp) != OTTO_SUCCESS)
+		retval = OTTO_FAIL;
+	if(validate_and_copy_jil_condition(item, conditionp) != OTTO_SUCCESS)
+		retval = OTTO_FAIL;
+	if(validate_and_copy_jil_description(item, descriptionp) != OTTO_SUCCESS)
+		retval = OTTO_FAIL;
+	if(validate_and_copy_jil_auto_hold(item, auto_holdp) != OTTO_SUCCESS)
+		retval = OTTO_FAIL;
+	if(validate_and_copy_jil_date_conditions(item, date_conditionsp, days_of_weekp, start_minsp, start_timesp) != OTTO_SUCCESS)
+		retval = OTTO_FAIL;
+
+	// check valid combinations of attributes
+	// TODO
 
 	regress_word(b);
 
@@ -337,7 +204,73 @@ add_insert_job(JOB *item, DYNBUF *b)
 int
 add_update_job(JOB *item, DYNBUF *b)
 {
-	int retval = OTTO_FAIL;
+	int     retval                = OTTO_SUCCESS;
+	int     exit_loop             = OTTO_FALSE;
+	char    *namep                = NULL;
+	char    *typep                = NULL;
+	char    *auto_holdp           = NULL;
+	char    *box_namep            = NULL;
+	char    *commandp             = NULL;
+	char    *conditionp           = NULL;
+	char    *descriptionp         = NULL;
+	char    *date_conditionsp     = NULL;
+	char    *days_of_weekp        = NULL;
+	char    *start_minsp          = NULL;
+	char    *start_timesp         = NULL;
+
+	advance_jilword(b);
+	namep = b->s;
+
+	while(exit_loop == OTTO_FALSE)
+	{
+		switch(jil_reserved_word(b->s))
+		{
+			case JIL_JOBTYPE: advance_jilword(b); typep            = b->s; break;
+			case JIL_BOXNAME: advance_jilword(b); box_namep        = b->s; break;
+			case JIL_COMMAND: advance_jilword(b); commandp         = b->s; break;
+			case JIL_CONDITN: advance_jilword(b); conditionp       = b->s; break;
+			case JIL_DESCRIP: advance_jilword(b); descriptionp     = b->s; break;
+			case JIL_AUTOHLD: advance_jilword(b); auto_holdp       = b->s; break;
+			case JIL_DTECOND: advance_jilword(b); date_conditionsp = b->s; break;
+			case JIL_DYSOFWK: advance_jilword(b); days_of_weekp    = b->s; break;
+			case JIL_STRTMIN: advance_jilword(b); start_minsp      = b->s; break;
+			case JIL_STRTTIM: advance_jilword(b); start_timesp     = b->s; break;
+			case JIL_DEL_BOX:
+			case JIL_DEL_JOB:
+			case JIL_INS_JOB:
+			case JIL_UPD_JOB:
+			case JIL_UNSUPPD: exit_loop = OTTO_TRUE; break;
+			default:          advance_word(b);       break;
+		}
+
+		if(b->s[0] == '\0')
+			exit_loop = OTTO_TRUE;
+	}
+
+	memset(item, 0, sizeof(JOB));
+	item->opcode = UPDATE_JOB;
+
+	if(validate_and_copy_jil_name(item, namep) != OTTO_SUCCESS)
+		retval = OTTO_FAIL;
+	if(validate_and_copy_jil_type(item, typep) != OTTO_SUCCESS)
+		retval = OTTO_FAIL;
+	if(validate_and_copy_jil_box_name(item, box_namep) != OTTO_SUCCESS)
+		retval = OTTO_FAIL;
+	if(validate_and_copy_jil_command(item, commandp) != OTTO_SUCCESS)
+		retval = OTTO_FAIL;
+	if(validate_and_copy_jil_condition(item, conditionp) != OTTO_SUCCESS)
+		retval = OTTO_FAIL;
+	if(validate_and_copy_jil_description(item, descriptionp) != OTTO_SUCCESS)
+		retval = OTTO_FAIL;
+	if(validate_and_copy_jil_auto_hold(item, auto_holdp) != OTTO_SUCCESS)
+		retval = OTTO_FAIL;
+	if(validate_and_copy_jil_date_conditions(item, date_conditionsp, days_of_weekp, start_minsp, start_timesp) != OTTO_SUCCESS)
+		retval = OTTO_FAIL;
+
+	// check valid combinations of attributes
+	// TODO
+
+	regress_word(b);
 
 	return(retval);
 }
@@ -348,28 +281,19 @@ int
 add_delete_item(JOB *item, DYNBUF *b, char *kind)
 {
 	int retval = OTTO_SUCCESS;
-	int rc;
+	char *namep = NULL;
 
 	advance_jilword(b);
-	if((rc = ottojob_copy_name(item->name, b->s, NAMLEN)) != OTTO_SUCCESS)
-	{
-		if(rc & OTTO_INVALID_NAME_CHARS)
-		{
-			fprintf(stderr, "ERROR for job: %s < %s name contains one or more invalid characters or symbols >.\n", kind, item->name);
-			retval = OTTO_FAIL;
-		}
+	namep = b->s;
 
-		if(rc & OTTO_INVALID_NAME_LENGTH)
-		{
-			fprintf(stderr, "ERROR for job: %s < %s name exceeds allowed length (%d bytes) >.\n", kind, item->name, NAMLEN);
-			retval = OTTO_FAIL;
-		}
-	}
-
+	memset(item, 0, sizeof(JOB));
 	if(strcmp(kind, "box") == 0)
 		item->opcode = DELETE_BOX;
 	else
 		item->opcode = DELETE_JOB;
+
+	if(validate_and_copy_jil_name(item, namep) != OTTO_SUCCESS)
+		retval = OTTO_FAIL;
 
 	return(retval);
 }
@@ -377,11 +301,10 @@ add_delete_item(JOB *item, DYNBUF *b, char *kind)
 
 
 int
-jil_reserved_word(DYNBUF *b)
+jil_reserved_word(char *s)
 {
 	int retval = JIL_UNKNOWN;
 	int c, i;
-	char *s = b->s;
 
 	switch(s[0])
 	{
@@ -442,7 +365,7 @@ jil_reserved_word(DYNBUF *b)
 
 	if(retval != JIL_UNKNOWN && retval != JIL_UNSUPPD)
 	{
-		// autosys allows whitespace between a keeyword and the following
+		// autosys allows whitespace between a keyword and the following
 		// colon.  it's easier to parse if it's adjacent so fix it here
 		// look ahead for the colon, if found move it to c if necessary
 		for(i=c; s[i] != '\0'; i++)
@@ -510,8 +433,8 @@ set_jil_joblist_levels(JOBLIST *joblist)
 					for(i=0; i<joblist->nitems; i++)
 					{
 						if(i != b &&
-							joblist->item[i].opcode == CREATE_JOB &&
-							strcmp(joblist->item[i].box_name, joblist->item[b].name) == 0)
+								joblist->item[i].opcode == CREATE_JOB &&
+								strcmp(joblist->item[i].box_name, joblist->item[b].name) == 0)
 						{
 							joblist->item[i].level = current_level + 1;
 							one_changed = OTTO_TRUE;
@@ -522,6 +445,386 @@ set_jil_joblist_levels(JOBLIST *joblist)
 			current_level++;
 		}
 	}
+}
+
+
+
+int
+validate_and_copy_jil_name(JOB *item, char *namep)
+{
+	int retval   = OTTO_SUCCESS;
+	char *action = "action";
+	char *kind   = "";
+	int rc;
+
+	switch(item->opcode)
+	{
+		case CREATE_JOB: action = "insert_job"; kind = "job "; break;
+		case UPDATE_JOB: action = "update_job"; kind = "job "; break;
+		case DELETE_JOB: action = "delete_job"; kind = "job "; break;
+		case DELETE_BOX: action = "delete_box"; kind = "box "; break;
+	}
+
+	if(namep == NULL)
+	{
+		retval = OTTO_FAIL;
+	}
+
+	if(retval == OTTO_SUCCESS && jil_reserved_word(namep) != JIL_UNKNOWN)
+	{
+		retval = OTTO_FAIL;
+	}
+
+	if(retval == OTTO_SUCCESS)
+	{
+		if((rc = ottojob_copy_name(item->name, namep, NAMLEN)) != OTTO_SUCCESS)
+			retval = OTTO_FAIL;
+		if(rc & OTTO_INVALID_NAME_CHARS)
+		{
+			fprintf(stderr, "ERROR for %s: %s < %sname contains one or more invalid characters or symbols >.\n", action, item->name, kind);
+		}
+
+		if(rc & OTTO_INVALID_NAME_LENGTH)
+		{
+			fprintf(stderr, "ERROR for %s: %s < %sname exceeds allowed length (%d bytes) >.\n", action, item->name, kind, NAMLEN);
+		}
+	}
+
+	return(retval);
+}
+
+
+
+int
+validate_and_copy_jil_type(JOB *item, char *typep)
+{
+	int retval = OTTO_SUCCESS;
+	int rc;
+
+	if(typep != NULL)
+	{
+		item->attributes = HAS_TYPE;
+
+		if(jil_reserved_word(typep) == JIL_UNKNOWN)
+		{
+			switch(item->opcode)
+			{
+				case CREATE_JOB:
+					if((rc = ottojob_copy_type(&item->type, typep, TYPLEN)) != OTTO_SUCCESS)
+						retval = OTTO_FAIL;
+					if(rc == OTTO_INVALID_VALUE)
+					{
+						fprintf(stderr, "ERROR for insert_job: %s < invalid value \"%c\" for JIL keyword: \"job_type\" >.\n", item->name, typep[0]);
+					}
+					break;
+				case UPDATE_JOB: 
+					fprintf(stderr, "ERROR for update_job: %s < invalid use of JIL keyword: \"job_type\" >.\n", item->name);
+					retval = OTTO_FAIL;
+					break;
+			}
+		}
+		else
+		{
+			retval = OTTO_FAIL;
+		}
+	}
+
+	return(retval);
+}
+
+
+
+int
+validate_and_copy_jil_box_name(JOB *item, char *box_namep)
+{
+	int retval = OTTO_SUCCESS;
+	char *action = "action";
+	int rc;
+
+	switch(item->opcode)
+	{
+		case CREATE_JOB: action = "insert_job"; break;
+		case UPDATE_JOB: action = "update_job"; break;
+	}
+
+	if(box_namep != NULL)
+	{
+		item->attributes = HAS_BOX_NAME;
+
+		if(jil_reserved_word(box_namep) == JIL_UNKNOWN)
+		{
+			if((rc = ottojob_copy_name(item->box_name, box_namep, NAMLEN)) != OTTO_SUCCESS)
+				retval = OTTO_FAIL;
+			if(rc & OTTO_INVALID_NAME_CHARS)
+			{
+				fprintf(stderr, "ERROR for %s: %s < box_name %s contains one or more invalid characters or symbols >.\n", action, item->name, item->box_name);
+			}
+
+			if(rc & OTTO_INVALID_NAME_LENGTH)
+			{
+				fprintf(stderr, "ERROR for %s: %s < box_name %s exceeds allowed length (%d bytes) >.\n", action, item->name, item->box_name, NAMLEN);
+			}
+
+			if(item->type == OTTO_BOX && strcmp(item->name, item->box_name) == 0)
+			{
+				fprintf(stderr, "ERROR for %s: %s < job_name and box_name cannot be same >.\n", action, item->name);
+				retval = OTTO_FAIL;
+			}
+		}
+		else
+		{
+			// only a problem if creating a job
+			if(item->opcode == CREATE_JOB)
+				retval = OTTO_FAIL;
+		}
+	}
+
+	return(retval);
+}
+
+
+
+int
+validate_and_copy_jil_command(JOB *item, char *commandp)
+{
+	int retval = OTTO_SUCCESS;
+	char *action = "action";
+	int rc;
+
+	switch(item->opcode)
+	{
+		case CREATE_JOB: action = "insert_job"; break;
+		case UPDATE_JOB: action = "update_job"; break;
+	}
+
+	if(commandp != NULL)
+	{
+		item->attributes = HAS_COMMAND;
+
+		if(jil_reserved_word(commandp) == JIL_UNKNOWN)
+		{
+			if((rc = ottojob_copy_command(item->command, commandp, CMDLEN)) != OTTO_SUCCESS)
+				retval = OTTO_FAIL;
+		}
+		if(item->type == OTTO_CMD && item->command[0] == '\0')
+		{
+			fprintf(stderr, "ERROR for %s: %s < required JIL keyword \"command\" is missing >.\n", action, item->name);
+			retval = OTTO_FAIL;
+		}
+	}
+
+	return(retval);
+}
+
+
+
+int
+validate_and_copy_jil_condition(JOB *item, char *conditionp)
+{
+	int retval = OTTO_SUCCESS;
+	char *action = "action";
+
+	switch(item->opcode)
+	{
+		case CREATE_JOB: action = "insert_job"; break;
+		case UPDATE_JOB: action = "update_job"; break;
+	}
+
+	if(conditionp != NULL)
+	{
+		item->attributes = HAS_CONDITION;
+
+		if(jil_reserved_word(conditionp) == JIL_UNKNOWN)
+		{
+			if(ottojob_copy_condition(item->condition, conditionp, CNDLEN) != OTTO_SUCCESS)
+			{
+				fprintf(stderr, "ERROR for %s: %s < condition statement contains errors >.\n", action, item->name);
+				retval = OTTO_FAIL;
+			}
+		}
+		else
+		{
+			// only a problem if creating a job
+			if(item->opcode == CREATE_JOB)
+				retval = OTTO_FAIL;
+		}
+	}
+
+	return(retval);
+}
+
+
+
+int
+validate_and_copy_jil_description(JOB *item, char *descriptionp)
+{
+	int retval = OTTO_SUCCESS;
+
+	if(descriptionp != NULL)
+	{
+		item->attributes = HAS_DESCRIPTION;
+
+		if(jil_reserved_word(descriptionp) == JIL_UNKNOWN)
+		{
+			if(ottojob_copy_description(item->description, descriptionp, DSCLEN) != OTTO_SUCCESS)
+				retval = OTTO_FAIL;
+		}
+	}
+
+	return(retval);
+}
+
+
+
+int
+validate_and_copy_jil_auto_hold(JOB *item, char *auto_holdp)
+{
+	int retval = OTTO_SUCCESS;
+	char *action = "action";
+	int rc;
+
+	switch(item->opcode)
+	{
+		case CREATE_JOB: action = "insert_job"; break;
+		case UPDATE_JOB: action = "update_job"; break;
+	}
+
+	if(auto_holdp != NULL)
+	{
+		item->attributes = HAS_AUTO_HOLD;
+
+		if(jil_reserved_word(auto_holdp) == JIL_UNKNOWN)
+		{
+			if((rc = ottojob_copy_flag(&item->autohold, auto_holdp, FLGLEN)) != OTTO_SUCCESS)
+				retval = OTTO_FAIL;
+			if(rc == OTTO_INVALID_VALUE)
+			{
+				fprintf(stderr, "ERROR for %s: %s < invalid value \"%c\" for JIL keyword: \"auto_hold\" >.\n", action, item->name, auto_holdp[0]);
+			}
+			item->on_autohold = item->autohold;
+		}
+		else
+		{
+			// only a problem if creating a job
+			if(item->opcode == CREATE_JOB)
+				retval = OTTO_FAIL;
+		}
+	}
+
+	return(retval);
+}
+
+
+
+int
+validate_and_copy_jil_date_conditions(JOB *item, char *date_conditionsp, char *days_of_weekp, char *start_minsp, char *start_timesp)
+{
+	int     retval                = OTTO_SUCCESS;
+	char   *action                = "action";
+	char    date_conditions       = 0;
+	char    days_of_week          = 0;
+	int64_t start_minutes         = 0;
+	int64_t start_times[24]       = {0};
+	int     date_check            = 0;
+	int     parse_date_conditions = OTTO_FALSE;
+	int     i;
+	int     rc;
+
+	switch(item->opcode)
+	{
+		case CREATE_JOB: action = "insert_job"; break;
+		case UPDATE_JOB: action = "update_job"; break;
+	}
+
+	// check if a valid comination of date conditions attributes was specified
+	if(date_conditionsp != NULL && jil_reserved_word(date_conditionsp) == JIL_UNKNOWN) date_check |= DTECOND_BIT;
+	if(days_of_weekp    != NULL && jil_reserved_word(days_of_weekp)    == JIL_UNKNOWN) date_check |= DYSOFWK_BIT;
+	if(start_minsp      != NULL && jil_reserved_word(start_minsp)      == JIL_UNKNOWN) date_check |= STRTMNS_BIT;
+	if(start_timesp     != NULL && jil_reserved_word(start_timesp)     == JIL_UNKNOWN) date_check |= STRTTMS_BIT;
+
+	switch(date_check)
+	{
+		case 0:
+			// do nothing
+			break;
+		case (DTECOND_BIT | DYSOFWK_BIT | STRTMNS_BIT):
+		case (DTECOND_BIT | DYSOFWK_BIT | STRTTMS_BIT):
+			if(item->box_name[0] != '\0')
+			{
+				fprintf(stderr, "ERROR for %s: %s < invalid application of date conditions >.\n", action, item->name);
+				fprintf(stderr, "Otto only allows date conditions on objects at level 0. (i.e. no parent box).\n");
+				retval = OTTO_FAIL;
+			}
+			else
+			{
+				parse_date_conditions = OTTO_TRUE;
+			}
+			break;
+		default:
+			fprintf(stderr, "ERROR for %s: %s < invalid combination of date conditions >.\n", action, item->name);
+			fprintf(stderr, "You must specify date_conditions, days_of_week, and either start_mins or start_times.\n");
+			retval = OTTO_FAIL;
+			break;
+	}
+
+	if(parse_date_conditions == OTTO_TRUE)
+	{
+		if((rc = ottojob_copy_flag(&date_conditions, date_conditionsp, FLGLEN)) != OTTO_SUCCESS)
+			retval = OTTO_FAIL;
+		if(rc == OTTO_INVALID_VALUE)
+		{
+			fprintf(stderr, "ERROR for %s: %s < invalid value \"%c\" for JIL keyword: \"date_conditions\" >.\n", action, item->name, date_conditionsp[0]);
+		}
+
+		if((rc = ottojob_copy_days_of_week(&days_of_week, days_of_weekp)) != OTTO_SUCCESS)
+			retval = OTTO_FAIL;
+		if(rc == OTTO_INVALID_VALUE)
+		{
+			fprintf(stderr, "ERROR for %s: %s < days_of_week attribute contains errors >.\n", action, item->name);
+		}
+
+		if(start_minsp != NULL)
+		{
+			if((rc = ottojob_copy_start_minutes(&start_minutes, start_minsp)) != OTTO_SUCCESS)
+				retval = OTTO_FAIL;
+			if(rc == OTTO_INVALID_VALUE)
+			{
+				fprintf(stderr, "ERROR for %s: %s < start_mins attribute contains errors >.\n", action, item->name);
+			}
+		}
+
+		if(start_timesp != NULL)
+		{
+			if((rc = ottojob_copy_start_times(start_times, start_timesp)) != OTTO_SUCCESS)
+				retval = OTTO_FAIL;
+			if(rc == OTTO_INVALID_VALUE)
+			{
+				fprintf(stderr, "ERROR for %s: %s < start_times attribute contains errors >.\n", action, item->name);
+			}
+		}
+
+		if(retval == OTTO_SUCCESS)
+		{
+			// assume the job uses start times
+			item->date_conditions = OTTO_USE_START_TIMES;
+
+			// modify if it's using start_minutes
+			if(start_minsp != NULL)
+			{
+				item->date_conditions = OTTO_USE_START_MINUTES;
+				for(i=0; i<24; i++)
+					start_times[i] = start_minutes;
+			}
+
+			// copy the data to the structure
+			item->attributes    = HAS_DATE_CONDITIONS;
+			item->days_of_week  = days_of_week;
+			item->start_minutes = start_minutes;
+			memcpy(item->start_times, start_times, sizeof(start_times));
+		}
+	}
+
+	return(retval);
 }
 
 

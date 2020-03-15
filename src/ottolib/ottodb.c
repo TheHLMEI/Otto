@@ -224,6 +224,7 @@ find_jobname(char *jobname)
 		}
 		else
 		{
+		// printf("find_jobname break at %d\n", i);
 			break;
 		}
 	}
@@ -418,12 +419,12 @@ open_ottodb(int type)
 					memset(root_job, 0, sizeof(JOB));
 					sprintf(root_job->name, "ottosysd %s", cfg.otto_version);
 					root_job->id = cfg.ottodb_version;
-					root_job->parent = -1;
-					root_job->head   = -1;
-					root_job->tail   = -1;
-					root_job->prev   = -1;
-					root_job->next   = -1;
-					clear_from       =  0;
+					root_job->box  = -1;
+					root_job->head = -1;
+					root_job->tail = -1;
+					root_job->prev = -1;
+					root_job->next = -1;
+					clear_from     =  0;
 				}
 
 				if(clear_from >= 0)

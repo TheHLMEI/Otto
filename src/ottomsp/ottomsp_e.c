@@ -58,7 +58,7 @@ prep_tasks(int16_t id)
 				start = id;
 			}
 		}
-		if(jobwork[id].type == 'b')
+		if(jobwork[id].type == OTTO_BOX)
 			prep_tasks(jobwork[id].head);
 
 		if(jobname[0] != '\0' && strcmp(jobname, jobwork[id].name) == 0)

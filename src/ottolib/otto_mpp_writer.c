@@ -259,7 +259,7 @@ write_mpp_xml_task(JOB *item, char *outline, int autoschedule)
 	{
 		printf("			<DurationFormat>4</DurationFormat>\n");
 	}
-	printf("			<Summary>%c</Summary>\n", item->type == 'b' ? '1' : '0');
+	printf("			<Summary>%c</Summary>\n", item->type == OTTO_BOX ? '1' : '0');
 	printf("			<Rollup>0</Rollup>\n");
 			
 	if(item->condition[0] != '\0')
@@ -339,7 +339,7 @@ write_mpp_xml_task(JOB *item, char *outline, int autoschedule)
 	printf("			<ExtendedAttribute>\n");
 	printf("				<FieldID>%s</FieldID>\n", EXT[AUTOHOLD].fieldid);
 	printf("				<Value>");
-	if(item->base_auto_hold == OTTO_TRUE)
+	if(item->autohold == OTTO_TRUE)
 		printf("1");
 	else
 		printf("0");
@@ -392,14 +392,14 @@ write_mpp_xml_task(JOB *item, char *outline, int autoschedule)
 
 		switch(item->date_conditions)
 		{
-			case OTTO_USE_STARTMINS:
+			case OTTO_USE_START_MINUTES:
 				printf("			<ExtendedAttribute>\n");
-				printf("				<FieldID>%s</FieldID>\n", EXT[START_MINS].fieldid);
+				printf("				<FieldID>%s</FieldID>\n", EXT[START_MINUTES].fieldid);
 				printf("				<Value>");
 				one_printed = OTTO_FALSE;
 				for(m=0; m<60; m++)
 				{
-					if(item->start_mins & (1L << m))
+					if(item->start_minutes & (1L << m))
 					{
 						if(one_printed == OTTO_TRUE)
 							printf(",");
@@ -410,7 +410,7 @@ write_mpp_xml_task(JOB *item, char *outline, int autoschedule)
 				printf("</Value>\n");
 				printf("			</ExtendedAttribute>\n");
 				break;
-			case OTTO_USE_STARTTIMES:
+			case OTTO_USE_START_TIMES:
 				printf("			<ExtendedAttribute>\n");
 				printf("				<FieldID>%s</FieldID>\n", EXT[START_TIMES].fieldid);
 				printf("				<Value>");

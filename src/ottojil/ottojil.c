@@ -233,10 +233,10 @@ send_create_job(JOB *item)
 	strcpy(pdu.condition,   item->condition);
 
 	pdu.type            = item->type;
-	pdu.auto_hold       = item->auto_hold;
+	pdu.autohold        = item->autohold;
 	pdu.date_conditions = item->date_conditions;
 	pdu.days_of_week    = item->days_of_week;
-	pdu.start_mins      = item->start_mins;
+	pdu.start_minutes   = item->start_minutes;
 	for(i=0; i<24; i++)
 		pdu.start_times[i]  = item->start_times[i];
 	pdu.opcode          = item->opcode;
@@ -304,6 +304,81 @@ int
 send_update_job(JOB *item)
 {
 	int retval = OTTO_SUCCESS;
+	int feedback_level;
+	ottoipc_update_job_pdu_st pdu;
+	ottoipc_simple_pdu_st *response;
+	int i;
+
+	if(cfg.verbose == OTTO_TRUE)
+		feedback_level = MAJR;
+	else
+		feedback_level = INFO;
+
+	memset(&pdu, 0, sizeof(pdu));
+
+	strcpy(pdu.name,        item->name);
+	strcpy(pdu.box_name,    item->box_name);
+	strcpy(pdu.description, item->description);
+	strcpy(pdu.command,     item->command);
+	strcpy(pdu.condition,   item->condition);
+
+	pdu.attributes      = item->attributes;
+	pdu.autohold        = item->autohold;
+	pdu.date_conditions = item->date_conditions;
+	pdu.days_of_week    = item->days_of_week;
+	pdu.start_minutes   = item->start_minutes;
+	for(i=0; i<24; i++)
+		pdu.start_times[i]  = item->start_times[i];
+
+	lprintf(logp, feedback_level, "Updating job: %s.\n", pdu.name);
+	pdu.opcode = UPDATE_JOB;
+
+	ottoipc_initialize_send();
+	ottoipc_enqueue_update_job(&pdu);
+	retval = ottoipc_send_all(server_socket);
+
+	if(retval == OTTO_SUCCESS)
+	{
+		retval = ottoipc_recv_all(server_socket);
+	}
+
+	if(retval == OTTO_SUCCESS)
+	{
+		// loop over all returned PDUs reporting status
+		while(ottoipc_dequeue_pdu((void **)&response) == OTTO_SUCCESS)
+		{
+			if(cfg.debug == OTTO_TRUE)
+				log_received_pdu(response);
+
+			switch(response->option)
+			{
+				case JOB_NOT_FOUND:
+					lprintf(logp, feedback_level, "The job already exists.\n");
+					retval = OTTO_FAIL;
+					break;
+				case BOX_NOT_FOUND:
+					lprintf(logp, feedback_level, "The parent job was not found.\n");
+					retval = OTTO_FAIL;
+					break;
+				case JOB_DEPENDS_ON_MISSING_JOB:
+					lprintf(logp, feedback_level, "The job depends on a missing job.\n");
+					break;
+				case JOB_DEPENDS_ON_ITSELF:
+					lprintf(logp, feedback_level, "The job depends on itself.\n");
+					retval = OTTO_FAIL;
+					break;
+			}
+		}
+	}
+
+	if(retval == OTTO_SUCCESS)
+	{
+		lprintf(logp, feedback_level, "Update was successful.\n");
+	}
+	else
+	{
+		lprintf(logp, feedback_level, "Update was not successful.\n");
+	}
 
 	return(retval);
 }

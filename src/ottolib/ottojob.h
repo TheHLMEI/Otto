@@ -17,41 +17,44 @@
 #pragma pack(1)
 typedef struct _job
 {
-	int16_t id;
+	int16_t id;                     // linkage
 	int16_t level;
-	int16_t parent;
+	int16_t box;
 	int16_t head;
 	int16_t tail;
 	int16_t prev;
 	int16_t next;
-	char    name[NAMLEN+1];
+
+	char    name[NAMLEN+1];         // job definition
 	char    type;
 	char    box_name[NAMLEN+1];
 	char    description[DSCLEN+1];
 	char    command[CMDLEN+1];
 	char    condition[CNDLEN+1];
-	char    auto_hold;
 	char    date_conditions;
 	char    days_of_week;
-	int64_t start_mins;
+	int64_t start_minutes;
 	int64_t start_times[24];
-	char    base_auto_hold;
-	char    on_noexec;
-	char    expression[CNDLEN+1];
+	char    autohold;
+
+	char    expression[CNDLEN+1];   // current job state
 	char    expr_fail;
 	char    status;
+	char    on_autohold;
+	char    on_noexec;
 	pid_t   pid;
 	time_t  start;
 	time_t  finish;
 	time_t  duration;
 	int     exit_status;
-	union
+
+	union                           // supplemental info
 	{
 		char opcode;
 		char print;
 		char gpflag;
 	};
-	int16_t bitmask;
+	char    attributes;
 } JOB;
 
 typedef struct _joblist
@@ -72,7 +75,7 @@ int ottojob_copy_days_of_week(char *output, char *days_of_week);
 int ottojob_copy_description(char *output, char *description, int outlen);
 int ottojob_copy_flag(char *output, char *input, int outlen);
 int ottojob_copy_name(char *output, char *name, int outlen);
-int ottojob_copy_start_mins(int64_t *output, char *start_mins);
+int ottojob_copy_start_minutes(int64_t *output, char *start_minutes);
 int ottojob_copy_start_times(int64_t *output, char *start_times);
 int ottojob_copy_type(char *output, char *type, int outlen);
 

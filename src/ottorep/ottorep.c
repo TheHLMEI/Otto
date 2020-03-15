@@ -262,6 +262,8 @@ ottorep(void)
 		{
 			copy_jobwork();
 
+			joblist.nitems = 0;
+
 			repeat = build_joblist(&joblist, root_job->head, 0, OTTO_TRUE);
 
 			if(report_type == SUMMARY_REPORT)
@@ -275,6 +277,14 @@ ottorep(void)
 					printf("%-20s ", c_time);
 					printf("(refresh: %d sec)\n", report_repeat);
 				}
+				else
+				{
+					repeat = OTTO_FALSE;
+				}
+			}
+			else
+			{
+				repeat = OTTO_FALSE;
 			}
 
 			switch(report_type)
@@ -313,7 +323,7 @@ build_joblist(JOBLIST *joblist, int id, int levelmod, int do_check)
 			if((check == OTTO_FALSE) ||
 				(check == OTTO_TRUE && strwcmp(jobwork[id].name, jobname) == OTTO_TRUE))
 			{
-				if(jobwork[jobwork[id].parent].print != OTTO_TRUE)
+				if(jobwork[jobwork[id].box].print != OTTO_TRUE)
 					levelmod = jobwork[id].level;
 				jobwork[id].print = OTTO_TRUE;
 				memcpy(&joblist->item[joblist->nitems], &jobwork[id], sizeof(JOB));

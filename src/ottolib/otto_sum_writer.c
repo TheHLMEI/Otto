@@ -102,7 +102,7 @@ write_job_summary(JOB *item)
 		ne_str = "onnoexec";
 	}
 
-	if(item->auto_hold == OTTO_TRUE)
+	if(item->on_autohold == OTTO_TRUE)
 	{
 		ne_str = "autohold";
 	}

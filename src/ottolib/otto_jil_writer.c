@@ -76,7 +76,7 @@ write_insert_job_jil(JOB *item)
 	if(item->description[0] != '\0')
 		printf("%sdescription:     %s\n", indent, item->description);
 
-	if(item->base_auto_hold == OTTO_TRUE)
+	if(item->autohold == OTTO_TRUE)
 		printf("%sauto_hold:       1\n", indent);
 
 	if(item->date_conditions != OTTO_FALSE)
@@ -115,12 +115,12 @@ write_insert_job_jil(JOB *item)
 
 		switch(item->date_conditions)
 		{
-			case OTTO_USE_STARTMINS:
+			case OTTO_USE_START_MINUTES:
 				printf("%sstart_mins:      ", indent);
 				one_printed = OTTO_FALSE;
 				for(i=0; i<60; i++)
 				{
-					if(item->start_mins & (1L << i))
+					if(item->start_minutes & (1L << i))
 					{
 						if(one_printed == OTTO_TRUE)
 							printf(",");
@@ -130,7 +130,7 @@ write_insert_job_jil(JOB *item)
 				}
 				printf("\n");
 				break;
-			case OTTO_USE_STARTTIMES:
+			case OTTO_USE_START_TIMES:
 				printf("%sstart_times:     \"", indent);
 				one_printed = OTTO_FALSE;
 				for(i=0; i<24; i++)

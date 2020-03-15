@@ -61,7 +61,7 @@ int   run_job (int id);
 void  finish_box (int box_id, time_t finish);
 void  finish_job (int sigNum);
 void  set_job_status(int status, int id);
-void  set_job_auto_hold (int action, int id);
+void  set_job_autohold (int action, int id);
 void  set_job_hold (int action, int id);
 void  set_job_noexec (int action, int id);
 void  set_job_noexec_chain (int action, int id);
@@ -547,7 +547,7 @@ fire_this_minute(int this_wday, int this_hour, int this_min)
 								case OTTO_TRUE:
 									switch(job[id].type)
 									{
-										case 'b':
+										case OTTO_BOX:
 											activate_box(id);
 											job[id].start    = time(0);
 											job[id].finish   = 0;
@@ -555,7 +555,7 @@ fire_this_minute(int this_wday, int this_hour, int this_min)
 											job[id].status   = STAT_RU;
 											do_check             = OTTO_TRUE;
 											break;
-										case 'c':
+										case OTTO_CMD:
 											run_job(id);
 											break;
 									}
@@ -670,8 +670,8 @@ handle_scheduler_pdu(ottoipc_simple_pdu_st *pdu)
 		switch(pdu->opcode)
 		{
 			case CHANGE_STATUS:    set_job_status(option,  id); break;
-			case JOB_ON_AUTOHOLD:  set_job_auto_hold(ON,  id); break;
-			case JOB_OFF_AUTOHOLD: set_job_auto_hold(OFF, id); break;
+			case JOB_ON_AUTOHOLD:  set_job_autohold(ON,  id); break;
+			case JOB_OFF_AUTOHOLD: set_job_autohold(OFF, id); break;
 			case JOB_ON_HOLD:      set_job_hold(ON,  id); break;
 			case JOB_OFF_HOLD:     set_job_hold(OFF, id); break;
 			case JOB_ON_NOEXEC:    set_job_noexec(ON,  id); break;
@@ -702,8 +702,8 @@ handle_daemon_pdu(ottoipc_simple_pdu_st *pdu)
 	switch(pdu->opcode)
 	{
 		case PING:
-			sprintf(pdu->name, "ottosysd %s %s Debug %s DB Layout Version %d",
-					cfg.otto_version, cfg.pause ? "Running" : "Paused", cfg.debug ? "On" : "Off", cfg.ottodb_version);
+			sprintf(pdu->name, "ottosysd %s, %s, Debug %s, DB Layout v%d",
+					cfg.otto_version, cfg.pause ? "Paused" : "Running", cfg.debug ? "On" : "Off", cfg.ottodb_version);
 			break;
 
 		case VERIFY_DB: sprintf(pdu->name, "%ld", ottodb_inode); break;
@@ -725,7 +725,7 @@ handle_daemon_pdu(ottoipc_simple_pdu_st *pdu)
 void
 check_dependencies()
 {
-	int parent, i, id, recheck, expr_ret;
+	int box, i, id, recheck, expr_ret;
 
 	recheck = OTTO_TRUE;
 	while(recheck == OTTO_TRUE)
@@ -743,11 +743,11 @@ check_dependencies()
 				break;
 
 			// make things easier to type
-			id     = jobwork[i].id;
-			parent = job[id].parent;
+			id  = jobwork[i].id;
+			box = job[id].box;
 
 			// only check jobs with no parent box or whose parent box is RUNNING
-			if(parent == -1 || job[parent].status == STAT_RU)
+			if(box == -1 || job[box].status == STAT_RU)
 			{
 				expr_ret = OTTO_TRUE;
 				job[id].expr_fail = OTTO_FALSE;
@@ -760,13 +760,13 @@ check_dependencies()
 					case OTTO_TRUE:
 						switch(job[id].type)
 						{
-							case 'b':
+							case OTTO_BOX:
 								job[id].start    = time(0);
 								job[id].finish   = 0;
 								job[id].duration = 0;
 								job[id].status   = STAT_RU;
 								break;
-							case 'c':
+							case OTTO_CMD:
 								run_job(id);
 								break;
 						}
@@ -900,7 +900,7 @@ activate_box_chain(int id)
 	{
 		switch(job[id].type)
 		{
-			case 'b':
+			case OTTO_BOX:
 				// only activate the job if it's not ON_HOLD
 				if(job[id].status != STAT_OH)
 				{
@@ -914,14 +914,14 @@ activate_box_chain(int id)
 					activate_box_chain(job[id].head);
 				}
 				break;
-			case 'c':
+			case OTTO_CMD:
 				if(job[id].status != STAT_OH)
 				{
 					job[id].pid      = 0;
 					job[id].start    = 0;
 					job[id].finish   = 0;
 					job[id].duration = 0;
-					if(job[id].auto_hold == OTTO_TRUE)
+					if(job[id].on_autohold == OTTO_TRUE)
 						job[id].status   = STAT_OH;
 					else
 						job[id].status   = STAT_AC;
@@ -971,8 +971,8 @@ finish_box(int box_id, time_t finish)
 		if(job[box_id].start != 0)
 			job[box_id].duration = finish - job[box_id].start;
 
-		if(job[box_id].parent != -1)
-			finish_box(job[box_id].parent, finish);
+		if(job[box_id].box != -1)
+			finish_box(job[box_id].box, finish);
 	}
 }
 
@@ -992,8 +992,8 @@ run_job(int id)
 		job[id].duration = 0;
 		job[id].status   = STAT_SU;
 		lprintf(logp, INFO, "%s started (on_noexec)\n", job[id].name);
-		if(job[id].parent != -1)
-			finish_box(job[id].parent, job[id].finish);
+		if(job[id].box != -1)
+			finish_box(job[id].box, job[id].finish);
 
 		return(0);
 	}
@@ -1091,7 +1091,7 @@ finish_job(int sigNum)
 				job[id].finish = time(0);
 				job[id].duration = job[id].finish - job[id].start;
 
-				finish_box(job[id].parent, job[id].finish);
+				finish_box(job[id].box, job[id].finish);
 
 				check_dependencies();
 				break;
@@ -1114,7 +1114,7 @@ set_job_status(int status, int id)
 			job[id].finish = time(0);
 			if(job[id].start != 0)
 				job[id].duration = job[id].finish - job[id].start;
-			finish_box(job[id].parent, job[id].finish);
+			finish_box(job[id].box, job[id].finish);
 			break;
 		case INACTIVE:
 			job[id].status = STAT_IN;
@@ -1127,14 +1127,14 @@ set_job_status(int status, int id)
 			job[id].finish = time(0);
 			if(job[id].start != 0)
 				job[id].duration = job[id].finish - job[id].start;
-			finish_box(job[id].parent, job[id].finish);
+			finish_box(job[id].box, job[id].finish);
 			break;
 		case TERMINATED:
 			job[id].status = STAT_TE;
 			job[id].finish = time(0);
 			if(job[id].start != 0)
 				job[id].duration = job[id].finish - job[id].start;
-			finish_box(job[id].parent, job[id].finish);
+			finish_box(job[id].box, job[id].finish);
 			break;
 	}
 }
@@ -1142,18 +1142,18 @@ set_job_status(int status, int id)
 
 
 void
-set_job_auto_hold(int action, int id)
+set_job_autohold(int action, int id)
 {
 	switch(action)
 	{
-		// just set this one job on hold no matter what type it is
+		// just set this one job on autohold no matter what type it is
 		case ON:
-			job[id].auto_hold = OTTO_TRUE;
+			job[id].on_autohold = OTTO_TRUE;
 			break;
 
 		case OFF:
-			// just set this one job off auto_hold no matter what type it is
-			job[id].auto_hold = OTTO_FALSE;
+			// just set this one job off autohold no matter what type it is
+			job[id].on_autohold = OTTO_FALSE;
 			break;
 		default:
 			break;
@@ -1179,19 +1179,19 @@ set_job_hold(int action, int id)
 			if(job[id].status == STAT_OH)
 			{
 				// check status of parent box
-				switch(job[job[id].parent].status)
+				switch(job[job[id].box].status)
 				{
 					case STAT_RU:
 					case STAT_AC:
 						switch(job[id].type)
 						{
-							case 'b':
+							case OTTO_BOX:
 								// take the box off hold
 								job[id].status = STAT_AC;
 								// then activate the rest of the box
 								activate_box(id);
 								break;
-							case 'c':
+							case OTTO_CMD:
 								job[id].status = STAT_AC;
 								break;
 						}
@@ -1220,7 +1220,7 @@ set_job_noexec(int action, int id)
 			{
 				job[id].on_noexec = OTTO_TRUE;
 
-				if(job[id].type == 'b')
+				if(job[id].type == OTTO_BOX)
 					set_job_noexec_chain(action, job[id].head);
 			}
 			break;
@@ -1229,11 +1229,11 @@ set_job_noexec(int action, int id)
 			if(job[id].on_noexec == OTTO_TRUE)
 			{
 				// check whether parent box is on noexec
-				if(job[id].parent == -1 || job[job[id].parent].on_noexec != OTTO_TRUE)
+				if(job[id].box == -1 || job[job[id].box].on_noexec != OTTO_TRUE)
 				{
 					job[id].on_noexec = OTTO_FALSE;
 
-					if(job[id].type == 'b')
+					if(job[id].type == OTTO_BOX)
 						set_job_noexec_chain(action, job[id].head);
 				}
 			}
@@ -1265,7 +1265,7 @@ set_job_noexec_chain(int action, int id)
 				break;
 		}
 
-		if(job[id].type == 'b')
+		if(job[id].type == OTTO_BOX)
 			set_job_noexec_chain(action, job[id].head);
 
 		id = job[id].next;
@@ -1279,7 +1279,7 @@ reset_job(int id)
 {
 	if(check_reset(id) == OTTO_TRUE)
 	{
-		job[id].auto_hold   = job[id].base_auto_hold;
+		job[id].on_autohold = job[id].autohold;
 		job[id].on_noexec   = OTTO_FALSE;
 		job[id].status      = STAT_IN;
 		job[id].pid         = 0;
@@ -1288,7 +1288,7 @@ reset_job(int id)
 		job[id].finish      = 0;
 		job[id].duration    = 0;
 
-		if(job[id].type == 'b')
+		if(job[id].type == OTTO_BOX)
 			reset_job_chain(job[id].head);
 	}
 }
@@ -1300,7 +1300,7 @@ reset_job_chain(int id)
 {
 	while(id != -1)
 	{
-		job[id].auto_hold   = job[id].base_auto_hold;
+		job[id].on_autohold = job[id].autohold;
 		job[id].on_noexec   = OTTO_FALSE;
 		job[id].status      = STAT_IN;
 		job[id].pid         = 0;
@@ -1309,7 +1309,7 @@ reset_job_chain(int id)
 		job[id].finish      = 0;
 		job[id].duration    = 0;
 
-		if(job[id].type == 'b')
+		if(job[id].type == OTTO_BOX)
 			reset_job_chain(job[id].head);
 
 		id = job[id].next;
@@ -1329,7 +1329,7 @@ check_reset(int id)
 	}
 	else
 	{
-		if(job[id].type == 'b')
+		if(job[id].type == OTTO_BOX)
 			retval = check_reset_chain(job[id].head);
 	}
 
@@ -1351,7 +1351,7 @@ check_reset_chain(int id)
 		}
 		else
 		{
-			if(job[id].type == 'b')
+			if(job[id].type == OTTO_BOX)
 				retval = check_reset_chain(job[id].head);
 		}
 
@@ -1368,8 +1368,8 @@ start_job(int id)
 {
 	switch(job[id].type)
 	{
-		case 'b': run_box(id); break;
-		case 'c': run_job(id); break;
+		case OTTO_BOX: run_box(id); break;
+		case OTTO_CMD: run_job(id); break;
 	}
 }
 
@@ -1405,7 +1405,7 @@ set_levels_chain(int id, int level)
 	while(id != -1)
 	{
 		jobwork[id].level = level;
-		if(jobwork[id].type == 'b')
+		if(jobwork[id].type == OTTO_BOX)
 			set_levels_chain(jobwork[id].head, level+1);
 
 		id = jobwork[id].next;

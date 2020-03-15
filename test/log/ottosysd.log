@@ -1,19 +1,19 @@
 
 
-               Thu Feb 20 2020
-15:36:46 INFO: version: v2.0.0
-               initialized by: dhowell (dhowell)
-15:36:46 INFO: Command line:
+               Sun Mar 15 2020
+02:55:59 INFO: version: v2.0.0
+               initialized by: howeldan (howeldan)
+02:55:59 INFO: Command line:
                ottosysd 
-15:36:46 INFO: Environment:
-               OTTOCFG=/home/dhowell/otto/test/ottocfg.txt
-               OTTOLOG=/home/dhowell/otto/test/log
-               OTTOENV=null
-               HOME=/home/dhowell
-               LOGNAME=dhowell
-               USER=dhowell
-               PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/usr/local/conv/opt/gitea/bin:/usr/local/conv/opt/ddi/bin:/usr/local/conv/gencode2/bin:/usr/local/conv/bin:../bin:.:/home/dhowell/bin:/home/dhowell/otto/bin:/home/dhowell/.local/bin:/home/dhowell/bin
-15:36:46 INFO: Configuration:
+02:55:59 INFO: Environment:
+               OTTOCFG=/home/howeldan/otto/test/ottocfg.txt
+               OTTOLOG=/home/howeldan/otto/test/log
+               OTTOENV=/home/howeldan/otto/test/ottoenv.txt
+               HOME=/home/howeldan
+               USER=howeldan
+               LOGNAME=howeldan
+               PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/usr/local/conv/opt/otto/bin:/usr/local/conv/opt/gencode2/bin:/usr/lib/jvm/jre-1.8.0-openjdk/bin:/u01/app/oracle/product/12.1.0/client_1/bin:/usr/local/conv/opt/oracle_tools/bin:/usr/local/conv/opt/gitea/bin:/usr/local/conv/opt/jenkins/bin:/usr/local/conv/opt/ddi/bin:/usr/local/conv/opt/SQuaRE/bin:/usr/local/conv/opt/tfal/bin:/usr/local/conv/gencode2/bin:/usr/local/conv/bin:../bin:.:/home/howeldan/bin:/home/howeldan/otto/bin
+02:55:59 INFO: Configuration:
                server_addr:        localhost
                server_port:        23542
                ottodb_version:         4
@@ -23,10 +23,10 @@
                show_sofar:          true
                debug:               true
                envvar:      OTTOBIN=/usr/local/conv/opt/otto/bin
-15:36:46 INFO: Database structure:
-               job_id          at    0 for    2 type integer(4)  notnull
+02:55:59 INFO: Job structure layout:
+               id              at    0 for    2 type integer(4)  notnull
                level           at    2 for    2 type integer(4)  notnull
-               parent          at    4 for    2 type integer(4)  notnull
+               box             at    4 for    2 type integer(4)  notnull
                head            at    6 for    2 type integer(4)  notnull
                tail            at    8 for    2 type integer(4)  notnull
                prev            at   10 for    2 type integer(4)  notnull
@@ -37,29 +37,404 @@
                description     at  145 for 1025 type char        notnull
                command         at 1170 for  513 type char        notnull
                condition       at 1683 for 1025 type char        notnull
-               expression      at 2708 for 1025 type char        notnull
-               expr_fail       at 3733 for    1 type char        notnull
-               auto_hold       at 3734 for    1 type char        notnull
-               date_conditions at 3735 for    1 type char        notnull
-               days_of_week    at 3736 for    1 type char        notnull
-               start_mins      at 3737 for    8 type char        notnull
-               start_times     at 3745 for  192 type char        notnull
-               on_noexec       at 3937 for    1 type char        notnull
-               status          at 3938 for    1 type char        notnull
-               pid             at 3939 for    4 type integer(9)  notnull
-               exit_status     at 3943 for    4 type integer(9)  notnull
-               start           at 3947 for    8 type integer(10) notnull
-               finish          at 3955 for    8 type integer(10) notnull
-               duration        at 3963 for    8 type integer(10) notnull
-               print           at 3971 for    1 type char        notnull
-15:36:46 INFO: IPC bufferlen = 7950016
-15:36:46 INFO: msec to next minute 13570
-15:36:50 MAJR: Shutting down. Caught signal 2 (SIGINT).
-15:36:50 INFO: Backtrace:
-                 ottosysd() [0x40282c]
-                 /lib64/libc.so.6(+0x3c6b0) [0x7f1b94f8f6b0]
-                 /lib64/libc.so.6(__poll+0x17) [0x7f1b95049a37]
-                 ottosysd() [0x402aa8]
-                 ottosysd() [0x4027b9]
-                 /lib64/libc.so.6(__libc_start_main+0xf3) [0x7f1b94f7a1a3]
-                 ottosysd() [0x4025de]
+               date_conditions at 2708 for    1 type char        notnull
+               days_of_week    at 2709 for    1 type char        notnull
+               start_minutes   at 2710 for    8 type char        notnull
+               start_times     at 2718 for  192 type char        notnull
+               autohold        at 2910 for    1 type char        notnull
+               expression      at 2911 for 1025 type char        notnull
+               expr_fail       at 3936 for    1 type char        notnull
+               status          at 3937 for    1 type char        notnull
+               on_autohold     at 3938 for    1 type char        notnull
+               on_noexec       at 3939 for    1 type char        notnull
+               pid             at 3940 for    4 type integer(9)  notnull
+               start           at 3944 for    8 type integer(10) notnull
+               finish          at 3952 for    8 type integer(10) notnull
+               duration        at 3960 for    8 type integer(10) notnull
+               exit_status     at 3968 for    4 type integer(9)  notnull
+               gpflag          at 3972 for    1 type char        notnull
+               attributes      at 3973 for    1 type char        notnull
+02:55:59 INFO: IPC buffer length = 5900016
+02:55:59 INFO: msec to next minute 688
+02:56:00 INFO: last_check_time = 0- 2:55  now = 0- 2:56
+02:56:00 INFO: checking time 0- 2:56
+02:56:00 INFO: msec to next minute 59998
+02:56:10 INFO: New incoming connection - 7
+02:56:10 INFO: msec to next minute 49891
+02:56:10 INFO: Received PDU:
+                 user   = howeldan (howeldan)
+                 type   = CREATE_JOB_PDU
+                 opcode = CREATE_JOB
+                 name   = CNV_PRV
+                 option = 0
+02:56:10 INFO: msec to next minute 49871
+02:56:10 INFO: Received PDU:
+                 user   = howeldan (howeldan)
+                 type   = CREATE_JOB_PDU
+                 opcode = CREATE_JOB
+                 name   = CNV_PRV_PRESAK
+                 option = 0
+02:56:10 INFO: msec to next minute 49852
+02:56:10 INFO: Received PDU:
+                 user   = howeldan (howeldan)
+                 type   = CREATE_JOB_PDU
+                 opcode = CREATE_JOB
+                 name   = CNV_PRV_PRESAK_S
+                 option = 0
+02:56:10 INFO: msec to next minute 49833
+02:56:10 INFO: Received PDU:
+                 user   = howeldan (howeldan)
+                 type   = CREATE_JOB_PDU
+                 opcode = CREATE_JOB
+                 name   = CNV_PRV_PRESAK_H
+                 option = 0
+02:56:10 INFO: msec to next minute 49814
+02:56:10 INFO: Received PDU:
+                 user   = howeldan (howeldan)
+                 type   = CREATE_JOB_PDU
+                 opcode = CREATE_JOB
+                 name   = CNV_PRV_PRESAK_J
+                 option = 0
+02:56:10 INFO: msec to next minute 49796
+02:56:10 INFO: Received PDU:
+                 user   = howeldan (howeldan)
+                 type   = CREATE_JOB_PDU
+                 opcode = CREATE_JOB
+                 name   = CNV_PRV_PRESAK_L_CONV
+                 option = 0
+02:56:10 INFO: msec to next minute 49778
+02:56:10 INFO: Received PDU:
+                 user   = howeldan (howeldan)
+                 type   = CREATE_JOB_PDU
+                 opcode = CREATE_JOB
+                 name   = CNV_PRV_PRESAK_F
+                 option = 0
+02:56:10 INFO: msec to next minute 49759
+02:56:10 INFO: Received PDU:
+                 user   = howeldan (howeldan)
+                 type   = CREATE_JOB_PDU
+                 opcode = CREATE_JOB
+                 name   = CNV_PRV_MS_MASTER
+                 option = 0
+02:56:10 INFO: msec to next minute 49741
+02:56:10 INFO: Received PDU:
+                 user   = howeldan (howeldan)
+                 type   = CREATE_JOB_PDU
+                 opcode = CREATE_JOB
+                 name   = CNV_PRV_MS_MASTER_S
+                 option = 0
+02:56:10 INFO: msec to next minute 49722
+02:56:10 INFO: Received PDU:
+                 user   = howeldan (howeldan)
+                 type   = CREATE_JOB_PDU
+                 opcode = CREATE_JOB
+                 name   = CNV_PRV_MS_MASTER_H
+                 option = 0
+02:56:10 INFO: msec to next minute 49704
+02:56:10 INFO: Received PDU:
+                 user   = howeldan (howeldan)
+                 type   = CREATE_JOB_PDU
+                 opcode = CREATE_JOB
+                 name   = CNV_PRV_MS_MASTER_J
+                 option = 0
+02:56:10 INFO: msec to next minute 49685
+02:56:10 INFO: Received PDU:
+                 user   = howeldan (howeldan)
+                 type   = CREATE_JOB_PDU
+                 opcode = CREATE_JOB
+                 name   = CNV_PRV_MS_MASTER_N
+                 option = 0
+02:56:10 INFO: msec to next minute 49662
+02:56:10 INFO: Received PDU:
+                 user   = howeldan (howeldan)
+                 type   = CREATE_JOB_PDU
+                 opcode = CREATE_JOB
+                 name   = CNV_PRV_MS_MASTER_L_CONV
+                 option = 0
+02:56:10 INFO: msec to next minute 49643
+02:56:10 INFO: Received PDU:
+                 user   = howeldan (howeldan)
+                 type   = CREATE_JOB_PDU
+                 opcode = CREATE_JOB
+                 name   = CNV_PRV_MS_MASTER_F
+                 option = 0
+02:56:10 INFO: msec to next minute 49625
+02:56:10 INFO: Received PDU:
+                 user   = howeldan (howeldan)
+                 type   = CREATE_JOB_PDU
+                 opcode = CREATE_JOB
+                 name   = CNV_PRV_MS_EFT
+                 option = 0
+02:56:10 INFO: msec to next minute 49606
+02:56:10 INFO: Received PDU:
+                 user   = howeldan (howeldan)
+                 type   = CREATE_JOB_PDU
+                 opcode = CREATE_JOB
+                 name   = CNV_PRV_MS_EFT_S
+                 option = 0
+02:56:10 INFO: msec to next minute 49588
+02:56:10 INFO: Received PDU:
+                 user   = howeldan (howeldan)
+                 type   = CREATE_JOB_PDU
+                 opcode = CREATE_JOB
+                 name   = CNV_PRV_MS_EFT_H
+                 option = 0
+02:56:10 INFO: msec to next minute 49569
+02:56:10 INFO: Received PDU:
+                 user   = howeldan (howeldan)
+                 type   = CREATE_JOB_PDU
+                 opcode = CREATE_JOB
+                 name   = CNV_PRV_MS_EFT_J
+                 option = 0
+02:56:10 INFO: msec to next minute 49551
+02:56:10 INFO: Received PDU:
+                 user   = howeldan (howeldan)
+                 type   = CREATE_JOB_PDU
+                 opcode = CREATE_JOB
+                 name   = CNV_PRV_MS_EFT_N
+                 option = 0
+02:56:10 INFO: msec to next minute 49532
+02:56:10 INFO: Received PDU:
+                 user   = howeldan (howeldan)
+                 type   = CREATE_JOB_PDU
+                 opcode = CREATE_JOB
+                 name   = CNV_PRV_MS_EFT_L_CONV
+                 option = 0
+02:56:10 INFO: msec to next minute 49514
+02:56:10 INFO: Received PDU:
+                 user   = howeldan (howeldan)
+                 type   = CREATE_JOB_PDU
+                 opcode = CREATE_JOB
+                 name   = CNV_PRV_MS_EFT_F
+                 option = 0
+02:56:10 INFO: msec to next minute 49495
+02:56:10 INFO: Received PDU:
+                 user   = howeldan (howeldan)
+                 type   = CREATE_JOB_PDU
+                 opcode = CREATE_JOB
+                 name   = CNV_PRV_MS_OWNER
+                 option = 0
+02:56:10 INFO: msec to next minute 49477
+02:56:10 INFO: Received PDU:
+                 user   = howeldan (howeldan)
+                 type   = CREATE_JOB_PDU
+                 opcode = CREATE_JOB
+                 name   = CNV_PRV_MS_OWNER_S
+                 option = 0
+02:56:10 INFO: msec to next minute 49454
+02:56:10 INFO: Received PDU:
+                 user   = howeldan (howeldan)
+                 type   = CREATE_JOB_PDU
+                 opcode = CREATE_JOB
+                 name   = CNV_PRV_MS_OWNER_H
+                 option = 0
+02:56:10 INFO: msec to next minute 49436
+02:56:10 INFO: Received PDU:
+                 user   = howeldan (howeldan)
+                 type   = CREATE_JOB_PDU
+                 opcode = CREATE_JOB
+                 name   = CNV_PRV_MS_OWNER_J
+                 option = 0
+02:56:10 INFO: msec to next minute 49418
+02:56:10 INFO: Received PDU:
+                 user   = howeldan (howeldan)
+                 type   = CREATE_JOB_PDU
+                 opcode = CREATE_JOB
+                 name   = CNV_PRV_MS_OWNER_N
+                 option = 0
+02:56:10 INFO: msec to next minute 49401
+02:56:10 INFO: Received PDU:
+                 user   = howeldan (howeldan)
+                 type   = CREATE_JOB_PDU
+                 opcode = CREATE_JOB
+                 name   = CNV_PRV_MS_OWNER_L_CONV
+                 option = 0
+02:56:10 INFO: msec to next minute 49383
+02:56:10 INFO: Received PDU:
+                 user   = howeldan (howeldan)
+                 type   = CREATE_JOB_PDU
+                 opcode = CREATE_JOB
+                 name   = CNV_PRV_MS_OWNER_F
+                 option = 0
+02:56:10 INFO: msec to next minute 49365
+02:56:10 INFO: Received PDU:
+                 user   = howeldan (howeldan)
+                 type   = CREATE_JOB_PDU
+                 opcode = CREATE_JOB
+                 name   = CNV_PRV_PREP_ADDR
+                 option = 0
+02:56:10 INFO: msec to next minute 49346
+02:56:10 INFO: Received PDU:
+                 user   = howeldan (howeldan)
+                 type   = CREATE_JOB_PDU
+                 opcode = CREATE_JOB
+                 name   = CNV_PRV_PREP_ADDR_S
+                 option = 0
+02:56:10 INFO: msec to next minute 49328
+02:56:10 INFO: Received PDU:
+                 user   = howeldan (howeldan)
+                 type   = CREATE_JOB_PDU
+                 opcode = CREATE_JOB
+                 name   = CNV_PRV_PREP_ADDR_H
+                 option = 0
+02:56:10 INFO: msec to next minute 49310
+02:56:10 INFO: Received PDU:
+                 user   = howeldan (howeldan)
+                 type   = CREATE_JOB_PDU
+                 opcode = CREATE_JOB
+                 name   = CNV_PRV_PREP_ADDR_J
+                 option = 0
+02:56:10 INFO: msec to next minute 49292
+02:56:10 INFO: Received PDU:
+                 user   = howeldan (howeldan)
+                 type   = CREATE_JOB_PDU
+                 opcode = CREATE_JOB
+                 name   = CNV_PRV_PREP_ADDR_L_CONV
+                 option = 0
+02:56:10 INFO: msec to next minute 49274
+02:56:10 INFO: Received PDU:
+                 user   = howeldan (howeldan)
+                 type   = CREATE_JOB_PDU
+                 opcode = CREATE_JOB
+                 name   = CNV_PRV_PREP_ADDR_F
+                 option = 0
+02:56:10 INFO: msec to next minute 49256
+02:56:10 INFO: Received PDU:
+                 user   = howeldan (howeldan)
+                 type   = CREATE_JOB_PDU
+                 opcode = CREATE_JOB
+                 name   = CNV_PRV_SHARED_LOOKUP
+                 option = 0
+02:56:10 INFO: msec to next minute 49238
+02:56:10 INFO: Received PDU:
+                 user   = howeldan (howeldan)
+                 type   = CREATE_JOB_PDU
+                 opcode = CREATE_JOB
+                 name   = CNV_PRV_SHARED_LOOKUP_H
+                 option = 0
+02:56:10 INFO: msec to next minute 49220
+02:56:10 INFO: Received PDU:
+                 user   = howeldan (howeldan)
+                 type   = CREATE_JOB_PDU
+                 opcode = CREATE_JOB
+                 name   = CNV_PRV_MS_MSG
+                 option = 0
+02:56:10 INFO: msec to next minute 49202
+02:56:10 INFO: Received PDU:
+                 user   = howeldan (howeldan)
+                 type   = CREATE_JOB_PDU
+                 opcode = CREATE_JOB
+                 name   = CNV_PRV_MS_MASTER_M
+                 option = 0
+02:56:10 INFO: msec to next minute 49184
+02:56:10 INFO: Received PDU:
+                 user   = howeldan (howeldan)
+                 type   = CREATE_JOB_PDU
+                 opcode = CREATE_JOB
+                 name   = CNV_PRV_MS_EFT_M
+                 option = 0
+02:56:10 INFO: msec to next minute 49166
+02:56:10 INFO: Received PDU:
+                 user   = howeldan (howeldan)
+                 type   = CREATE_JOB_PDU
+                 opcode = CREATE_JOB
+                 name   = CNV_PRV_MS_OWNER_M
+                 option = 0
+02:56:10 INFO: msec to next minute 49147
+02:56:10 INFO: msec to next minute 49147
+02:56:18 INFO: New incoming connection - 7
+02:56:18 INFO: msec to next minute 41966
+02:56:18 INFO: Received PDU:
+                 user   = howeldan (howeldan)
+                 type   = CREATE_JOB_PDU
+                 opcode = CREATE_JOB
+                 name   = CNV_PRV_SETUP
+                 option = 0
+02:56:18 INFO: msec to next minute 41943
+02:56:18 INFO: Received PDU:
+                 user   = howeldan (howeldan)
+                 type   = CREATE_JOB_PDU
+                 opcode = CREATE_JOB
+                 name   = CNV_PRV_CONVERT
+                 option = 0
+02:56:18 INFO: msec to next minute 41924
+02:56:18 INFO: msec to next minute 41923
+02:56:30 INFO: New incoming connection - 7
+02:56:30 INFO: msec to next minute 29998
+02:57:00 INFO: last_check_time = 0- 2:56  now = 0- 2:57
+02:57:00 INFO: checking time 0- 2:57
+02:57:00 INFO: msec to next minute 59970
+02:57:42 INFO: Received PDU:
+                 user   = howeldan (howeldan)
+                 type   = UPDATE_JOB_PDU
+                 opcode = UPDATE_JOB
+                 name   = CNV_PRV_PRESAK
+                 option = 0
+02:57:42 INFO: msec to next minute 17529
+02:57:42 INFO: Received PDU:
+                 user   = howeldan (howeldan)
+                 type   = UPDATE_JOB_PDU
+                 opcode = UPDATE_JOB
+                 name   = CNV_PRV_PREP_ADDR
+                 option = 0
+02:57:42 INFO: msec to next minute 17512
+02:57:42 INFO: Received PDU:
+                 user   = howeldan (howeldan)
+                 type   = UPDATE_JOB_PDU
+                 opcode = UPDATE_JOB
+                 name   = CNV_PRV_MS_MASTER
+                 option = 0
+02:57:42 INFO: msec to next minute 17493
+02:57:42 INFO: msec to next minute 17493
+02:58:00 INFO: last_check_time = 0- 2:57  now = 0- 2:58
+02:58:00 INFO: checking time 0- 2:58
+02:58:00 INFO: msec to next minute 59996
+02:58:13 INFO: New incoming connection - 7
+02:58:13 INFO: msec to next minute 46081
+02:59:00 INFO: last_check_time = 0- 2:58  now = 0- 2:59
+02:59:00 INFO: checking time 0- 2:59
+02:59:00 INFO: msec to next minute 59988
+02:59:48 INFO: Received PDU:
+                 user   = howeldan (howeldan)
+                 type   = UPDATE_JOB_PDU
+                 opcode = UPDATE_JOB
+                 name   = CNV_PRV_MS_EFT
+                 option = 0
+02:59:48 INFO: msec to next minute 11299
+02:59:48 INFO: Received PDU:
+                 user   = howeldan (howeldan)
+                 type   = UPDATE_JOB_PDU
+                 opcode = UPDATE_JOB
+                 name   = CNV_PRV_MS_OWNER
+                 option = 0
+02:59:48 INFO: msec to next minute 11281
+02:59:48 INFO: Received PDU:
+                 user   = howeldan (howeldan)
+                 type   = UPDATE_JOB_PDU
+                 opcode = UPDATE_JOB
+                 name   = CNV_PRV_SHARED_LOOKUP
+                 option = 0
+02:59:48 INFO: msec to next minute 11264
+02:59:48 INFO: Received PDU:
+                 user   = howeldan (howeldan)
+                 type   = UPDATE_JOB_PDU
+                 opcode = UPDATE_JOB
+                 name   = CNV_PRV_MS_MSG
+                 option = 0
+02:59:48 INFO: msec to next minute 11246
+02:59:48 INFO: msec to next minute 11246
+03:00:00 INFO: last_check_time = 0- 2:59  now = 0- 3: 0
+03:00:00 INFO: checking time 0- 3: 0
+03:00:00 INFO: msec to next minute 59989
+03:01:00 INFO: last_check_time = 0- 3: 0  now = 0- 3: 1
+03:01:00 INFO: checking time 0- 3: 1
+03:01:00 INFO: msec to next minute 59957
+03:01:07 MAJR: Shutting down. Caught signal 2 (SIGINT).
+03:01:07 INFO: Backtrace:
+                 ottosysd() [0x40285a]
+                 /lib64/libc.so.6(+0x3c6b0) [0x7f74b2df66b0]
+                 /lib64/libc.so.6(__poll+0x17) [0x7f74b2eb0a37]
+                 ottosysd() [0x402b08]
+                 ottosysd() [0x4027dd]
+                 /lib64/libc.so.6(__libc_start_main+0xf3) [0x7f74b2de11a3]
+                 ottosysd() [0x4025ee]

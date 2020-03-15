@@ -89,7 +89,40 @@ enum PDUTYPE
 };
 
 
-#define COMMON_PDU_ATTRIBUTES uint8_t pdu_type; uint8_t opcode; char name[NAMLEN+1]; uint8_t option;
+#define COMMON_PDU_ATTRIBUTES uint8_t pdu_type;              \
+                              uint8_t opcode;                \
+                              char    name[NAMLEN+1];        \
+                              uint8_t option;
+#define JOBLNK_PDU_ATTRIBUTES int16_t job_id;                \
+                              int16_t level;                 \
+                              int16_t box;                   \
+                              int16_t head;                  \
+                              int16_t tail;                  \
+                              int16_t prev;                  \
+                              int16_t next;
+#define JOBDEF_PDU_ATTRIBUTES union                          \
+                              {                              \
+                                 char    type;               \
+                                 char    attributes;         \
+                              };                             \
+                              char    box_name[NAMLEN+1];    \
+                              char    description[DSCLEN+1]; \
+                              char    command[CMDLEN+1];     \
+                              char    condition[CNDLEN+1];   \
+                              char    date_conditions;       \
+                              char    days_of_week;          \
+                              int64_t start_minutes;         \
+                              int64_t start_times[24];       \
+                              char    autohold;
+#define JOBSTT_PDU_ATTRIBUTES char    expr_fail;             \
+                              char    status;                \
+                              char    on_autohold;           \
+                              char    on_noexec;             \
+                              pid_t   pid;                   \
+                              time_t  start;                 \
+                              time_t  finish;                \
+                              time_t  duration;              \
+                              int     exit_status;
 
 #pragma pack(1)
 typedef struct _ottoipc_pdu_header_st
@@ -108,64 +141,18 @@ typedef struct _ottoipc_simple_pdu_st
 typedef struct _ottoipc_create_job_pdu_st
 {
 	COMMON_PDU_ATTRIBUTES
-	char    type;
-	char    box_name[NAMLEN+1];
-	char    description[DSCLEN+1];
-	char    command[CMDLEN+1];
-	char    condition[CNDLEN+1];
-	char    auto_hold;
-	char    date_conditions;
-	char    days_of_week;
-	int64_t start_mins;
-	int64_t start_times[24];
+	JOBDEF_PDU_ATTRIBUTES
 } ottoipc_create_job_pdu_st;
 
 typedef struct _ottoipc_report_job_pdu_st
 {
 	COMMON_PDU_ATTRIBUTES
-	int16_t job_id;
-	int16_t level;
-	int16_t parent;
-	int16_t head;
-	int16_t tail;
-	int16_t prev;
-	int16_t next;
-	char    type;
-	char    box_name[NAMLEN+1];
-	char    description[DSCLEN+1];
-	char    command[CMDLEN+1];
-	char    condition[CNDLEN+1];
-	char    expression[CNDLEN+1];
-	char    expr_fail;
-	char    auto_hold;
-	char    date_conditions;
-	char    days_of_week;
-	int64_t start_mins;
-	int64_t start_times[24];
-	char    on_noexec;
-	char    status;
-	pid_t   pid;
-	int     exit_status;
-	time_t  start;
-	time_t  finish;
-	time_t  duration;
-	char    flag;
+	JOBLNK_PDU_ATTRIBUTES
+	JOBDEF_PDU_ATTRIBUTES
+	JOBSTT_PDU_ATTRIBUTES
 } ottoipc_report_job_pdu_st;
 
-typedef struct _ottoipc_update_job_pdu_st
-{
-	COMMON_PDU_ATTRIBUTES
-	char    type;
-	char    box_name[NAMLEN+1];
-	char    description[DSCLEN+1];
-	char    command[CMDLEN+1];
-	char    condition[CNDLEN+1];
-	char    auto_hold;
-	char    date_conditions;
-	char    days_of_week;
-	int64_t start_mins;
-	int64_t start_times[24];
-} ottoipc_update_job_pdu_st;
+typedef struct _ottoipc_create_job_pdu_st ottoipc_update_job_pdu_st;
 
 typedef struct _ottoipc_simple_pdu_st ottoipc_delete_job_pdu_st;
 

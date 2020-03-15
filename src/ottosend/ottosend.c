@@ -320,7 +320,7 @@ ottosend(void)
 
 				if(pdu->opcode == PING && pdu->option == ACK)
 				{
-					lprintf(logp, MAJR, "ottosysd is responding\n");
+					lprintf(logp, MAJR, "%s\n", pdu->name);
 				}
 			}
 		}
@@ -347,9 +347,10 @@ ottosend_copy_event(ottoipc_simple_pdu_st *pdu, char *s)
 			break;
 		}
 	}
-	// Autosys JIL aliases
-	if(strcmp("STARTJOB", s) == 0) { i = START_JOB; pdu->opcode = i; }
-	if(strcmp("KILLJOB",  s) == 0) { i = KILL_JOB;  pdu->opcode = i; }
+	// Autosys command aliases
+	if(strcmp("STARTJOB",   s) == 0) { i = START_JOB;   pdu->opcode = i; }
+	if(strcmp("KILLJOB",    s) == 0) { i = KILL_JOB;    pdu->opcode = i; }
+	if(strcmp("STOP_DEMON", s) == 0) { i = STOP_DAEMON; pdu->opcode = i; }
 	if(i == OPCODE_TOTAL)
 	{
 		if(strcmp("JOB_ON_ICE",  s) == 0 ||

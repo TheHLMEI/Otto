@@ -11,11 +11,6 @@
 
 #define MPP_WIDTHMAX 255
 
-#define DTECOND_BIT      (1L)
-#define DYSOFWK_BIT (1L << 1)
-#define STRTMNS_BIT (1L << 2)
-#define STRTTMS_BIT (1L << 3)
-
 #define cdeAMP_____     ((i64)'A'<<56 | (i64)'M'<<48 | (i64)'P'<<40 | (i64)';'<<32 | ' '<<24 | ' '<<16 | ' '<<8 | ' ')
 #define cdeAPOS____     ((i64)'A'<<56 | (i64)'P'<<48 | (i64)'O'<<40 | (i64)'S'<<32 | ';'<<24 | ' '<<16 | ' '<<8 | ' ')
 #define cdeGT______     ((i64)'G'<<56 | (i64)'T'<<48 | (i64)';'<<40 | (i64)' '<<32 | ' '<<24 | ' '<<16 | ' '<<8 | ' ')
@@ -182,7 +177,7 @@ get_extend_def(char *s)
 		if(strncasecmp(alias, "auto_hold",        8) == 0) xmlcpy(extenddef[AUTOHOLD],        fieldid);
 		if(strncasecmp(alias, "date_conditions", 15) == 0) xmlcpy(extenddef[DATE_CONDITIONS], fieldid);
 		if(strncasecmp(alias, "days_of_week",    12) == 0) xmlcpy(extenddef[DAYS_OF_WEEK],    fieldid);
-		if(strncasecmp(alias, "start_mins",      10) == 0) xmlcpy(extenddef[START_MINS],      fieldid);
+		if(strncasecmp(alias, "start_mins",      10) == 0) xmlcpy(extenddef[START_MINUTES],   fieldid);
 		if(strncasecmp(alias, "start_times",     11) == 0) xmlcpy(extenddef[START_TIMES],     fieldid);
 	}
 
@@ -331,7 +326,7 @@ add_extend_ptr(MPP_TASK *tmptask, char *s)
 		if(strncmp(fieldid, extenddef[AUTOHOLD],        9) == 0) tmptask->extend[AUTOHOLD]        = value;
 		if(strncmp(fieldid, extenddef[DATE_CONDITIONS], 9) == 0) tmptask->extend[DATE_CONDITIONS] = value;
 		if(strncmp(fieldid, extenddef[DAYS_OF_WEEK],    9) == 0) tmptask->extend[DAYS_OF_WEEK]    = value;
-		if(strncmp(fieldid, extenddef[START_MINS],      9) == 0) tmptask->extend[START_MINS]      = value;
+		if(strncmp(fieldid, extenddef[START_MINUTES],   9) == 0) tmptask->extend[START_MINUTES]   = value;
 		if(strncmp(fieldid, extenddef[START_TIMES],     9) == 0) tmptask->extend[START_TIMES]     = value;
 	}
 
@@ -577,7 +572,8 @@ validate_and_copy_mpp_xml(MPP_TASKLIST *tasklist, JOBLIST *joblist)
 			{
 				if(tasklist->item[i].extend[AUTOHOLD] != NULL && tasklist->item[i].extend[AUTOHOLD][0] == '1')
 				{
-					joblist->item[i].auto_hold = OTTO_TRUE;
+					joblist->item[i].autohold    = OTTO_TRUE;
+					joblist->item[i].on_autohold = OTTO_TRUE;
 				}
 			}
 
@@ -588,7 +584,7 @@ validate_and_copy_mpp_xml(MPP_TASKLIST *tasklist, JOBLIST *joblist)
 				date_check = 0;
 				if(tasklist->item[i].extend[DATE_CONDITIONS] != NULL) date_check |= DTECOND_BIT;
 				if(tasklist->item[i].extend[DAYS_OF_WEEK]    != NULL) date_check |= DYSOFWK_BIT;
-				if(tasklist->item[i].extend[START_MINS]      != NULL) date_check |= STRTMNS_BIT;
+				if(tasklist->item[i].extend[START_MINUTES]   != NULL) date_check |= STRTMNS_BIT;
 				if(tasklist->item[i].extend[START_TIMES]     != NULL) date_check |= STRTTMS_BIT;
 
 				parse_date_conditions = OTTO_FALSE;
@@ -627,7 +623,7 @@ validate_and_copy_mpp_xml(MPP_TASKLIST *tasklist, JOBLIST *joblist)
 						errcount++;
 					}
 
-					if((rc = ottojob_copy_start_mins(&joblist->item[i].start_mins, tasklist->item[i].extend[START_MINS])) != OTTO_SUCCESS)
+					if((rc = ottojob_copy_start_minutes(&joblist->item[i].start_minutes, tasklist->item[i].extend[START_MINUTES])) != OTTO_SUCCESS)
 						retval = OTTO_FAIL;
 					if(rc == OTTO_INVALID_VALUE)
 					{
@@ -644,14 +640,14 @@ validate_and_copy_mpp_xml(MPP_TASKLIST *tasklist, JOBLIST *joblist)
 					}
 
 					// assume the task is using start times
-					joblist->item[i].date_conditions = OTTO_USE_STARTTIMES;
+					joblist->item[i].date_conditions = OTTO_USE_START_TIMES;
 
 					// modify if it's using start_mins
 					if(date_check & STRTMNS_BIT)
 					{
-						joblist->item[i].date_conditions = OTTO_USE_STARTMINS;
+						joblist->item[i].date_conditions = OTTO_USE_START_MINUTES;
 						for(j=0; j<24; j++)
-							joblist->item[i].start_times[j] = joblist->item[i].start_mins;
+							joblist->item[i].start_times[j] = joblist->item[i].start_minutes;
 					}
 				}
 			}

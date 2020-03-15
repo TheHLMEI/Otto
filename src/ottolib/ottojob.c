@@ -21,17 +21,6 @@ extern SIMPLELOG *logp;
 
 #define VCNDLEN             4096
 
-#define i64 int64_t
-#define cdeSU______     ((i64)'S'<<56 | (i64)'U'<<48 | (i64)' '<<40 | (i64)' '<<32 | ' '<<24 | ' '<<16 | ' '<<8 | ' ')
-#define cdeMO______     ((i64)'M'<<56 | (i64)'O'<<48 | (i64)' '<<40 | (i64)' '<<32 | ' '<<24 | ' '<<16 | ' '<<8 | ' ')
-#define cdeTU______     ((i64)'T'<<56 | (i64)'U'<<48 | (i64)' '<<40 | (i64)' '<<32 | ' '<<24 | ' '<<16 | ' '<<8 | ' ')
-#define cdeWE______     ((i64)'W'<<56 | (i64)'E'<<48 | (i64)' '<<40 | (i64)' '<<32 | ' '<<24 | ' '<<16 | ' '<<8 | ' ')
-#define cdeTH______     ((i64)'T'<<56 | (i64)'H'<<48 | (i64)' '<<40 | (i64)' '<<32 | ' '<<24 | ' '<<16 | ' '<<8 | ' ')
-#define cdeFR______     ((i64)'F'<<56 | (i64)'R'<<48 | (i64)' '<<40 | (i64)' '<<32 | ' '<<24 | ' '<<16 | ' '<<8 | ' ')
-#define cdeSA______     ((i64)'S'<<56 | (i64)'A'<<48 | (i64)' '<<40 | (i64)' '<<32 | ' '<<24 | ' '<<16 | ' '<<8 | ' ')
-#define cdeALL_____     ((i64)'A'<<56 | (i64)'L'<<48 | (i64)'L'<<40 | (i64)' '<<32 | ' '<<24 | ' '<<16 | ' '<<8 | ' ')
-
-
 
 typedef struct _vcnd_st
 {
@@ -372,7 +361,7 @@ ottojob_copy_name(char *output, char *name, int outlen)
 
 
 int
-ottojob_copy_start_mins(int64_t *output, char *start_mins)
+ottojob_copy_start_minutes(int64_t *output, char *start_minutes)
 {
 	int retval = OTTO_SUCCESS;
 	char *s, *t;
@@ -381,7 +370,7 @@ ottojob_copy_start_mins(int64_t *output, char *start_mins)
 	int comma_found = OTTO_FALSE;
 	int min = 0, time_is_valid = OTTO_FALSE;
 
-	s = start_mins;
+	s = start_minutes;
 	*output = 0;
 
 	if(s != NULL && output != NULL)
@@ -427,7 +416,7 @@ ottojob_copy_start_mins(int64_t *output, char *start_mins)
 			}
 			else
 			{
-				lprintf(logp, MAJR, "START_MINS ERROR: Unrecognized value (%s).  Value must be in [0-59].\n", word);
+				lprintf(logp, MAJR, "START_MINUTES ERROR: Unrecognized value (%s).  Value must be in [0-59].\n", word);
 				retval = OTTO_FAIL;
 			}
 
@@ -573,14 +562,14 @@ ottojob_copy_type(char *output, char *type, int outlen)
 		s = type;
 		t = output;
 
-		// default to 'c'
-		*t = 'c';
+		// default to OTTO_CMD
+		*t = OTTO_CMD;
 
 		if(s != NULL && t != NULL && outlen >= 1)
 		{
 			*t = tolower(*s);
 
-			if(*t != 'b' && *t != 'c')
+			if(*t != OTTO_BOX && *t != OTTO_CMD)
 			{
 				retval = OTTO_INVALID_VALUE;
 			}
@@ -891,35 +880,38 @@ ottojob_log_job_layout()
 
 	lsprintf(logp, INFO, "Job structure layout:\n");
 	lsprintf(logp, CATI, "id              at %4d for %4d type integer(4)  notnull\n", offsetof(JOB, id),              sizeof(j.id));
-	lsprintf(logp, CATI, "parent          at %4d for %4d type integer(4)  notnull\n", offsetof(JOB, parent),          sizeof(j.parent));
+	lsprintf(logp, CATI, "level           at %4d for %4d type integer(4)  notnull\n", offsetof(JOB, level),           sizeof(j.level));
+	lsprintf(logp, CATI, "box             at %4d for %4d type integer(4)  notnull\n", offsetof(JOB, box),             sizeof(j.box));
 	lsprintf(logp, CATI, "head            at %4d for %4d type integer(4)  notnull\n", offsetof(JOB, head),            sizeof(j.head));
 	lsprintf(logp, CATI, "tail            at %4d for %4d type integer(4)  notnull\n", offsetof(JOB, tail),            sizeof(j.tail));
 	lsprintf(logp, CATI, "prev            at %4d for %4d type integer(4)  notnull\n", offsetof(JOB, prev),            sizeof(j.prev));
 	lsprintf(logp, CATI, "next            at %4d for %4d type integer(4)  notnull\n", offsetof(JOB, next),            sizeof(j.next));
-	lsprintf(logp, CATI, "level           at %4d for %4d type integer(4)  notnull\n", offsetof(JOB, level),           sizeof(j.level));
+
 	lsprintf(logp, CATI, "name            at %4d for %4d type char        notnull\n", offsetof(JOB, name),            sizeof(j.name));
 	lsprintf(logp, CATI, "type            at %4d for %4d type char        notnull\n", offsetof(JOB, type),            sizeof(j.type));
 	lsprintf(logp, CATI, "box_name        at %4d for %4d type char        notnull\n", offsetof(JOB, box_name),        sizeof(j.box_name));
 	lsprintf(logp, CATI, "description     at %4d for %4d type char        notnull\n", offsetof(JOB, description),     sizeof(j.description));
 	lsprintf(logp, CATI, "command         at %4d for %4d type char        notnull\n", offsetof(JOB, command),         sizeof(j.command));
 	lsprintf(logp, CATI, "condition       at %4d for %4d type char        notnull\n", offsetof(JOB, condition),       sizeof(j.condition));
-	lsprintf(logp, CATI, "expression      at %4d for %4d type char        notnull\n", offsetof(JOB, expression),      sizeof(j.expression));
-	lsprintf(logp, CATI, "expr_fail       at %4d for %4d type char        notnull\n", offsetof(JOB, expr_fail),       sizeof(j.expr_fail));
-	lsprintf(logp, CATI, "auto_hold       at %4d for %4d type char        notnull\n", offsetof(JOB, auto_hold),       sizeof(j.auto_hold));
 	lsprintf(logp, CATI, "date_conditions at %4d for %4d type char        notnull\n", offsetof(JOB, date_conditions), sizeof(j.date_conditions));
 	lsprintf(logp, CATI, "days_of_week    at %4d for %4d type char        notnull\n", offsetof(JOB, days_of_week),    sizeof(j.days_of_week));
-	lsprintf(logp, CATI, "start_mins      at %4d for %4d type char        notnull\n", offsetof(JOB, start_mins),      sizeof(j.start_mins));
+	lsprintf(logp, CATI, "start_minutes   at %4d for %4d type char        notnull\n", offsetof(JOB, start_minutes),   sizeof(j.start_minutes));
 	lsprintf(logp, CATI, "start_times     at %4d for %4d type char        notnull\n", offsetof(JOB, start_times),     sizeof(j.start_times));
-	lsprintf(logp, CATI, "on_noexec       at %4d for %4d type char        notnull\n", offsetof(JOB, on_noexec),       sizeof(j.on_noexec));
+	lsprintf(logp, CATI, "autohold        at %4d for %4d type char        notnull\n", offsetof(JOB, autohold),        sizeof(j.autohold));
+
+	lsprintf(logp, CATI, "expression      at %4d for %4d type char        notnull\n", offsetof(JOB, expression),      sizeof(j.expression));
+	lsprintf(logp, CATI, "expr_fail       at %4d for %4d type char        notnull\n", offsetof(JOB, expr_fail),       sizeof(j.expr_fail));
 	lsprintf(logp, CATI, "status          at %4d for %4d type char        notnull\n", offsetof(JOB, status),          sizeof(j.status));
+	lsprintf(logp, CATI, "on_autohold     at %4d for %4d type char        notnull\n", offsetof(JOB, on_autohold),     sizeof(j.on_autohold));
+	lsprintf(logp, CATI, "on_noexec       at %4d for %4d type char        notnull\n", offsetof(JOB, on_noexec),       sizeof(j.on_noexec));
 	lsprintf(logp, CATI, "pid             at %4d for %4d type integer(9)  notnull\n", offsetof(JOB, pid),             sizeof(j.pid));
-	lsprintf(logp, CATI, "exit_status     at %4d for %4d type integer(9)  notnull\n", offsetof(JOB, exit_status),     sizeof(j.exit_status));
 	lsprintf(logp, CATI, "start           at %4d for %4d type integer(10) notnull\n", offsetof(JOB, start),           sizeof(j.start));
 	lsprintf(logp, CATI, "finish          at %4d for %4d type integer(10) notnull\n", offsetof(JOB, finish),          sizeof(j.finish));
 	lsprintf(logp, CATI, "duration        at %4d for %4d type integer(10) notnull\n", offsetof(JOB, duration),        sizeof(j.duration));
-	lsprintf(logp, CATI, "base_auto_hold  at %4d for %4d type char        notnull\n", offsetof(JOB, base_auto_hold),  sizeof(j.base_auto_hold));
+	lsprintf(logp, CATI, "exit_status     at %4d for %4d type integer(9)  notnull\n", offsetof(JOB, exit_status),     sizeof(j.exit_status));
+
 	lsprintf(logp, CATI, "gpflag          at %4d for %4d type char        notnull\n", offsetof(JOB, gpflag),          sizeof(j.gpflag));
-	lsprintf(logp, CATI, "bitmask         at %4d for %4d type integer(4)  notnull\n", offsetof(JOB, bitmask),         sizeof(j.bitmask));
+	lsprintf(logp, CATI, "attributes      at %4d for %4d type char        notnull\n", offsetof(JOB, attributes),      sizeof(j.attributes));
 	lsprintf(logp, END, "");
 }
 

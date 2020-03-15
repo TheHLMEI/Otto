@@ -13,9 +13,6 @@
 
 
 void write_insert_job_dtl(JOB *item);
-void write_update_job_dtl(JOB *item);
-void write_delete_job_dtl(JOB *item);
-void write_delete_box_dtl(JOB *item);
 void write_expression_dtl(char *s);
 void write_expression_status_dtl(char *s);
 
@@ -37,9 +34,9 @@ write_dtl(JOBLIST *joblist)
 			switch(joblist->item[i].opcode)
 			{
 				case CREATE_JOB: write_insert_job_dtl(&joblist->item[i]); break;
-				case UPDATE_JOB: write_update_job_dtl(&joblist->item[i]); break;
-				case DELETE_JOB: write_delete_job_dtl(&joblist->item[i]); break;
-				case DELETE_BOX: write_delete_box_dtl(&joblist->item[i]); break;
+				case UPDATE_JOB:
+				case DELETE_JOB:
+				case DELETE_BOX:
 				default:
 									  break;
 			}
@@ -61,9 +58,9 @@ write_insert_job_dtl(JOB *item)
 
 	printf("---------------\n");
 	printf("id             : %d\n",  item->id);
-	printf("linkage        : parent %d, head %d, tail %d, prev %d, next %d\n",
-			                   item->parent, item->head, item->tail, item->prev, item->next);
 	printf("level          : %d\n",  item->level);
+	printf("linkage        : box %d, head %d, tail %d, prev %d, next %d\n",
+			                   item->box, item->head, item->tail, item->prev, item->next);
 	printf("name           : %s\n",  item->name);
 	printf("type           : %c\n",  item->type);
 	printf("box_name       : %s\n",  item->box_name);
@@ -71,19 +68,6 @@ write_insert_job_dtl(JOB *item)
 	if(item->type != OTTO_BOX)
 		printf("command        : %s\n",  item->command);
 	printf("condition      : %s\n", item->condition);
-	if(item->condition[0] != '\0')
-	{
-		printf("expression1    : ");
-		write_expression_dtl(item->expression);
-		printf("\n");
-		printf("expression2    : ");
-		write_expression_status_dtl(item->expression);
-		printf("\n");
-		printf("expr_fail      : %d\n",  item->expr_fail);
-	}
-	printf("auto_hold      : %d\n",  item->auto_hold);
-	printf("base_auto_hold : %d\n",  item->base_auto_hold);
-	printf("on_noexec      : %d\n",  item->on_noexec);
 	if(item->date_conditions == 0)
 		printf("date_conditions: 0\n");
 	else
@@ -125,12 +109,12 @@ write_insert_job_dtl(JOB *item)
 			printf("start_mins     :\n");
 			printf("start_times    :\n");
 			break;
-		case OTTO_USE_STARTMINS:
-			printf("start_mins     : ");
+		case OTTO_USE_START_MINUTES:
+			printf("start_minutes     : ");
 			one_printed = OTTO_FALSE;
 			for(i=0; i<60; i++)
 			{
-				if(item->start_mins & (1L << i))
+				if(item->start_minutes & (1L << i))
 				{
 					if(one_printed == OTTO_TRUE)
 						printf(",");
@@ -141,7 +125,7 @@ write_insert_job_dtl(JOB *item)
 			printf("\n");
 			printf("start_times    :\n");
 			break;
-		case OTTO_USE_STARTTIMES:
+		case OTTO_USE_START_TIMES:
 			printf("start_mins     :\n");
 			printf("start_times    : \"");
 			one_printed = OTTO_FALSE;
@@ -162,6 +146,16 @@ write_insert_job_dtl(JOB *item)
 			break;
 	}
 
+	if(item->condition[0] != '\0')
+	{
+		printf("expression1    : ");
+		write_expression_dtl(item->expression);
+		printf("\n");
+		printf("expression2    : ");
+		write_expression_status_dtl(item->expression);
+		printf("\n");
+		printf("expr_fail      : %d\n",  item->expr_fail);
+	}
 	printf("status         : ");
 	switch(item->status)
 	{
@@ -174,9 +168,11 @@ write_insert_job_dtl(JOB *item)
 		case STAT_OH: printf("OH\n"); break;
 		default:      printf("--\n"); break;
 	}
+	printf("autohold       : %d\n",  item->autohold);
+	printf("on_autohold    : %d\n",  item->on_autohold);
+	printf("on_noexec      : %d\n",  item->on_noexec);
 	if(item->type != OTTO_BOX)
 		printf("pid            : %d\n",  item->pid);
-	printf("exit_status    : %d\n",  item->exit_status);
 	printf("start          : ");
 	if(item->start == 0)
 	{
@@ -212,36 +208,7 @@ write_insert_job_dtl(JOB *item)
 	{
 		printf("%02ld:%02ld:%02ld\n", item->duration / 3600, item->duration / 60 % 60, item->duration % 60);
 	}
-
-	printf("\n");
-}
-
-
-
-void
-write_update_job_dtl(JOB *item)
-{
-	printf("update_job:      %s\n", item->name);
-
-	printf("\n");
-}
-
-
-
-void
-write_delete_job_dtl(JOB *item)
-{
-	printf("delete_job:      %s\n", item->name);
-
-	printf("\n");
-}
-
-
-
-void
-write_delete_box_dtl(JOB *item)
-{
-	printf("delete_box:      %s\n", item->name);
+	printf("exit_status    : %d\n",  item->exit_status);
 
 	printf("\n");
 }
