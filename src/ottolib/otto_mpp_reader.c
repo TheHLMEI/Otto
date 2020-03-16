@@ -76,7 +76,7 @@ int
 parse_mpp_xml(DYNBUF *b, JOBLIST *joblist)
 {
 	int retval = OTTO_SUCCESS;
-	MPP_TASKLIST tasklist;;
+	MPP_TASKLIST tasklist;
 
 	if(joblist == NULL)
 		retval = OTTO_FAIL;

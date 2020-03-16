@@ -521,7 +521,7 @@ compile_expressions(JOBLIST *joblist)
 		{
 			s = joblist->item[i].condition;
 			t = joblist->item[i].expression;
-			l = CNDLEN;;
+			l = CNDLEN;
 			item_ok = OTTO_TRUE;
 
 			while(l > 0 && *s != '\0' && item_ok == OTTO_TRUE)
