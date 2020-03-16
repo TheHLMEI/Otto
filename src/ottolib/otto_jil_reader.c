@@ -191,9 +191,6 @@ add_insert_job(JOB *item, DYNBUF *b)
 	if(validate_and_copy_jil_date_conditions(item, date_conditionsp, days_of_weekp, start_minsp, start_timesp) != OTTO_SUCCESS)
 		retval = OTTO_FAIL;
 
-	// check valid combinations of attributes
-	// TODO
-
 	regress_word(b);
 
 	return(retval);
@@ -266,9 +263,6 @@ add_update_job(JOB *item, DYNBUF *b)
 		retval = OTTO_FAIL;
 	if(validate_and_copy_jil_date_conditions(item, date_conditionsp, days_of_weekp, start_minsp, start_timesp) != OTTO_SUCCESS)
 		retval = OTTO_FAIL;
-
-	// check valid combinations of attributes
-	// TODO
 
 	regress_word(b);
 
@@ -372,7 +366,8 @@ jil_reserved_word(char *s)
 		{
 			if(!isspace(s[i]) && s[i] != ':')
 			{
-				// printf(error)
+				// encountered something other than whitespace or a colon
+				// so this must not be a supported JIL keyword
 				retval = JIL_UNKNOWN;
 				break;
 			}
