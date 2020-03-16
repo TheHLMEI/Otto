@@ -38,6 +38,7 @@ typedef struct _ottocfg_st
 	int       show_sofar;
 	int       path_overridden;
 	time_t    ottoenv_mtime;
+	char     *wrapper_script;
 
 	char     *envvar[MAX_ENVVAR];   // environment to be passed to child jobs
 	char     *envvar_s[MAX_ENVVAR]; // static environment from $OTTOCFG

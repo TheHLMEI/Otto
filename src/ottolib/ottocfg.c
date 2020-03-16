@@ -241,6 +241,14 @@ read_cfgfile()
 						continue;
 					}
 
+					if(strcmp(word, "wrapper_script") == 0)
+					{
+						if(cfg.wrapper_script != NULL)
+							free(cfg.wrapper_script);
+						cfg.wrapper_script = strdup(word2);
+						continue;
+					}
+
 				}
 			}
 		}
@@ -785,8 +793,8 @@ log_cfg()
 
 	lsprintf(logp, INFO, "Environment:\n");
 	lsprintf(logp, CATI, "OTTOCFG=%s\n", cfg.env_ottocfg);
-	lsprintf(logp, CATI, "OTTOLOG=%s\n", cfg.env_ottolog);
 	lsprintf(logp, CATI, "OTTOENV=%s\n", cfg.env_ottoenv == NULL ? "null" : cfg.env_ottoenv);
+	lsprintf(logp, CATI, "OTTOLOG=%s\n", cfg.env_ottolog);
 	lsprintf(logp, CATI, "%s\n",         cfg.envvar_s[HOMEVAR]);
 	lsprintf(logp, CATI, "%s\n",         cfg.envvar_s[USERVAR]);
 	lsprintf(logp, CATI, "%s\n",         cfg.envvar_s[LOGNAMEVAR]);
@@ -795,20 +803,21 @@ log_cfg()
 	lsprintf(logp, END, "");
 
 	lsprintf(logp, INFO, "Configuration:\n");
-	lsprintf(logp, CATI, "server_addr:        %5s\n", cfg.server_addr);
-	lsprintf(logp, CATI, "server_port:        %5d\n", cfg.server_port);
-	lsprintf(logp, CATI, "ottodb_version:     %5d\n", cfg.ottodb_version);
-	lsprintf(logp, CATI, "ottodb_maxjobs:     %5d\n", cfg.ottodb_maxjobs);
-	lsprintf(logp, CATI, "pause:              %5s\n", cfg.pause      == OTTO_TRUE ? "true" : "false");
-	lsprintf(logp, CATI, "verbose:            %5s\n", cfg.verbose    == OTTO_TRUE ? "true" : "false");
-	lsprintf(logp, CATI, "show_sofar:         %5s\n", cfg.show_sofar == OTTO_TRUE ? "true" : "false");
-	lsprintf(logp, CATI, "debug:              %5s\n", cfg.debug      == OTTO_TRUE ? "true" : "false");
+	lsprintf(logp, CATI, "server_addr:        %s\n", cfg.server_addr    == NULL      ? "null" : cfg.server_addr);
+	lsprintf(logp, CATI, "server_port:        %d\n", cfg.server_port);
+	lsprintf(logp, CATI, "ottodb_version:     %d\n", cfg.ottodb_version);
+	lsprintf(logp, CATI, "ottodb_maxjobs:     %d\n", cfg.ottodb_maxjobs);
+	lsprintf(logp, CATI, "pause:              %s\n", cfg.pause          == OTTO_TRUE ? "true" : "false");
+	lsprintf(logp, CATI, "verbose:            %s\n", cfg.verbose        == OTTO_TRUE ? "true" : "false");
+	lsprintf(logp, CATI, "show_sofar:         %s\n", cfg.show_sofar     == OTTO_TRUE ? "true" : "false");
+	lsprintf(logp, CATI, "debug:              %s\n", cfg.debug          == OTTO_TRUE ? "true" : "false");
+	lsprintf(logp, CATI, "wrapper_script:     %s\n", cfg.wrapper_script == NULL      ? "null" : cfg.wrapper_script);
 
 	// add envvars from config file
 	if(cfg.path_overridden == OTTO_TRUE)
-		lsprintf(logp, CATI, "envvar:      %s\n", cfg.envvar_s[PATHVAR]);
+		lsprintf(logp, CATI, "envvar:             %s\n", cfg.envvar_s[PATHVAR]);
 	for(i=PATHVAR+1; i<cfg.n_envvar_s; i++)
-		lsprintf(logp, CATI, "envvar:      %s\n", cfg.envvar_s[i]);
+		lsprintf(logp, CATI, "envvar:             %s\n", cfg.envvar_s[i]);
 	lsprintf(logp, END, "");
 }
 

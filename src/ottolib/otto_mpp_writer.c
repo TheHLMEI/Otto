@@ -3,6 +3,7 @@
 #include <time.h>
 
 #include "ottobits.h"
+#include "ottocfg.h"
 #include "ottoutil.h"
 #include "otto_mpp_bits.h"
 #include "otto_mpp_writer.h"
@@ -271,7 +272,7 @@ write_mpp_xml_task(JOB *item, char *outline, int autoschedule)
 	{
 		s = item->command;
 		s = copy_word(wrapper, s);
-		if(strstr(wrapper, "autojob") == NULL)
+		if(cfg.wrapper_script != NULL && cfg.wrapper_script[0] != '\0' && strcmp(cfg.wrapper_script, wrapper) != 0)
 		{
 			strcpy(jobscript, wrapper);
 			wrapper[0] = '\0';

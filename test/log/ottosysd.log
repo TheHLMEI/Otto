@@ -1,29 +1,30 @@
 
 
                Sun Mar 15 2020
-02:55:59 INFO: version: v2.0.0
+20:07:23 INFO: version: v2.0.0
                initialized by: howeldan (howeldan)
-02:55:59 INFO: Command line:
+20:07:23 INFO: Command line:
                ottosysd 
-02:55:59 INFO: Environment:
+20:07:23 INFO: Environment:
                OTTOCFG=/home/howeldan/otto/test/ottocfg.txt
-               OTTOLOG=/home/howeldan/otto/test/log
                OTTOENV=/home/howeldan/otto/test/ottoenv.txt
+               OTTOLOG=/home/howeldan/otto/test/log
                HOME=/home/howeldan
                USER=howeldan
                LOGNAME=howeldan
                PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/usr/local/conv/opt/otto/bin:/usr/local/conv/opt/gencode2/bin:/usr/lib/jvm/jre-1.8.0-openjdk/bin:/u01/app/oracle/product/12.1.0/client_1/bin:/usr/local/conv/opt/oracle_tools/bin:/usr/local/conv/opt/gitea/bin:/usr/local/conv/opt/jenkins/bin:/usr/local/conv/opt/ddi/bin:/usr/local/conv/opt/SQuaRE/bin:/usr/local/conv/opt/tfal/bin:/usr/local/conv/gencode2/bin:/usr/local/conv/bin:../bin:.:/home/howeldan/bin:/home/howeldan/otto/bin
-02:55:59 INFO: Configuration:
+20:07:23 INFO: Configuration:
                server_addr:        localhost
                server_port:        23542
-               ottodb_version:         4
-               ottodb_maxjobs:      1000
+               ottodb_version:     4
+               ottodb_maxjobs:     1000
                pause:              false
-               verbose:             true
-               show_sofar:          true
-               debug:               true
-               envvar:      OTTOBIN=/usr/local/conv/opt/otto/bin
-02:55:59 INFO: Job structure layout:
+               verbose:            true
+               show_sofar:         true
+               debug:              true
+               wrapper_script:     cnv_ottojob.sh
+               envvar:             OTTOBIN=/usr/local/conv/opt/otto/bin
+20:07:23 INFO: Job structure layout:
                id              at    0 for    2 type integer(4)  notnull
                level           at    2 for    2 type integer(4)  notnull
                box             at    4 for    2 type integer(4)  notnull
@@ -54,387 +55,542 @@
                exit_status     at 3968 for    4 type integer(9)  notnull
                gpflag          at 3972 for    1 type char        notnull
                attributes      at 3973 for    1 type char        notnull
-02:55:59 INFO: IPC buffer length = 5900016
-02:55:59 INFO: msec to next minute 688
-02:56:00 INFO: last_check_time = 0- 2:55  now = 0- 2:56
-02:56:00 INFO: checking time 0- 2:56
-02:56:00 INFO: msec to next minute 59998
-02:56:10 INFO: New incoming connection - 7
-02:56:10 INFO: msec to next minute 49891
-02:56:10 INFO: Received PDU:
-                 user   = howeldan (howeldan)
-                 type   = CREATE_JOB_PDU
-                 opcode = CREATE_JOB
-                 name   = CNV_PRV
-                 option = 0
-02:56:10 INFO: msec to next minute 49871
-02:56:10 INFO: Received PDU:
-                 user   = howeldan (howeldan)
-                 type   = CREATE_JOB_PDU
-                 opcode = CREATE_JOB
-                 name   = CNV_PRV_PRESAK
-                 option = 0
-02:56:10 INFO: msec to next minute 49852
-02:56:10 INFO: Received PDU:
-                 user   = howeldan (howeldan)
-                 type   = CREATE_JOB_PDU
-                 opcode = CREATE_JOB
-                 name   = CNV_PRV_PRESAK_S
-                 option = 0
-02:56:10 INFO: msec to next minute 49833
-02:56:10 INFO: Received PDU:
-                 user   = howeldan (howeldan)
-                 type   = CREATE_JOB_PDU
-                 opcode = CREATE_JOB
-                 name   = CNV_PRV_PRESAK_H
-                 option = 0
-02:56:10 INFO: msec to next minute 49814
-02:56:10 INFO: Received PDU:
-                 user   = howeldan (howeldan)
-                 type   = CREATE_JOB_PDU
-                 opcode = CREATE_JOB
-                 name   = CNV_PRV_PRESAK_J
-                 option = 0
-02:56:10 INFO: msec to next minute 49796
-02:56:10 INFO: Received PDU:
-                 user   = howeldan (howeldan)
-                 type   = CREATE_JOB_PDU
-                 opcode = CREATE_JOB
-                 name   = CNV_PRV_PRESAK_L_CONV
-                 option = 0
-02:56:10 INFO: msec to next minute 49778
-02:56:10 INFO: Received PDU:
-                 user   = howeldan (howeldan)
-                 type   = CREATE_JOB_PDU
-                 opcode = CREATE_JOB
-                 name   = CNV_PRV_PRESAK_F
-                 option = 0
-02:56:10 INFO: msec to next minute 49759
-02:56:10 INFO: Received PDU:
-                 user   = howeldan (howeldan)
-                 type   = CREATE_JOB_PDU
-                 opcode = CREATE_JOB
-                 name   = CNV_PRV_MS_MASTER
-                 option = 0
-02:56:10 INFO: msec to next minute 49741
-02:56:10 INFO: Received PDU:
-                 user   = howeldan (howeldan)
-                 type   = CREATE_JOB_PDU
-                 opcode = CREATE_JOB
-                 name   = CNV_PRV_MS_MASTER_S
-                 option = 0
-02:56:10 INFO: msec to next minute 49722
-02:56:10 INFO: Received PDU:
-                 user   = howeldan (howeldan)
-                 type   = CREATE_JOB_PDU
-                 opcode = CREATE_JOB
-                 name   = CNV_PRV_MS_MASTER_H
-                 option = 0
-02:56:10 INFO: msec to next minute 49704
-02:56:10 INFO: Received PDU:
-                 user   = howeldan (howeldan)
-                 type   = CREATE_JOB_PDU
-                 opcode = CREATE_JOB
-                 name   = CNV_PRV_MS_MASTER_J
-                 option = 0
-02:56:10 INFO: msec to next minute 49685
-02:56:10 INFO: Received PDU:
-                 user   = howeldan (howeldan)
-                 type   = CREATE_JOB_PDU
-                 opcode = CREATE_JOB
-                 name   = CNV_PRV_MS_MASTER_N
-                 option = 0
-02:56:10 INFO: msec to next minute 49662
-02:56:10 INFO: Received PDU:
-                 user   = howeldan (howeldan)
-                 type   = CREATE_JOB_PDU
-                 opcode = CREATE_JOB
-                 name   = CNV_PRV_MS_MASTER_L_CONV
-                 option = 0
-02:56:10 INFO: msec to next minute 49643
-02:56:10 INFO: Received PDU:
-                 user   = howeldan (howeldan)
-                 type   = CREATE_JOB_PDU
-                 opcode = CREATE_JOB
-                 name   = CNV_PRV_MS_MASTER_F
-                 option = 0
-02:56:10 INFO: msec to next minute 49625
-02:56:10 INFO: Received PDU:
-                 user   = howeldan (howeldan)
-                 type   = CREATE_JOB_PDU
-                 opcode = CREATE_JOB
-                 name   = CNV_PRV_MS_EFT
-                 option = 0
-02:56:10 INFO: msec to next minute 49606
-02:56:10 INFO: Received PDU:
-                 user   = howeldan (howeldan)
-                 type   = CREATE_JOB_PDU
-                 opcode = CREATE_JOB
-                 name   = CNV_PRV_MS_EFT_S
-                 option = 0
-02:56:10 INFO: msec to next minute 49588
-02:56:10 INFO: Received PDU:
-                 user   = howeldan (howeldan)
-                 type   = CREATE_JOB_PDU
-                 opcode = CREATE_JOB
-                 name   = CNV_PRV_MS_EFT_H
-                 option = 0
-02:56:10 INFO: msec to next minute 49569
-02:56:10 INFO: Received PDU:
-                 user   = howeldan (howeldan)
-                 type   = CREATE_JOB_PDU
-                 opcode = CREATE_JOB
-                 name   = CNV_PRV_MS_EFT_J
-                 option = 0
-02:56:10 INFO: msec to next minute 49551
-02:56:10 INFO: Received PDU:
-                 user   = howeldan (howeldan)
-                 type   = CREATE_JOB_PDU
-                 opcode = CREATE_JOB
-                 name   = CNV_PRV_MS_EFT_N
-                 option = 0
-02:56:10 INFO: msec to next minute 49532
-02:56:10 INFO: Received PDU:
-                 user   = howeldan (howeldan)
-                 type   = CREATE_JOB_PDU
-                 opcode = CREATE_JOB
-                 name   = CNV_PRV_MS_EFT_L_CONV
-                 option = 0
-02:56:10 INFO: msec to next minute 49514
-02:56:10 INFO: Received PDU:
-                 user   = howeldan (howeldan)
-                 type   = CREATE_JOB_PDU
-                 opcode = CREATE_JOB
-                 name   = CNV_PRV_MS_EFT_F
-                 option = 0
-02:56:10 INFO: msec to next minute 49495
-02:56:10 INFO: Received PDU:
-                 user   = howeldan (howeldan)
-                 type   = CREATE_JOB_PDU
-                 opcode = CREATE_JOB
-                 name   = CNV_PRV_MS_OWNER
-                 option = 0
-02:56:10 INFO: msec to next minute 49477
-02:56:10 INFO: Received PDU:
-                 user   = howeldan (howeldan)
-                 type   = CREATE_JOB_PDU
-                 opcode = CREATE_JOB
-                 name   = CNV_PRV_MS_OWNER_S
-                 option = 0
-02:56:10 INFO: msec to next minute 49454
-02:56:10 INFO: Received PDU:
-                 user   = howeldan (howeldan)
-                 type   = CREATE_JOB_PDU
-                 opcode = CREATE_JOB
-                 name   = CNV_PRV_MS_OWNER_H
-                 option = 0
-02:56:10 INFO: msec to next minute 49436
-02:56:10 INFO: Received PDU:
-                 user   = howeldan (howeldan)
-                 type   = CREATE_JOB_PDU
-                 opcode = CREATE_JOB
-                 name   = CNV_PRV_MS_OWNER_J
-                 option = 0
-02:56:10 INFO: msec to next minute 49418
-02:56:10 INFO: Received PDU:
-                 user   = howeldan (howeldan)
-                 type   = CREATE_JOB_PDU
-                 opcode = CREATE_JOB
-                 name   = CNV_PRV_MS_OWNER_N
-                 option = 0
-02:56:10 INFO: msec to next minute 49401
-02:56:10 INFO: Received PDU:
-                 user   = howeldan (howeldan)
-                 type   = CREATE_JOB_PDU
-                 opcode = CREATE_JOB
-                 name   = CNV_PRV_MS_OWNER_L_CONV
-                 option = 0
-02:56:10 INFO: msec to next minute 49383
-02:56:10 INFO: Received PDU:
-                 user   = howeldan (howeldan)
-                 type   = CREATE_JOB_PDU
-                 opcode = CREATE_JOB
-                 name   = CNV_PRV_MS_OWNER_F
-                 option = 0
-02:56:10 INFO: msec to next minute 49365
-02:56:10 INFO: Received PDU:
-                 user   = howeldan (howeldan)
-                 type   = CREATE_JOB_PDU
-                 opcode = CREATE_JOB
-                 name   = CNV_PRV_PREP_ADDR
-                 option = 0
-02:56:10 INFO: msec to next minute 49346
-02:56:10 INFO: Received PDU:
-                 user   = howeldan (howeldan)
-                 type   = CREATE_JOB_PDU
-                 opcode = CREATE_JOB
-                 name   = CNV_PRV_PREP_ADDR_S
-                 option = 0
-02:56:10 INFO: msec to next minute 49328
-02:56:10 INFO: Received PDU:
-                 user   = howeldan (howeldan)
-                 type   = CREATE_JOB_PDU
-                 opcode = CREATE_JOB
-                 name   = CNV_PRV_PREP_ADDR_H
-                 option = 0
-02:56:10 INFO: msec to next minute 49310
-02:56:10 INFO: Received PDU:
-                 user   = howeldan (howeldan)
-                 type   = CREATE_JOB_PDU
-                 opcode = CREATE_JOB
-                 name   = CNV_PRV_PREP_ADDR_J
-                 option = 0
-02:56:10 INFO: msec to next minute 49292
-02:56:10 INFO: Received PDU:
-                 user   = howeldan (howeldan)
-                 type   = CREATE_JOB_PDU
-                 opcode = CREATE_JOB
-                 name   = CNV_PRV_PREP_ADDR_L_CONV
-                 option = 0
-02:56:10 INFO: msec to next minute 49274
-02:56:10 INFO: Received PDU:
-                 user   = howeldan (howeldan)
-                 type   = CREATE_JOB_PDU
-                 opcode = CREATE_JOB
-                 name   = CNV_PRV_PREP_ADDR_F
-                 option = 0
-02:56:10 INFO: msec to next minute 49256
-02:56:10 INFO: Received PDU:
-                 user   = howeldan (howeldan)
-                 type   = CREATE_JOB_PDU
-                 opcode = CREATE_JOB
-                 name   = CNV_PRV_SHARED_LOOKUP
-                 option = 0
-02:56:10 INFO: msec to next minute 49238
-02:56:10 INFO: Received PDU:
-                 user   = howeldan (howeldan)
-                 type   = CREATE_JOB_PDU
-                 opcode = CREATE_JOB
-                 name   = CNV_PRV_SHARED_LOOKUP_H
-                 option = 0
-02:56:10 INFO: msec to next minute 49220
-02:56:10 INFO: Received PDU:
-                 user   = howeldan (howeldan)
-                 type   = CREATE_JOB_PDU
-                 opcode = CREATE_JOB
-                 name   = CNV_PRV_MS_MSG
-                 option = 0
-02:56:10 INFO: msec to next minute 49202
-02:56:10 INFO: Received PDU:
-                 user   = howeldan (howeldan)
-                 type   = CREATE_JOB_PDU
-                 opcode = CREATE_JOB
-                 name   = CNV_PRV_MS_MASTER_M
-                 option = 0
-02:56:10 INFO: msec to next minute 49184
-02:56:10 INFO: Received PDU:
-                 user   = howeldan (howeldan)
-                 type   = CREATE_JOB_PDU
-                 opcode = CREATE_JOB
-                 name   = CNV_PRV_MS_EFT_M
-                 option = 0
-02:56:10 INFO: msec to next minute 49166
-02:56:10 INFO: Received PDU:
-                 user   = howeldan (howeldan)
-                 type   = CREATE_JOB_PDU
-                 opcode = CREATE_JOB
-                 name   = CNV_PRV_MS_OWNER_M
-                 option = 0
-02:56:10 INFO: msec to next minute 49147
-02:56:10 INFO: msec to next minute 49147
-02:56:18 INFO: New incoming connection - 7
-02:56:18 INFO: msec to next minute 41966
-02:56:18 INFO: Received PDU:
-                 user   = howeldan (howeldan)
-                 type   = CREATE_JOB_PDU
-                 opcode = CREATE_JOB
-                 name   = CNV_PRV_SETUP
-                 option = 0
-02:56:18 INFO: msec to next minute 41943
-02:56:18 INFO: Received PDU:
-                 user   = howeldan (howeldan)
-                 type   = CREATE_JOB_PDU
-                 opcode = CREATE_JOB
-                 name   = CNV_PRV_CONVERT
-                 option = 0
-02:56:18 INFO: msec to next minute 41924
-02:56:18 INFO: msec to next minute 41923
-02:56:30 INFO: New incoming connection - 7
-02:56:30 INFO: msec to next minute 29998
-02:57:00 INFO: last_check_time = 0- 2:56  now = 0- 2:57
-02:57:00 INFO: checking time 0- 2:57
-02:57:00 INFO: msec to next minute 59970
-02:57:42 INFO: Received PDU:
-                 user   = howeldan (howeldan)
-                 type   = UPDATE_JOB_PDU
-                 opcode = UPDATE_JOB
-                 name   = CNV_PRV_PRESAK
-                 option = 0
-02:57:42 INFO: msec to next minute 17529
-02:57:42 INFO: Received PDU:
-                 user   = howeldan (howeldan)
-                 type   = UPDATE_JOB_PDU
-                 opcode = UPDATE_JOB
-                 name   = CNV_PRV_PREP_ADDR
-                 option = 0
-02:57:42 INFO: msec to next minute 17512
-02:57:42 INFO: Received PDU:
-                 user   = howeldan (howeldan)
-                 type   = UPDATE_JOB_PDU
-                 opcode = UPDATE_JOB
-                 name   = CNV_PRV_MS_MASTER
-                 option = 0
-02:57:42 INFO: msec to next minute 17493
-02:57:42 INFO: msec to next minute 17493
-02:58:00 INFO: last_check_time = 0- 2:57  now = 0- 2:58
-02:58:00 INFO: checking time 0- 2:58
-02:58:00 INFO: msec to next minute 59996
-02:58:13 INFO: New incoming connection - 7
-02:58:13 INFO: msec to next minute 46081
-02:59:00 INFO: last_check_time = 0- 2:58  now = 0- 2:59
-02:59:00 INFO: checking time 0- 2:59
-02:59:00 INFO: msec to next minute 59988
-02:59:48 INFO: Received PDU:
-                 user   = howeldan (howeldan)
-                 type   = UPDATE_JOB_PDU
-                 opcode = UPDATE_JOB
-                 name   = CNV_PRV_MS_EFT
-                 option = 0
-02:59:48 INFO: msec to next minute 11299
-02:59:48 INFO: Received PDU:
-                 user   = howeldan (howeldan)
-                 type   = UPDATE_JOB_PDU
-                 opcode = UPDATE_JOB
-                 name   = CNV_PRV_MS_OWNER
-                 option = 0
-02:59:48 INFO: msec to next minute 11281
-02:59:48 INFO: Received PDU:
-                 user   = howeldan (howeldan)
-                 type   = UPDATE_JOB_PDU
-                 opcode = UPDATE_JOB
-                 name   = CNV_PRV_SHARED_LOOKUP
-                 option = 0
-02:59:48 INFO: msec to next minute 11264
-02:59:48 INFO: Received PDU:
-                 user   = howeldan (howeldan)
-                 type   = UPDATE_JOB_PDU
-                 opcode = UPDATE_JOB
-                 name   = CNV_PRV_MS_MSG
-                 option = 0
-02:59:48 INFO: msec to next minute 11246
-02:59:48 INFO: msec to next minute 11246
-03:00:00 INFO: last_check_time = 0- 2:59  now = 0- 3: 0
-03:00:00 INFO: checking time 0- 3: 0
-03:00:00 INFO: msec to next minute 59989
-03:01:00 INFO: last_check_time = 0- 3: 0  now = 0- 3: 1
-03:01:00 INFO: checking time 0- 3: 1
-03:01:00 INFO: msec to next minute 59957
-03:01:07 MAJR: Shutting down. Caught signal 2 (SIGINT).
-03:01:07 INFO: Backtrace:
+20:07:23 INFO: IPC buffer length = 5900016
+20:07:23 INFO: msec to next minute 36201
+20:08:00 INFO: last_check_time = 0-20: 7  now = 0-20: 8
+20:08:00 INFO: checking time 0-20: 8
+20:08:00 INFO: msec to next minute 59989
+20:09:00 INFO: last_check_time = 0-20: 8  now = 0-20: 9
+20:09:00 INFO: checking time 0-20: 9
+20:09:00 INFO: msec to next minute 59967
+20:10:00 INFO: last_check_time = 0-20: 9  now = 0-20:10
+20:10:00 INFO: checking time 0-20:10
+20:10:00 INFO: msec to next minute 59964
+20:11:00 INFO: last_check_time = 0-20:10  now = 0-20:11
+20:11:00 INFO: checking time 0-20:11
+20:11:00 INFO: msec to next minute 59995
+20:12:00 INFO: last_check_time = 0-20:11  now = 0-20:12
+20:12:00 INFO: checking time 0-20:12
+20:12:00 INFO: msec to next minute 59940
+20:13:00 INFO: last_check_time = 0-20:12  now = 0-20:13
+20:13:00 INFO: checking time 0-20:13
+20:13:00 INFO: msec to next minute 59957
+20:14:00 INFO: last_check_time = 0-20:13  now = 0-20:14
+20:14:00 INFO: checking time 0-20:14
+20:14:00 INFO: msec to next minute 59990
+20:15:00 INFO: last_check_time = 0-20:14  now = 0-20:15
+20:15:00 INFO: checking time 0-20:15
+20:15:00 INFO: msec to next minute 59982
+20:16:00 INFO: last_check_time = 0-20:15  now = 0-20:16
+20:16:00 INFO: checking time 0-20:16
+20:16:00 INFO: msec to next minute 59974
+20:17:00 INFO: last_check_time = 0-20:16  now = 0-20:17
+20:17:00 INFO: checking time 0-20:17
+20:17:00 INFO: msec to next minute 59966
+20:18:00 INFO: last_check_time = 0-20:17  now = 0-20:18
+20:18:00 INFO: checking time 0-20:18
+20:18:00 INFO: msec to next minute 59958
+20:19:00 INFO: last_check_time = 0-20:18  now = 0-20:19
+20:19:00 INFO: checking time 0-20:19
+20:19:00 INFO: msec to next minute 59950
+20:20:00 INFO: last_check_time = 0-20:19  now = 0-20:20
+20:20:00 INFO: checking time 0-20:20
+20:20:00 INFO: msec to next minute 59942
+20:21:00 INFO: last_check_time = 0-20:20  now = 0-20:21
+20:21:00 INFO: checking time 0-20:21
+20:21:00 INFO: msec to next minute 59956
+20:22:00 INFO: last_check_time = 0-20:21  now = 0-20:22
+20:22:00 INFO: checking time 0-20:22
+20:22:00 INFO: msec to next minute 59952
+20:23:00 INFO: last_check_time = 0-20:22  now = 0-20:23
+20:23:00 INFO: checking time 0-20:23
+20:23:00 INFO: msec to next minute 59950
+20:24:00 INFO: last_check_time = 0-20:23  now = 0-20:24
+20:24:00 INFO: checking time 0-20:24
+20:24:00 INFO: msec to next minute 59949
+20:25:00 INFO: last_check_time = 0-20:24  now = 0-20:25
+20:25:00 INFO: checking time 0-20:25
+20:25:00 INFO: msec to next minute 59940
+20:26:00 INFO: last_check_time = 0-20:25  now = 0-20:26
+20:26:00 INFO: checking time 0-20:26
+20:26:00 INFO: msec to next minute 59940
+20:27:00 INFO: last_check_time = 0-20:26  now = 0-20:27
+20:27:00 INFO: checking time 0-20:27
+20:27:00 INFO: msec to next minute 59941
+20:28:00 INFO: last_check_time = 0-20:27  now = 0-20:28
+20:28:00 INFO: checking time 0-20:28
+20:28:00 INFO: msec to next minute 59969
+20:29:00 INFO: last_check_time = 0-20:28  now = 0-20:29
+20:29:00 INFO: checking time 0-20:29
+20:29:00 INFO: msec to next minute 59966
+20:30:00 INFO: last_check_time = 0-20:29  now = 0-20:30
+20:30:00 INFO: checking time 0-20:30
+20:30:00 INFO: msec to next minute 59939
+20:31:00 INFO: last_check_time = 0-20:30  now = 0-20:31
+20:31:00 INFO: checking time 0-20:31
+20:31:00 INFO: msec to next minute 59962
+20:32:00 INFO: last_check_time = 0-20:31  now = 0-20:32
+20:32:00 INFO: checking time 0-20:32
+20:32:00 INFO: msec to next minute 59956
+20:33:00 INFO: last_check_time = 0-20:32  now = 0-20:33
+20:33:00 INFO: checking time 0-20:33
+20:33:00 INFO: msec to next minute 59950
+20:34:00 INFO: last_check_time = 0-20:33  now = 0-20:34
+20:34:00 INFO: checking time 0-20:34
+20:34:00 INFO: msec to next minute 59943
+20:35:00 INFO: last_check_time = 0-20:34  now = 0-20:35
+20:35:00 INFO: checking time 0-20:35
+20:35:00 INFO: msec to next minute 59939
+20:36:00 INFO: last_check_time = 0-20:35  now = 0-20:36
+20:36:00 INFO: checking time 0-20:36
+20:36:00 INFO: msec to next minute 59944
+20:37:00 INFO: last_check_time = 0-20:36  now = 0-20:37
+20:37:00 INFO: checking time 0-20:37
+20:37:00 INFO: msec to next minute 59939
+20:38:00 INFO: last_check_time = 0-20:37  now = 0-20:38
+20:38:00 INFO: checking time 0-20:38
+20:38:00 INFO: msec to next minute 59989
+20:39:00 INFO: last_check_time = 0-20:38  now = 0-20:39
+20:39:00 INFO: checking time 0-20:39
+20:39:00 INFO: msec to next minute 59959
+20:40:00 INFO: last_check_time = 0-20:39  now = 0-20:40
+20:40:00 INFO: checking time 0-20:40
+20:40:00 INFO: msec to next minute 59951
+20:41:00 INFO: last_check_time = 0-20:40  now = 0-20:41
+20:41:00 INFO: checking time 0-20:41
+20:41:00 INFO: msec to next minute 59943
+20:42:00 INFO: last_check_time = 0-20:41  now = 0-20:42
+20:42:00 INFO: checking time 0-20:42
+20:42:00 INFO: msec to next minute 59964
+20:43:00 INFO: last_check_time = 0-20:42  now = 0-20:43
+20:43:00 INFO: checking time 0-20:43
+20:43:00 INFO: msec to next minute 59958
+20:44:00 INFO: last_check_time = 0-20:43  now = 0-20:44
+20:44:00 INFO: checking time 0-20:44
+20:44:00 INFO: msec to next minute 59949
+20:45:00 INFO: last_check_time = 0-20:44  now = 0-20:45
+20:45:00 INFO: checking time 0-20:45
+20:45:00 INFO: msec to next minute 59942
+20:46:00 INFO: last_check_time = 0-20:45  now = 0-20:46
+20:46:00 INFO: checking time 0-20:46
+20:46:00 INFO: msec to next minute 59954
+20:47:00 INFO: last_check_time = 0-20:46  now = 0-20:47
+20:47:00 INFO: checking time 0-20:47
+20:47:00 INFO: msec to next minute 59974
+20:48:00 INFO: last_check_time = 0-20:47  now = 0-20:48
+20:48:00 INFO: checking time 0-20:48
+20:48:00 INFO: msec to next minute 59969
+20:49:00 INFO: last_check_time = 0-20:48  now = 0-20:49
+20:49:00 INFO: checking time 0-20:49
+20:49:00 INFO: msec to next minute 59957
+20:50:00 INFO: last_check_time = 0-20:49  now = 0-20:50
+20:50:00 INFO: checking time 0-20:50
+20:50:00 INFO: msec to next minute 59940
+20:51:00 INFO: last_check_time = 0-20:50  now = 0-20:51
+20:51:00 INFO: checking time 0-20:51
+20:51:00 INFO: msec to next minute 59939
+20:52:00 INFO: last_check_time = 0-20:51  now = 0-20:52
+20:52:00 INFO: checking time 0-20:52
+20:52:00 INFO: msec to next minute 59957
+20:53:00 INFO: last_check_time = 0-20:52  now = 0-20:53
+20:53:00 INFO: checking time 0-20:53
+20:53:00 INFO: msec to next minute 59940
+20:54:00 INFO: last_check_time = 0-20:53  now = 0-20:54
+20:54:00 INFO: checking time 0-20:54
+20:54:00 INFO: msec to next minute 59941
+20:55:00 INFO: last_check_time = 0-20:54  now = 0-20:55
+20:55:00 INFO: checking time 0-20:55
+20:55:00 INFO: msec to next minute 59940
+20:56:00 INFO: last_check_time = 0-20:55  now = 0-20:56
+20:56:00 INFO: checking time 0-20:56
+20:56:00 INFO: msec to next minute 59940
+20:57:00 INFO: last_check_time = 0-20:56  now = 0-20:57
+20:57:00 INFO: checking time 0-20:57
+20:57:00 INFO: msec to next minute 59958
+20:58:00 INFO: last_check_time = 0-20:57  now = 0-20:58
+20:58:00 INFO: checking time 0-20:58
+20:58:00 INFO: msec to next minute 59954
+20:59:00 INFO: last_check_time = 0-20:58  now = 0-20:59
+20:59:00 INFO: checking time 0-20:59
+20:59:00 INFO: msec to next minute 59945
+21:00:00 INFO: last_check_time = 0-20:59  now = 0-21: 0
+21:00:00 INFO: checking time 0-21: 0
+21:00:00 INFO: msec to next minute 59943
+21:01:00 INFO: last_check_time = 0-21: 0  now = 0-21: 1
+21:01:00 INFO: checking time 0-21: 1
+21:01:00 INFO: msec to next minute 59957
+21:02:00 INFO: last_check_time = 0-21: 1  now = 0-21: 2
+21:02:00 INFO: checking time 0-21: 2
+21:02:00 INFO: msec to next minute 59964
+21:03:00 INFO: last_check_time = 0-21: 2  now = 0-21: 3
+21:03:00 INFO: checking time 0-21: 3
+21:03:00 INFO: msec to next minute 59940
+21:04:00 INFO: last_check_time = 0-21: 3  now = 0-21: 4
+21:04:00 INFO: checking time 0-21: 4
+21:04:00 INFO: msec to next minute 59939
+21:05:00 INFO: last_check_time = 0-21: 4  now = 0-21: 5
+21:05:00 INFO: checking time 0-21: 5
+21:05:00 INFO: msec to next minute 59942
+21:06:00 INFO: last_check_time = 0-21: 5  now = 0-21: 6
+21:06:00 INFO: checking time 0-21: 6
+21:06:00 INFO: msec to next minute 59945
+21:07:00 INFO: last_check_time = 0-21: 6  now = 0-21: 7
+21:07:00 INFO: checking time 0-21: 7
+21:07:00 INFO: msec to next minute 59939
+21:08:00 INFO: last_check_time = 0-21: 7  now = 0-21: 8
+21:08:00 INFO: checking time 0-21: 8
+21:08:00 INFO: msec to next minute 59940
+21:09:00 INFO: last_check_time = 0-21: 8  now = 0-21: 9
+21:09:00 INFO: checking time 0-21: 9
+21:09:00 INFO: msec to next minute 59939
+21:10:00 INFO: last_check_time = 0-21: 9  now = 0-21:10
+21:10:00 INFO: checking time 0-21:10
+21:10:00 INFO: msec to next minute 59984
+21:11:00 INFO: last_check_time = 0-21:10  now = 0-21:11
+21:11:00 INFO: checking time 0-21:11
+21:11:00 INFO: msec to next minute 59940
+21:12:00 INFO: last_check_time = 0-21:11  now = 0-21:12
+21:12:00 INFO: checking time 0-21:12
+21:12:00 INFO: msec to next minute 59980
+21:13:00 INFO: last_check_time = 0-21:12  now = 0-21:13
+21:13:00 INFO: checking time 0-21:13
+21:13:00 INFO: msec to next minute 59942
+21:14:00 INFO: last_check_time = 0-21:13  now = 0-21:14
+21:14:00 INFO: checking time 0-21:14
+21:14:00 INFO: msec to next minute 59940
+21:15:00 INFO: last_check_time = 0-21:14  now = 0-21:15
+21:15:00 INFO: checking time 0-21:15
+21:15:00 INFO: msec to next minute 59957
+21:16:00 INFO: last_check_time = 0-21:15  now = 0-21:16
+21:16:00 INFO: checking time 0-21:16
+21:16:00 INFO: msec to next minute 59969
+21:17:00 INFO: last_check_time = 0-21:16  now = 0-21:17
+21:17:00 INFO: checking time 0-21:17
+21:17:00 INFO: msec to next minute 59961
+21:18:00 INFO: last_check_time = 0-21:17  now = 0-21:18
+21:18:00 INFO: checking time 0-21:18
+21:18:00 INFO: msec to next minute 59953
+21:19:00 INFO: last_check_time = 0-21:18  now = 0-21:19
+21:19:00 INFO: checking time 0-21:19
+21:19:00 INFO: msec to next minute 59945
+21:20:00 INFO: last_check_time = 0-21:19  now = 0-21:20
+21:20:00 INFO: checking time 0-21:20
+21:20:00 INFO: msec to next minute 59940
+21:21:00 INFO: last_check_time = 0-21:20  now = 0-21:21
+21:21:00 INFO: checking time 0-21:21
+21:21:00 INFO: msec to next minute 59972
+21:22:00 INFO: last_check_time = 0-21:21  now = 0-21:22
+21:22:00 INFO: checking time 0-21:22
+21:22:00 INFO: msec to next minute 59959
+21:23:00 INFO: last_check_time = 0-21:22  now = 0-21:23
+21:23:00 INFO: checking time 0-21:23
+21:23:00 INFO: msec to next minute 59948
+21:24:00 INFO: last_check_time = 0-21:23  now = 0-21:24
+21:24:00 INFO: checking time 0-21:24
+21:24:00 INFO: msec to next minute 59956
+21:25:00 INFO: last_check_time = 0-21:24  now = 0-21:25
+21:25:00 INFO: checking time 0-21:25
+21:25:00 INFO: msec to next minute 59948
+21:26:00 INFO: last_check_time = 0-21:25  now = 0-21:26
+21:26:00 INFO: checking time 0-21:26
+21:26:00 INFO: msec to next minute 59940
+21:27:00 INFO: last_check_time = 0-21:26  now = 0-21:27
+21:27:00 INFO: checking time 0-21:27
+21:27:00 INFO: msec to next minute 59952
+21:28:00 INFO: last_check_time = 0-21:27  now = 0-21:28
+21:28:00 INFO: checking time 0-21:28
+21:28:00 INFO: msec to next minute 59950
+21:29:00 INFO: last_check_time = 0-21:28  now = 0-21:29
+21:29:00 INFO: checking time 0-21:29
+21:29:00 INFO: msec to next minute 59949
+21:30:00 INFO: last_check_time = 0-21:29  now = 0-21:30
+21:30:00 INFO: checking time 0-21:30
+21:30:00 INFO: msec to next minute 59946
+21:31:00 INFO: last_check_time = 0-21:30  now = 0-21:31
+21:31:00 INFO: checking time 0-21:31
+21:31:00 INFO: msec to next minute 59940
+21:32:00 INFO: last_check_time = 0-21:31  now = 0-21:32
+21:32:00 INFO: checking time 0-21:32
+21:32:00 INFO: msec to next minute 59950
+21:33:00 INFO: last_check_time = 0-21:32  now = 0-21:33
+21:33:00 INFO: checking time 0-21:33
+21:33:00 INFO: msec to next minute 59939
+21:34:00 INFO: last_check_time = 0-21:33  now = 0-21:34
+21:34:00 INFO: checking time 0-21:34
+21:34:00 INFO: msec to next minute 59940
+21:35:00 INFO: last_check_time = 0-21:34  now = 0-21:35
+21:35:00 INFO: checking time 0-21:35
+21:35:00 INFO: msec to next minute 59957
+21:36:00 INFO: last_check_time = 0-21:35  now = 0-21:36
+21:36:00 INFO: checking time 0-21:36
+21:36:00 INFO: msec to next minute 59962
+21:37:00 INFO: last_check_time = 0-21:36  now = 0-21:37
+21:37:00 INFO: checking time 0-21:37
+21:37:00 INFO: msec to next minute 59954
+21:38:00 INFO: last_check_time = 0-21:37  now = 0-21:38
+21:38:00 INFO: checking time 0-21:38
+21:38:00 INFO: msec to next minute 59946
+21:39:00 INFO: last_check_time = 0-21:38  now = 0-21:39
+21:39:00 INFO: checking time 0-21:39
+21:39:00 INFO: msec to next minute 59940
+21:40:00 INFO: last_check_time = 0-21:39  now = 0-21:40
+21:40:00 INFO: checking time 0-21:40
+21:40:00 INFO: msec to next minute 59942
+21:41:00 INFO: last_check_time = 0-21:40  now = 0-21:41
+21:41:00 INFO: checking time 0-21:41
+21:41:00 INFO: msec to next minute 59973
+21:42:00 INFO: last_check_time = 0-21:41  now = 0-21:42
+21:42:00 INFO: checking time 0-21:42
+21:42:00 INFO: msec to next minute 59940
+21:43:00 INFO: last_check_time = 0-21:42  now = 0-21:43
+21:43:00 INFO: checking time 0-21:43
+21:43:00 INFO: msec to next minute 59973
+21:44:00 INFO: last_check_time = 0-21:43  now = 0-21:44
+21:44:00 INFO: checking time 0-21:44
+21:44:00 INFO: msec to next minute 59940
+21:45:00 INFO: last_check_time = 0-21:44  now = 0-21:45
+21:45:00 INFO: checking time 0-21:45
+21:45:00 INFO: msec to next minute 59956
+21:46:00 INFO: last_check_time = 0-21:45  now = 0-21:46
+21:46:00 INFO: checking time 0-21:46
+21:46:00 INFO: msec to next minute 59940
+21:47:00 INFO: last_check_time = 0-21:46  now = 0-21:47
+21:47:00 INFO: checking time 0-21:47
+21:47:00 INFO: msec to next minute 59939
+21:48:00 INFO: last_check_time = 0-21:47  now = 0-21:48
+21:48:00 INFO: checking time 0-21:48
+21:48:00 INFO: msec to next minute 59971
+21:49:00 INFO: last_check_time = 0-21:48  now = 0-21:49
+21:49:00 INFO: checking time 0-21:49
+21:49:00 INFO: msec to next minute 59957
+21:50:00 INFO: last_check_time = 0-21:49  now = 0-21:50
+21:50:00 INFO: checking time 0-21:50
+21:50:00 INFO: msec to next minute 59948
+21:51:00 INFO: last_check_time = 0-21:50  now = 0-21:51
+21:51:00 INFO: checking time 0-21:51
+21:51:00 INFO: msec to next minute 59948
+21:52:00 INFO: last_check_time = 0-21:51  now = 0-21:52
+21:52:00 INFO: checking time 0-21:52
+21:52:00 INFO: msec to next minute 59940
+21:53:00 INFO: last_check_time = 0-21:52  now = 0-21:53
+21:53:00 INFO: checking time 0-21:53
+21:53:00 INFO: msec to next minute 59939
+21:54:00 INFO: last_check_time = 0-21:53  now = 0-21:54
+21:54:00 INFO: checking time 0-21:54
+21:54:00 INFO: msec to next minute 59992
+21:55:00 INFO: last_check_time = 0-21:54  now = 0-21:55
+21:55:00 INFO: checking time 0-21:55
+21:55:00 INFO: msec to next minute 59939
+21:56:00 INFO: last_check_time = 0-21:55  now = 0-21:56
+21:56:00 INFO: checking time 0-21:56
+21:56:00 INFO: msec to next minute 59970
+21:57:00 INFO: last_check_time = 0-21:56  now = 0-21:57
+21:57:00 INFO: checking time 0-21:57
+21:57:00 INFO: msec to next minute 59940
+21:58:00 INFO: last_check_time = 0-21:57  now = 0-21:58
+21:58:00 INFO: checking time 0-21:58
+21:58:00 INFO: msec to next minute 59954
+21:59:00 INFO: last_check_time = 0-21:58  now = 0-21:59
+21:59:00 INFO: checking time 0-21:59
+21:59:00 INFO: msec to next minute 59947
+22:00:00 INFO: last_check_time = 0-21:59  now = 0-22: 0
+22:00:00 INFO: checking time 0-22: 0
+22:00:00 INFO: msec to next minute 59940
+22:01:00 INFO: last_check_time = 0-22: 0  now = 0-22: 1
+22:01:00 INFO: checking time 0-22: 1
+22:01:00 INFO: msec to next minute 59963
+22:02:00 INFO: last_check_time = 0-22: 1  now = 0-22: 2
+22:02:00 INFO: checking time 0-22: 2
+22:02:00 INFO: msec to next minute 59956
+22:03:00 INFO: last_check_time = 0-22: 2  now = 0-22: 3
+22:03:00 INFO: checking time 0-22: 3
+22:03:00 INFO: msec to next minute 59940
+22:04:00 INFO: last_check_time = 0-22: 3  now = 0-22: 4
+22:04:00 INFO: checking time 0-22: 4
+22:04:00 INFO: msec to next minute 59948
+22:05:00 INFO: last_check_time = 0-22: 4  now = 0-22: 5
+22:05:00 INFO: checking time 0-22: 5
+22:05:00 INFO: msec to next minute 59939
+22:06:00 INFO: last_check_time = 0-22: 5  now = 0-22: 6
+22:06:00 INFO: checking time 0-22: 6
+22:06:00 INFO: msec to next minute 59976
+22:07:00 INFO: last_check_time = 0-22: 6  now = 0-22: 7
+22:07:00 INFO: checking time 0-22: 7
+22:07:00 INFO: msec to next minute 59957
+22:08:00 INFO: last_check_time = 0-22: 7  now = 0-22: 8
+22:08:00 INFO: checking time 0-22: 8
+22:08:00 INFO: msec to next minute 59975
+22:09:00 INFO: last_check_time = 0-22: 8  now = 0-22: 9
+22:09:00 INFO: checking time 0-22: 9
+22:09:00 INFO: msec to next minute 59942
+22:10:00 INFO: last_check_time = 0-22: 9  now = 0-22:10
+22:10:00 INFO: checking time 0-22:10
+22:10:00 INFO: msec to next minute 59960
+22:11:00 INFO: last_check_time = 0-22:10  now = 0-22:11
+22:11:00 INFO: checking time 0-22:11
+22:11:00 INFO: msec to next minute 59953
+22:12:00 INFO: last_check_time = 0-22:11  now = 0-22:12
+22:12:00 INFO: checking time 0-22:12
+22:12:00 INFO: msec to next minute 59945
+22:13:00 INFO: last_check_time = 0-22:12  now = 0-22:13
+22:13:00 INFO: checking time 0-22:13
+22:13:00 INFO: msec to next minute 59940
+22:14:00 INFO: last_check_time = 0-22:13  now = 0-22:14
+22:14:00 INFO: checking time 0-22:14
+22:14:00 INFO: msec to next minute 59946
+22:15:00 INFO: last_check_time = 0-22:14  now = 0-22:15
+22:15:00 INFO: checking time 0-22:15
+22:15:00 INFO: msec to next minute 59949
+22:16:00 INFO: last_check_time = 0-22:15  now = 0-22:16
+22:16:00 INFO: checking time 0-22:16
+22:16:00 INFO: msec to next minute 59947
+22:17:00 INFO: last_check_time = 0-22:16  now = 0-22:17
+22:17:00 INFO: checking time 0-22:17
+22:17:00 INFO: msec to next minute 59940
+22:18:00 INFO: last_check_time = 0-22:17  now = 0-22:18
+22:18:00 INFO: checking time 0-22:18
+22:18:00 INFO: msec to next minute 59939
+22:19:00 INFO: last_check_time = 0-22:18  now = 0-22:19
+22:19:00 INFO: checking time 0-22:19
+22:19:00 INFO: msec to next minute 59940
+22:20:00 INFO: last_check_time = 0-22:19  now = 0-22:20
+22:20:00 INFO: checking time 0-22:20
+22:20:00 INFO: msec to next minute 59943
+22:21:00 INFO: last_check_time = 0-22:20  now = 0-22:21
+22:21:00 INFO: checking time 0-22:21
+22:21:00 INFO: msec to next minute 59957
+22:22:00 INFO: last_check_time = 0-22:21  now = 0-22:22
+22:22:00 INFO: checking time 0-22:22
+22:22:00 INFO: msec to next minute 59967
+22:23:00 INFO: last_check_time = 0-22:22  now = 0-22:23
+22:23:00 INFO: checking time 0-22:23
+22:23:00 INFO: msec to next minute 59959
+22:24:00 INFO: last_check_time = 0-22:23  now = 0-22:24
+22:24:00 INFO: checking time 0-22:24
+22:24:00 INFO: msec to next minute 59951
+22:25:00 INFO: last_check_time = 0-22:24  now = 0-22:25
+22:25:00 INFO: checking time 0-22:25
+22:25:00 INFO: msec to next minute 59943
+22:26:00 INFO: last_check_time = 0-22:25  now = 0-22:26
+22:26:00 INFO: checking time 0-22:26
+22:26:00 INFO: msec to next minute 59951
+22:27:00 INFO: last_check_time = 0-22:26  now = 0-22:27
+22:27:00 INFO: checking time 0-22:27
+22:27:00 INFO: msec to next minute 59943
+22:28:00 INFO: last_check_time = 0-22:27  now = 0-22:28
+22:28:00 INFO: checking time 0-22:28
+22:28:00 INFO: msec to next minute 59970
+22:29:00 INFO: last_check_time = 0-22:28  now = 0-22:29
+22:29:00 INFO: checking time 0-22:29
+22:29:00 INFO: msec to next minute 59975
+22:30:00 INFO: last_check_time = 0-22:29  now = 0-22:30
+22:30:00 INFO: checking time 0-22:30
+22:30:00 INFO: msec to next minute 59954
+22:31:00 INFO: last_check_time = 0-22:30  now = 0-22:31
+22:31:00 INFO: checking time 0-22:31
+22:31:00 INFO: msec to next minute 59946
+22:32:00 INFO: last_check_time = 0-22:31  now = 0-22:32
+22:32:00 INFO: checking time 0-22:32
+22:32:00 INFO: msec to next minute 59974
+22:33:00 INFO: last_check_time = 0-22:32  now = 0-22:33
+22:33:00 INFO: checking time 0-22:33
+22:33:00 INFO: msec to next minute 59970
+22:34:00 INFO: last_check_time = 0-22:33  now = 0-22:34
+22:34:00 INFO: checking time 0-22:34
+22:34:00 INFO: msec to next minute 59959
+22:35:00 INFO: last_check_time = 0-22:34  now = 0-22:35
+22:35:00 INFO: checking time 0-22:35
+22:35:00 INFO: msec to next minute 59940
+22:36:00 INFO: last_check_time = 0-22:35  now = 0-22:36
+22:36:00 INFO: checking time 0-22:36
+22:36:00 INFO: msec to next minute 59946
+22:37:00 INFO: last_check_time = 0-22:36  now = 0-22:37
+22:37:00 INFO: checking time 0-22:37
+22:37:00 INFO: msec to next minute 59940
+22:38:00 INFO: last_check_time = 0-22:37  now = 0-22:38
+22:38:00 INFO: checking time 0-22:38
+22:38:00 INFO: msec to next minute 59992
+22:39:00 INFO: last_check_time = 0-22:38  now = 0-22:39
+22:39:00 INFO: checking time 0-22:39
+22:39:00 INFO: msec to next minute 59971
+22:40:00 INFO: last_check_time = 0-22:39  now = 0-22:40
+22:40:00 INFO: checking time 0-22:40
+22:40:00 INFO: msec to next minute 59976
+22:41:00 INFO: last_check_time = 0-22:40  now = 0-22:41
+22:41:00 INFO: checking time 0-22:41
+22:41:00 INFO: msec to next minute 59968
+22:42:00 INFO: last_check_time = 0-22:41  now = 0-22:42
+22:42:00 INFO: checking time 0-22:42
+22:42:00 INFO: msec to next minute 59941
+22:43:00 INFO: last_check_time = 0-22:42  now = 0-22:43
+22:43:00 INFO: checking time 0-22:43
+22:43:00 INFO: msec to next minute 59940
+22:44:00 INFO: last_check_time = 0-22:43  now = 0-22:44
+22:44:00 INFO: checking time 0-22:44
+22:44:00 INFO: msec to next minute 59939
+22:45:00 INFO: last_check_time = 0-22:44  now = 0-22:45
+22:45:00 INFO: checking time 0-22:45
+22:45:00 INFO: msec to next minute 59940
+22:46:00 INFO: last_check_time = 0-22:45  now = 0-22:46
+22:46:00 INFO: checking time 0-22:46
+22:46:00 INFO: msec to next minute 59952
+22:47:00 INFO: last_check_time = 0-22:46  now = 0-22:47
+22:47:00 INFO: checking time 0-22:47
+22:47:00 INFO: msec to next minute 59944
+22:48:00 INFO: last_check_time = 0-22:47  now = 0-22:48
+22:48:00 INFO: checking time 0-22:48
+22:48:00 INFO: msec to next minute 59989
+22:49:00 INFO: last_check_time = 0-22:48  now = 0-22:49
+22:49:00 INFO: checking time 0-22:49
+22:49:00 INFO: msec to next minute 59955
+22:50:00 INFO: last_check_time = 0-22:49  now = 0-22:50
+22:50:00 INFO: checking time 0-22:50
+22:50:00 INFO: msec to next minute 59947
+22:51:00 INFO: last_check_time = 0-22:50  now = 0-22:51
+22:51:00 INFO: checking time 0-22:51
+22:51:00 INFO: msec to next minute 59993
+22:52:00 INFO: last_check_time = 0-22:51  now = 0-22:52
+22:52:00 INFO: checking time 0-22:52
+22:52:00 INFO: msec to next minute 59974
+22:53:00 INFO: last_check_time = 0-22:52  now = 0-22:53
+22:53:00 INFO: checking time 0-22:53
+22:53:00 INFO: msec to next minute 59940
+22:54:00 INFO: last_check_time = 0-22:53  now = 0-22:54
+22:54:00 INFO: checking time 0-22:54
+22:54:00 INFO: msec to next minute 59951
+22:55:00 INFO: last_check_time = 0-22:54  now = 0-22:55
+22:55:00 INFO: checking time 0-22:55
+22:55:00 INFO: msec to next minute 59958
+22:56:00 INFO: last_check_time = 0-22:55  now = 0-22:56
+22:56:00 INFO: checking time 0-22:56
+22:56:00 INFO: msec to next minute 59940
+22:57:00 INFO: last_check_time = 0-22:56  now = 0-22:57
+22:57:00 INFO: checking time 0-22:57
+22:57:00 INFO: msec to next minute 59943
+22:58:00 INFO: last_check_time = 0-22:57  now = 0-22:58
+22:58:00 INFO: checking time 0-22:58
+22:58:00 INFO: msec to next minute 59939
+22:59:00 INFO: last_check_time = 0-22:58  now = 0-22:59
+22:59:00 INFO: checking time 0-22:59
+22:59:00 INFO: msec to next minute 59993
+23:00:00 INFO: last_check_time = 0-22:59  now = 0-23: 0
+23:00:00 INFO: checking time 0-23: 0
+23:00:00 INFO: msec to next minute 59944
+23:01:00 INFO: last_check_time = 0-23: 0  now = 0-23: 1
+23:01:00 INFO: checking time 0-23: 1
+23:01:00 INFO: msec to next minute 59946
+23:02:00 INFO: last_check_time = 0-23: 1  now = 0-23: 2
+23:02:00 INFO: checking time 0-23: 2
+23:02:00 INFO: msec to next minute 59940
+23:03:00 INFO: last_check_time = 0-23: 2  now = 0-23: 3
+23:03:00 INFO: checking time 0-23: 3
+23:03:00 INFO: msec to next minute 59961
+23:03:40 MAJR: Shutting down. Caught signal 2 (SIGINT).
+23:03:40 INFO: Backtrace:
                  ottosysd() [0x40285a]
-                 /lib64/libc.so.6(+0x3c6b0) [0x7f74b2df66b0]
-                 /lib64/libc.so.6(__poll+0x17) [0x7f74b2eb0a37]
+                 /lib64/libc.so.6(+0x3c6b0) [0x7f605d54e6b0]
+                 /lib64/libc.so.6(__poll+0x17) [0x7f605d608a37]
                  ottosysd() [0x402b08]
                  ottosysd() [0x4027dd]
-                 /lib64/libc.so.6(__libc_start_main+0xf3) [0x7f74b2de11a3]
+                 /lib64/libc.so.6(__libc_start_main+0xf3) [0x7f605d5391a3]
                  ottosysd() [0x4025ee]

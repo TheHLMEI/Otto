@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "ottobits.h"
+#include "ottocfg.h"
 #include "ottoipc.h"
 #include "ottojob.h"
 #include "otto_mpp_bits.h"
@@ -532,7 +533,11 @@ validate_and_copy_mpp_xml(MPP_TASKLIST *tasklist, JOBLIST *joblist)
 					}
 					else
 					{
-						strcpy(joblist->item[i].command, "cnv_autojob.sh ");
+						if(cfg.wrapper_script != NULL && cfg.wrapper_script[0] != '\0')
+						{
+							strcpy(joblist->item[i].command, cfg.wrapper_script);
+							strcat(joblist->item[i].command, " ");
+						}
 						xmlcpy(tmpstr, tasklist->item[i].extend[JOBSCRIPT]);
 						strcat(joblist->item[i].command, tmpstr);
 						if(tasklist->item[i].extend[PARAMETERS] != NULL)
