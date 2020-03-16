@@ -68,12 +68,14 @@ enum RESULTCODES
 	JOB_UPDATED,
 	JOB_NOT_FOUND,
 	JOB_DELETED,
-	BOX_NOT_FOUND,
-	BOX_DELETED,
 	JOB_ALREADY_EXISTS,
 	JOB_DEPENDS_ON_MISSING_JOB,
 	JOB_DEPENDS_ON_ITSELF,
+	BOX_NOT_FOUND,
+	BOX_DELETED,
+	BOX_COMMAND,
 	NO_SPACE_AVAILABLE,
+	GRANDFATHER_PARADOX,
 	RESULTCODE_TOTAL
 };
 
@@ -93,7 +95,7 @@ enum PDUTYPE
                               uint8_t opcode;                \
                               char    name[NAMLEN+1];        \
                               uint8_t option;
-#define JOBLNK_PDU_ATTRIBUTES int16_t job_id;                \
+#define JOBLNK_PDU_ATTRIBUTES int16_t id;                    \
                               int16_t level;                 \
                               int16_t box;                   \
                               int16_t head;                  \
