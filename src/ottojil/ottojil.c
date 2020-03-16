@@ -267,19 +267,22 @@ send_create_job(JOB *item)
 					lprintf(logp, feedback_level, "The job already exists.\n");
 					retval = OTTO_FAIL;
 					break;
-				case BOX_NOT_FOUND:
-					lprintf(logp, feedback_level, "The parent job was not found.\n");
-					retval = OTTO_FAIL;
-					break;
-				case NO_SPACE_AVAILABLE:
-					lprintf(logp, feedback_level, "No space is available in the job database.\n");
-					retval = OTTO_FAIL;
-					break;
 				case JOB_DEPENDS_ON_MISSING_JOB:
 					lprintf(logp, feedback_level, "The job depends on a missing job.\n");
 					break;
 				case JOB_DEPENDS_ON_ITSELF:
 					lprintf(logp, feedback_level, "The job depends on itself.\n");
+					retval = OTTO_FAIL;
+					break;
+				case BOX_NOT_FOUND:
+					lprintf(logp, feedback_level, "The parent job was not found.\n");
+					retval = OTTO_FAIL;
+					break;
+				case BOX_COMMAND:
+					lprintf(logp, feedback_level, "The job is a box but specifies a command (ignored).\n");
+					break;
+				case NO_SPACE_AVAILABLE:
+					lprintf(logp, feedback_level, "No space is available in the job database.\n");
 					retval = OTTO_FAIL;
 					break;
 			}
@@ -353,11 +356,7 @@ send_update_job(JOB *item)
 			switch(response->option)
 			{
 				case JOB_NOT_FOUND:
-					lprintf(logp, feedback_level, "The job already exists.\n");
-					retval = OTTO_FAIL;
-					break;
-				case BOX_NOT_FOUND:
-					lprintf(logp, feedback_level, "The parent job was not found.\n");
+					lprintf(logp, feedback_level, "The job was not found.\n");
 					retval = OTTO_FAIL;
 					break;
 				case JOB_DEPENDS_ON_MISSING_JOB:
@@ -365,6 +364,17 @@ send_update_job(JOB *item)
 					break;
 				case JOB_DEPENDS_ON_ITSELF:
 					lprintf(logp, feedback_level, "The job depends on itself.\n");
+					retval = OTTO_FAIL;
+					break;
+				case BOX_NOT_FOUND:
+					lprintf(logp, feedback_level, "The parent job was not found.\n");
+					retval = OTTO_FAIL;
+					break;
+				case BOX_COMMAND:
+					lprintf(logp, feedback_level, "The job is a box but specifies a command (ignored).\n");
+					break;
+				case GRANDFATHER_PARADOX:
+					lprintf(logp, feedback_level, "The job would become a child job of itself.\n");
 					retval = OTTO_FAIL;
 					break;
 			}
