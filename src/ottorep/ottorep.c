@@ -44,7 +44,6 @@ void  ottorep_exit(int signum);
 int   ottorep_getargs(int argc, char **argv);
 void  ottorep_usage(void);
 int   ottorep(void);
-int   build_joblist(JOBLIST *joblist, int id, int levelmod, int check);
 
 
 int
@@ -247,6 +246,7 @@ ottorep(void)
 {
 	int        retval = OTTO_SUCCESS;
 	int        repeat = OTTO_TRUE;
+	int        i;
 	time_t     now;
 	struct tm *tm_time;
 	char       c_time[25];
@@ -264,8 +264,9 @@ ottorep(void)
 
 			joblist.nitems = 0;
 
-			repeat = build_joblist(&joblist, root_job->head, 0, OTTO_TRUE);
+			build_joblist(&joblist, jobname, root_job->head, 0, report_level, OTTO_TRUE);
 
+			repeat = OTTO_FALSE;
 			if(report_type == SUMMARY_REPORT)
 			{
 				if(report_repeat != 0)
@@ -276,15 +277,22 @@ ottorep(void)
 					strftime(c_time, 256, "%m/%d/%Y %T", tm_time);
 					printf("%-20s ", c_time);
 					printf("(refresh: %d sec)\n", report_repeat);
+
+					// check if the repeat is still necessary
+					for(i=0; i<joblist.nitems && repeat == OTTO_FALSE; i++)
+					{
+						switch(joblist.item[i].status)
+						{
+							case STAT_IN:
+							case STAT_AC:
+							case STAT_RU:
+								repeat = OTTO_TRUE;
+								break;
+							default:
+								break;
+						}
+					}
 				}
-				else
-				{
-					repeat = OTTO_FALSE;
-				}
-			}
-			else
-			{
-				repeat = OTTO_FALSE;
 			}
 
 			switch(report_type)
@@ -303,58 +311,6 @@ ottorep(void)
 
 		free(joblist.item);
 	}
-
-	return(retval);
-}
-
-
-
-int
-build_joblist(JOBLIST *joblist, int id, int levelmod, int do_check)
-{
-	int check, retval = 0;
-
-	if(do_check == OTTO_TRUE || (id > -1 && jobwork[id].level - levelmod <= report_level))
-	{
-		while(id != -1)
-		{
-			check = do_check;
-
-			if((check == OTTO_FALSE) ||
-				(check == OTTO_TRUE && strwcmp(jobwork[id].name, jobname) == OTTO_TRUE))
-			{
-				if(jobwork[jobwork[id].box].print != OTTO_TRUE)
-					levelmod = jobwork[id].level;
-				jobwork[id].print = OTTO_TRUE;
-				memcpy(&joblist->item[joblist->nitems], &jobwork[id], sizeof(JOB));
-				joblist->item[joblist->nitems].opcode = CREATE_JOB;
-				joblist->nitems++;
-			}
-			switch(jobwork[id].status)
-			{
-				case STAT_IN:
-				case STAT_AC:
-				case STAT_RU:
-					retval++;
-					break;
-				default:
-					break;
-			}
-			if(jobwork[id].type == OTTO_BOX)
-			{
-				if(jobwork[id].print == OTTO_TRUE)
-				{
-					check = OTTO_FALSE;
-				}
-				retval += build_joblist(joblist, jobwork[id].head, levelmod, check);
-			}
-
-			id = jobwork[id].next;
-		}
-	}
-
-	if(retval > 0)
-		retval = OTTO_TRUE;
 
 	return(retval);
 }

@@ -51,7 +51,7 @@ typedef struct _job
 	union                           // supplemental info
 	{
 		char opcode;
-		char print;
+		char printed;
 		char gpflag;
 	};
 	char    attributes;
@@ -80,6 +80,7 @@ int ottojob_copy_start_times(int64_t *output, char *start_times);
 int ottojob_copy_type(char *output, char *type, int outlen);
 
 void ottojob_log_job_layout();
+void build_joblist(JOBLIST *joblist, char *jobname, int id, int level_offset, int level_limit, int perform_check);
 int  ottojob_reduce_list(JOBLIST *joblist, char *name);
 
 

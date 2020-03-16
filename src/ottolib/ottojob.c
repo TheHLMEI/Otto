@@ -9,6 +9,7 @@
 #include "ottobits.h"
 #include "ottocfg.h"
 #include "ottodb.h"
+#include "ottoipc.h"
 #include "ottojob.h"
 #include "ottoutil.h"
 #include "simplelog.h"
@@ -702,7 +703,7 @@ ottojob_validate_condition(vcnd_st *c)
 						case OTTO_TRUE:
 							if(last == OTTO_CONJUNCTION)
 							{
-								*(c->t)++ = tolower(*(c->s));;
+								*(c->t)++ = tolower(*(c->s));
 								while(*(c->s) != '\0' && *(c->s) != '(')
 									c->s++;
 								if(*(c->s) == '(')
@@ -913,6 +914,53 @@ ottojob_log_job_layout()
 	lsprintf(logp, CATI, "gpflag          at %4d for %4d type char        notnull\n", offsetof(JOB, gpflag),          sizeof(j.gpflag));
 	lsprintf(logp, CATI, "attributes      at %4d for %4d type char        notnull\n", offsetof(JOB, attributes),      sizeof(j.attributes));
 	lsprintf(logp, END, "");
+}
+
+
+
+void
+build_joblist(JOBLIST *joblist, char *jobname, int id, int level_offset, int level_limit, int perform_check)
+{
+	if(joblist != NULL && joblist->item != NULL)
+	{
+		if(id > -1 && jobwork[id].level - level_offset <= level_limit)
+		{
+			while(id != -1)
+			{
+				// if there is no need to check this job's name or
+				// there is a need to check and it matches the supplied jobname
+				if((perform_check == OTTO_FALSE) ||
+					(perform_check == OTTO_TRUE && strwcmp(jobwork[id].name, jobname) == OTTO_TRUE))
+				{
+					// if this job's parent wasn't printed start the level limiting
+					// with this job's level
+					if(jobwork[jobwork[id].box].printed != OTTO_TRUE)
+						level_offset = jobwork[id].level;
+
+					// mark this job as having been printed
+					jobwork[id].printed = OTTO_TRUE;
+
+					// copy the job's values into the job list
+					memcpy(&joblist->item[joblist->nitems], &jobwork[id], sizeof(JOB));
+					joblist->item[joblist->nitems].opcode = CREATE_JOB;
+					joblist->nitems++;
+				}
+
+				// recurse if this job has children
+				if(jobwork[id].type == OTTO_BOX)
+				{
+					if(jobwork[id].printed == OTTO_TRUE)
+					{
+						// don't bother with the name check if this box is being printed
+						perform_check = OTTO_FALSE;
+					}
+					build_joblist(joblist, jobname, jobwork[id].head, level_offset, level_limit, perform_check);
+				}
+
+				id = jobwork[id].next;
+			}
+		}
+	}
 }
 
 

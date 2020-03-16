@@ -1,5 +1,6 @@
 #include <ctype.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "ottobits.h"
@@ -61,6 +62,13 @@ create_job(ottoipc_create_job_pdu_st *pdu)
 			pdu->option = JOB_DEPENDS_ON_MISSING_JOB;
 			ottoipc_enqueue_simple_pdu((ottoipc_simple_pdu_st *)pdu);
 		}
+
+		if(pdu->type == OTTO_BOX && pdu->command[0] != '\0')
+		{
+			memset(pdu->command, 0, sizeof(pdu->command));
+			pdu->option = BOX_COMMAND;
+			ottoipc_enqueue_simple_pdu((ottoipc_simple_pdu_st *)pdu);
+		}
 	}
 
 	// reset the work space if necessary
@@ -80,7 +88,7 @@ create_job(ottoipc_create_job_pdu_st *pdu)
 
 	if(retval == OTTO_SUCCESS)
 	{
-		// get actual index
+		// get actual indexes before re-sorting
 		id = jobwork[id].id;
 		if(box != -1)
 			box = jobwork[box].id;
@@ -140,6 +148,7 @@ create_job(ottoipc_create_job_pdu_st *pdu)
 			}
 			jobwork[box].tail = id;
 		}
+
 		save_jobwork();
 		pdu->option = JOB_CREATED;
 		ottoipc_enqueue_simple_pdu((ottoipc_simple_pdu_st *)pdu);
@@ -150,20 +159,85 @@ create_job(ottoipc_create_job_pdu_st *pdu)
 
 
 
-void
+int
 report_job(ottoipc_simple_pdu_st *pdu)
 {
-	pdu->option = NACK;
-	ottoipc_enqueue_simple_pdu(pdu);
+	int     retval = OTTO_SUCCESS;
+	JOBLIST joblist;
+	int     level_limit = MAXLVL;
+	int     h, i;
+	ottoipc_report_job_pdu_st response;
+
+	if((joblist.item = (JOB *)calloc(cfg.ottodb_maxjobs, sizeof(JOB))) == NULL)
+		retval = OTTO_FAIL;
+
+	joblist.nitems = 0;
+	level_limit    = pdu->option;
+	if(level_limit > MAXLVL)
+		level_limit = MAXLVL;
+
+	build_joblist(&joblist, pdu->name, root_job->head, 0, pdu->option, OTTO_TRUE);
+
+	if(joblist.nitems == 0)
+	{
+		pdu->option = BOX_NOT_FOUND;
+		ottoipc_enqueue_simple_pdu((ottoipc_simple_pdu_st *)pdu);
+	}
+	else
+	{
+		for(i=0; i<joblist.nitems; i++)
+		{
+			memset(&response, 0, sizeof(response));
+
+			response.pdu_type = pdu->pdu_type;
+			response.opcode   = pdu->opcode;
+
+			memcpy(response.name,        joblist.item[i].name,        NAMLEN+1);
+			memcpy(response.box_name,    joblist.item[i].box_name,    NAMLEN+1);
+			memcpy(response.description, joblist.item[i].description, DSCLEN+1);
+			memcpy(response.command,     joblist.item[i].command,     CMDLEN+1);
+			memcpy(response.condition,   joblist.item[i].condition,   CNDLEN+1);
+
+			response.id              = joblist.item[i].id;
+			response.level           = joblist.item[i].level;
+			response.box             = joblist.item[i].box;
+			response.head            = joblist.item[i].head;
+			response.tail            = joblist.item[i].tail;
+			response.prev            = joblist.item[i].prev;
+			response.next            = joblist.item[i].next;
+			response.type            = joblist.item[i].type;
+			response.date_conditions = joblist.item[i].date_conditions;
+			response.days_of_week    = joblist.item[i].days_of_week;
+			response.start_minutes   = joblist.item[i].start_minutes;
+			for(h=0; h<24; h++)
+				response.start_times[h] = joblist.item[i].start_times[h];
+			response.autohold        = joblist.item[i].autohold;
+			response.expr_fail       = joblist.item[i].expr_fail;
+			response.status          = joblist.item[i].status;
+			response.on_autohold     = joblist.item[i].on_autohold;
+			response.on_noexec       = joblist.item[i].on_noexec;
+			response.pid             = joblist.item[i].pid;
+			response.start           = joblist.item[i].start;
+			response.finish          = joblist.item[i].finish;
+			response.duration        = joblist.item[i].duration;
+			response.exit_status     = joblist.item[i].exit_status;
+
+			ottoipc_enqueue_report_job(&response);
+		}
+	}
+
+	return(retval);
 }
 
 
 
-void
+int
 update_job(ottoipc_update_job_pdu_st *pdu)
 {
-	int16_t id, old_box, new_box;
+	int retval = OTTO_SUCCESS;
+	int16_t id, box, new_box, tmp_id;
 	int     i;
+	int     rc;
 
 	copy_jobwork();
 
@@ -176,11 +250,11 @@ update_job(ottoipc_update_job_pdu_st *pdu)
 	}
 	else
 	{
-		// get actual index
-		old_box = jobwork[id].box;
-		id      = jobwork[id].id;
+		// get actual indexes before re-sorting
+		box = jobwork[id].box;
+		id  = jobwork[id].id;
 
-		// get old and new box indexes if this pdu requests a box change
+		// get new box index if this pdu requests a box change
 		if(pdu->attributes & HAS_BOX_NAME)
 		{
 			if(pdu->box_name[0] == '\0')
@@ -201,100 +275,151 @@ update_job(ottoipc_update_job_pdu_st *pdu)
 				}
 			}
 		}
-		// printf("box_name = '%s' new_box = %d\n", pdu->box_name, new_box);
 
 		sort_jobwork(BY_ID);
 
-		// update fields specifically appearing in the request according
-		// to the pdu->attributes bitmask
-
+		// check validity of requested changes
 		if(pdu->attributes & HAS_BOX_NAME)
 		{
-			// unlink the job from its current parent and siblings
-			if(jobwork[id].prev != -1) { jobwork[jobwork[id].prev].next = jobwork[id].next; }
-			if(jobwork[id].next != -1) { jobwork[jobwork[id].next].prev = jobwork[id].prev; }
-
-			if(old_box == -1)
+			// check to see if the new box is actually a child of the
+			// current job in some way
+			if(jobwork[id].type == OTTO_BOX)
 			{
-				if(root_job->head == id) { root_job->head = jobwork[id].next; }
-				if(root_job->tail == id) { root_job->tail = jobwork[id].prev; }
-				// printf("old_box == -1\n");
-			}
-			else
-			{
-				// printf("old_box == %d\n", old_box);
-				if(jobwork[old_box].head == id) { jobwork[old_box].head = jobwork[id].next; }
-				if(jobwork[old_box].tail == id) { jobwork[old_box].tail = jobwork[id].prev; }
-			}
-
-			// initialize job's new linkage
-			jobwork[id].box  = new_box;
-			jobwork[id].prev = -1;
-			jobwork[id].next = -1;
-
-			// link the job to its new parent and siblings
-			if(new_box == -1)
-			{
-				if(root_job->head == -1)
+				tmp_id = jobwork[new_box].box;
+				while(tmp_id != -1)
 				{
-					root_job->head = id;
+					if(tmp_id == box)
+					{
+						pdu->option = GRANDFATHER_PARADOX;
+						ottoipc_enqueue_simple_pdu((ottoipc_simple_pdu_st *)pdu);
+						retval = OTTO_FAIL;
+						break;
+					}
+					tmp_id = jobwork[tmp_id].box;
 				}
-				else
-				{
-					jobwork[id].prev = root_job->tail;
-					jobwork[root_job->tail].next = id;
-				}
-				root_job->tail = id;
-			}
-			else
-			{
-				if(jobwork[new_box].head == -1)
-				{
-					jobwork[new_box].head = id;
-				}
-				else
-				{
-					jobwork[id].prev = jobwork[new_box].tail;
-					jobwork[jobwork[new_box].tail].next = id;
-				}
-				jobwork[new_box].tail = id;
 			}
 		}
 
-		if(pdu->attributes & HAS_DESCRIPTION)
+		if(pdu->attributes & HAS_COMMAND && jobwork[id].type == OTTO_BOX)
 		{
-			memcpy(jobwork[id].description, pdu->description, sizeof(jobwork[id].description));
-		}
-
-		if(pdu->attributes & HAS_COMMAND)
-		{
-			memcpy(jobwork[id].command, pdu->command, sizeof(jobwork[id].command));
+			pdu->attributes ^= HAS_COMMAND;
+			pdu->option = BOX_COMMAND;
+			ottoipc_enqueue_simple_pdu((ottoipc_simple_pdu_st *)pdu);
 		}
 
 		if(pdu->attributes & HAS_CONDITION)
 		{
-			memcpy(jobwork[id].condition, pdu->condition, sizeof(jobwork[id].condition));
+			rc = validate_dependencies(pdu->name, pdu->condition);
+
+			// make sure the job isn't directly referencing itself (fatal)
+			if(rc & SELF_REFERENCE)
+			{
+				pdu->option = JOB_DEPENDS_ON_ITSELF;
+				ottoipc_enqueue_simple_pdu((ottoipc_simple_pdu_st *)pdu);
+				retval = OTTO_FAIL;
+			}
+
+			// check whether a referenced job exists (non-fatal)
+			if(rc & MISS_REFERENCE)
+			{
+				pdu->option = JOB_DEPENDS_ON_MISSING_JOB;
+				ottoipc_enqueue_simple_pdu((ottoipc_simple_pdu_st *)pdu);
+			}
 		}
 
-		if(pdu->attributes & HAS_DATE_CONDITIONS)
+
+		// update fields specifically appearing in the request according
+		// to the pdu->attributes bitmask
+		if(retval == OTTO_SUCCESS)
 		{
-			jobwork[id].date_conditions = pdu->date_conditions;
-			jobwork[id].days_of_week    = pdu->days_of_week;
-			jobwork[id].start_minutes   = pdu->start_minutes;
-			for(i=0; i<24; i++)
-				jobwork[id].start_times[i] = pdu->start_times[i];
-		}
+			if(pdu->attributes & HAS_BOX_NAME)
+			{
+				// unlink the job from its current parent and siblings
+				if(jobwork[id].prev != -1) { jobwork[jobwork[id].prev].next = jobwork[id].next; }
+				if(jobwork[id].next != -1) { jobwork[jobwork[id].next].prev = jobwork[id].prev; }
 
-		if(pdu->attributes & HAS_AUTO_HOLD)
-		{
-			jobwork[id].autohold    = pdu->autohold;
-			jobwork[id].on_autohold = pdu->autohold;
-		}
+				if(box == -1)
+				{
+					if(root_job->head == id) { root_job->head = jobwork[id].next; }
+					if(root_job->tail == id) { root_job->tail = jobwork[id].prev; }
+				}
+				else
+				{
+					if(jobwork[box].head == id) { jobwork[box].head = jobwork[id].next; }
+					if(jobwork[box].tail == id) { jobwork[box].tail = jobwork[id].prev; }
+				}
 
-		save_jobwork();
-		pdu->option = JOB_UPDATED;
-		ottoipc_enqueue_simple_pdu((ottoipc_simple_pdu_st *)pdu);
+				// initialize job's new linkage
+				jobwork[id].box  = new_box;
+				jobwork[id].prev = -1;
+				jobwork[id].next = -1;
+
+				// link the job to its new parent and siblings
+				if(new_box == -1)
+				{
+					if(root_job->head == -1)
+					{
+						root_job->head = id;
+					}
+					else
+					{
+						jobwork[id].prev = root_job->tail;
+						jobwork[root_job->tail].next = id;
+					}
+					root_job->tail = id;
+				}
+				else
+				{
+					if(jobwork[new_box].head == -1)
+					{
+						jobwork[new_box].head = id;
+					}
+					else
+					{
+						jobwork[id].prev = jobwork[new_box].tail;
+						jobwork[jobwork[new_box].tail].next = id;
+					}
+					jobwork[new_box].tail = id;
+				}
+			}
+
+			if(pdu->attributes & HAS_DESCRIPTION)
+			{
+				memcpy(jobwork[id].description, pdu->description, sizeof(jobwork[id].description));
+			}
+
+			if(pdu->attributes & HAS_COMMAND)
+			{
+				memcpy(jobwork[id].command, pdu->command, sizeof(jobwork[id].command));
+			}
+
+			if(pdu->attributes & HAS_CONDITION)
+			{
+				memcpy(jobwork[id].condition, pdu->condition, sizeof(jobwork[id].condition));
+			}
+
+			if(pdu->attributes & HAS_DATE_CONDITIONS)
+			{
+				jobwork[id].date_conditions = pdu->date_conditions;
+				jobwork[id].days_of_week    = pdu->days_of_week;
+				jobwork[id].start_minutes   = pdu->start_minutes;
+				for(i=0; i<24; i++)
+					jobwork[id].start_times[i] = pdu->start_times[i];
+			}
+
+			if(pdu->attributes & HAS_AUTO_HOLD)
+			{
+				jobwork[id].autohold    = pdu->autohold;
+				jobwork[id].on_autohold = pdu->autohold;
+			}
+
+			save_jobwork();
+			pdu->option = JOB_UPDATED;
+			ottoipc_enqueue_simple_pdu((ottoipc_simple_pdu_st *)pdu);
+		}
 	}
+
+	return(retval);
 }
 
 
@@ -315,7 +440,7 @@ delete_job(ottoipc_simple_pdu_st *pdu)
 	}
 	else
 	{
-		// get actual index
+		// get actual indexes before re-sorting
 		box = jobwork[id].box;
 		id  = jobwork[id].id;
 
@@ -360,7 +485,7 @@ delete_box(ottoipc_simple_pdu_st *pdu)
 	}
 	else
 	{
-		// get actual index
+		// get actual indexes before re-sorting
 		box = jobwork[id].box;
 		id  = jobwork[id].id;
 
