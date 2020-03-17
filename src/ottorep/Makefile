@@ -1,14 +1,13 @@
 .SUFFIXES:
-.SUFFIXES: .o .a .c
 
 # Where to install the executables
 insdir = ../../bin
 
 PROG = ottorep
 
-SRCS = ottorep.c
-OBJS = $(SRCS:.c=.o)
-DEPS = $(SRCS:.c=.d)
+SRC = ottorep.c
+OBJ = $(SRC:.c=.o)
+DEP = $(SRC:.c=.d)
 
 SHRS = ../ottolib/ottocfg.o         \
        ../ottolib/ottocond.o        \
@@ -33,13 +32,17 @@ install: $(PROG)
 	@cp $(PROG) $(insdir)
 	@chmod 755 $(insdir)/$(PROG) $(insdir)
 
-$(PROG): $(OBJS) $(SHRS) Makefile
-	$(CC) -o $@ $(OBJS) $(SHRS)
+$(PROG): $(OBJ) $(SHRS) Makefile
+	$(CC) -o $@ $(OBJ) $(SHRS)
 
 clean::
 	/bin/rm -f *.o *.d $(PROG)
 
--include $(DEPS)   # include all dependancy files in the makefile
+-include $(DEP)   # include all dependancy files in the makefile
+
+# rule to specifically generate the program's object
+$(OBJ): $(SRC)
+	$(CC) $(CFLAGS) -c $(SRC)
 
 # rule to generate a dependancy file by using the C preprocessor
 %.d: %.c

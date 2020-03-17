@@ -28,6 +28,8 @@ DEPS = $(SRCS:.c=.d)
 CFLAGS=-g -Wall -Werror -Wno-unknown-pragmas -Wno-char-subscripts
 
 
+install: all
+
 all: $(OBJS)
 	@echo Make all done
 
