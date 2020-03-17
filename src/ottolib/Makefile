@@ -5,8 +5,6 @@
 insdir = ../lib
 hdrdir = ../include
 
-LIB = libottolib.a
-
 SRCS = ottocfg.c         \
        ottocond.c        \
        ottocrud.c        \
@@ -25,23 +23,20 @@ SRCS = ottocfg.c         \
        simplelog.c
 
 OBJS = $(SRCS:.c=.o)
+DEPS = $(SRCS:.c=.d)
 
 CFLAGS=-g -Wall -Werror -Wno-unknown-pragmas -Wno-char-subscripts
 
-all: $(LIB)
-	@echo Make $(LIB) done
 
-install: $(LIB)
-	@echo cp $(LIB) $(insdir)
-	@rm -f $(insdir)/$(LIB)
-	@cp $(LIB) $(insdir)
-	@chmod 755 $(insdir)/$(LIB) $(insdir)
-	@echo cp *.h $(hdrdir)
-	@cp *.h $(hdrdir)
-
-$(LIB): $(OBJS)
-	ar -crs $(LIB) $(OBJS)
+all: $(OBJS)
+	@echo Make all done
 
 clean::
-	/bin/rm -f *.o $(LIB)
+	/bin/rm -f *.o *d
+
+-include $(DEPS)   # include all dependancy files in the makefile
+
+# rule to generate a dependancy file by using the C preprocessor
+%.d: %.c
+	@$(CC) $(CFLAGS) $< -MM -MT $(@:.d=.o) >$@
 

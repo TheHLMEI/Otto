@@ -25,6 +25,10 @@ bak/
 */bak/
 */bak/*
 
+# Dependancy files
+*.d
+*.dep
+
 # Object files
 *.o
 *.obj
@@ -40,6 +44,4 @@ bak/
 *.exe
 *.out
 
-# aim.cfg
-aim.cfg
 

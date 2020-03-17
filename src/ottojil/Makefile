@@ -7,15 +7,19 @@ insdir = ../../bin
 PROG = ottojil
 
 SRCS = ottojil.c
-
-
 OBJS = $(SRCS:.c=.o)
+DEPS = $(SRCS:.c=.d)
 
-LDPATHS = -L../lib
+SHRS = ../ottolib/ottocfg.o         \
+       ../ottolib/ottodb.o          \
+       ../ottolib/ottoipc.o         \
+       ../ottolib/otto_jil_reader.o \
+       ../ottolib/ottojob.o         \
+       ../ottolib/ottoutil.o        \
+       ../ottolib/signals.o         \
+       ../ottolib/simplelog.o
 
-LDLIBS = -lottolib
-
-CFLAGS=-g -Wall -Werror -Wno-unknown-pragmas -Wno-char-subscripts -I../include
+CFLAGS=-g -Wall -Werror -Wno-unknown-pragmas -Wno-char-subscripts -I../ottolib
 
 all: $(PROG)
 	@echo Make $(PROG) done
@@ -26,9 +30,14 @@ install: $(PROG)
 	@cp $(PROG) $(insdir)
 	@chmod 755 $(insdir)/$(PROG) $(insdir)
 
-$(PROG): $(OBJS)
-	$(CC) -o $@ $(OBJS) $(LDPATHS) $(LDLIBS)
+$(PROG): $(OBJS) $(SHRS) Makefile
+	$(CC) -o $@ $(OBJS) $(SHRS)
 
 clean::
-	/bin/rm -f *.o $(PROG)
+	/bin/rm -f *.o *.d $(PROG)
 
+-include $(DEPS)   # include all dependancy files in the makefile
+
+# rule to generate a dependancy file by using the C preprocessor
+%.d: %.c
+	@$(CC) $(CFLAGS) $< -MM -MT $(@:.d=.o) >$@
