@@ -170,8 +170,12 @@ ottosend_getargs(int argc, char **argv)
 		{
 			case START_JOB:
 			case KILL_JOB:
-			case SEND_SIGNAL:
+			case MOVE_JOB_TOP:
+			case MOVE_JOB_UP:
+			case MOVE_JOB_DOWN:
+			case MOVE_JOB_BOTTOM:
 			case RESET_JOB:
+			case SEND_SIGNAL:
 			case CHANGE_STATUS:
 			case JOB_ON_AUTOHOLD:
 			case JOB_OFF_AUTOHOLD:

@@ -537,8 +537,12 @@ stropcode(int i)
 		// scheduler control operations
 		case START_JOB:        retval = "START_JOB";        break;
 		case KILL_JOB:         retval = "KILL_JOB";         break;
-		case SEND_SIGNAL:      retval = "SEND_SIGNAL";      break;
+		case MOVE_JOB_TOP:     retval = "MOVE_JOB_TOP";     break;
+		case MOVE_JOB_UP:      retval = "MOVE_JOB_UP";      break;
+		case MOVE_JOB_DOWN:    retval = "MOVE_JOB_DOWN";    break;
+		case MOVE_JOB_BOTTOM:  retval = "MOVE_JOB_BOTTOM";  break;
 		case RESET_JOB:        retval = "RESET_JOB";        break;
+		case SEND_SIGNAL:      retval = "SEND_SIGNAL";      break;
 		case CHANGE_STATUS:    retval = "CHANGE_STATUS";    break;
 		case JOB_ON_AUTOHOLD:  retval = "JOB_ON_AUTOHOLD";  break;
 		case JOB_OFF_AUTOHOLD: retval = "JOB_OFF_AUTOHOLD"; break;

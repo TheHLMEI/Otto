@@ -23,8 +23,6 @@
 
 SIMPLELOG *logp = NULL;
 
-#define OFF 0
-#define ON  1
 #define OTTO_CLOSE_CONN -100
 
 // internal representation of minutes during the week to check for a timed job
@@ -54,25 +52,26 @@ void  handle_timeout();
 int   get_msec_to_next_minute(void);
 void  fire_this_minute(int this_wday, int this_hour, int this_min);
 /*------------------------------ job utility functions ----------------------------*/
-void  activate_box (int id);
-void  activate_box_chain (int id);
-void  run_box (int id);
-int   run_job (int id);
-void  finish_box (int box_id, time_t finish);
-void  finish_job (int sigNum);
-void  set_job_status(int status, int id);
-void  set_job_autohold (int action, int id);
-void  set_job_hold (int action, int id);
-void  set_job_noexec (int action, int id);
-void  set_job_noexec_chain (int action, int id);
-void  start_job(int id);
-void  kill_job (int signal, int id);
-void  reset_job(int id);
-void  reset_job_chain(int id);
-int   check_reset(int id);
-int   check_reset_chain(int id);
-void set_levels(void);
-void set_levels_chain(int id, int level);
+void  activate_box         (int id);
+void  activate_box_chain   (int id);
+void  run_box              (int id);
+int   run_job              (int id);
+void  finish_box           (int box_id, time_t finish);
+void  finish_job           (int sigNum);
+void  start_job            (int id);
+void  kill_job             (int id, int signal);
+void  move_job             (int id, int action);
+void  reset_job            (int id);
+void  reset_job_chain      (int id);
+int   check_reset          (int id);
+int   check_reset_chain    (int id);
+void  set_job_status       (int id, int status);
+void  set_job_autohold     (int id, int action);
+void  set_job_hold         (int id, int action);
+void  set_job_noexec       (int id, int action);
+void  set_job_noexec_chain (int id, int action);
+void  set_levels           (void);
+void  set_levels_chain     (int id, int level);
 
 
 
@@ -669,18 +668,22 @@ handle_scheduler_pdu(ottoipc_simple_pdu_st *pdu)
 		pdu->option = ACK;
 		switch(pdu->opcode)
 		{
-			case CHANGE_STATUS:    set_job_status(option,  id); break;
-			case JOB_ON_AUTOHOLD:  set_job_autohold(ON,  id); break;
-			case JOB_OFF_AUTOHOLD: set_job_autohold(OFF, id); break;
-			case JOB_ON_HOLD:      set_job_hold(ON,  id); break;
-			case JOB_OFF_HOLD:     set_job_hold(OFF, id); break;
-			case JOB_ON_NOEXEC:    set_job_noexec(ON,  id); break;
-			case JOB_OFF_NOEXEC:   set_job_noexec(OFF, id); break;
-			case KILL_JOB:         kill_job(SIGKILL, id); break;
-			case RESET_JOB:        reset_job(id); break;
-			case SEND_SIGNAL:      kill_job(option, id); break;
-			case START_JOB:        start_job(id); break;
-			default:               pdu->option = NOOP; break;
+			case START_JOB:        start_job       (id);              break;
+			case KILL_JOB:         kill_job        (id, SIGKILL);     break;
+			case MOVE_JOB_TOP:     move_job        (id, pdu->opcode); break;
+			case MOVE_JOB_UP:      move_job        (id, pdu->opcode); break;
+			case MOVE_JOB_DOWN:    move_job        (id, pdu->opcode); break;
+			case MOVE_JOB_BOTTOM:  move_job        (id, pdu->opcode); break;
+			case RESET_JOB:        reset_job       (id);              break;
+			case SEND_SIGNAL:      kill_job        (id, option);      break;
+			case CHANGE_STATUS:    set_job_status  (id, option);      break;
+			case JOB_ON_AUTOHOLD:  set_job_autohold(id, pdu->opcode); break;
+			case JOB_OFF_AUTOHOLD: set_job_autohold(id, pdu->opcode); break;
+			case JOB_ON_HOLD:      set_job_hold    (id, pdu->opcode); break;
+			case JOB_OFF_HOLD:     set_job_hold    (id, pdu->opcode); break;
+			case JOB_ON_NOEXEC:    set_job_noexec  (id, pdu->opcode); break;
+			case JOB_OFF_NOEXEC:   set_job_noexec  (id, pdu->opcode); break;
+			default:               pdu->option = NOOP;                break;
 		}
 	}
 	else
@@ -706,14 +709,14 @@ handle_daemon_pdu(ottoipc_simple_pdu_st *pdu)
 					cfg.otto_version, cfg.pause ? "Paused" : "Running", cfg.debug ? "On" : "Off", cfg.ottodb_version);
 			break;
 
-		case VERIFY_DB: sprintf(pdu->name, "%ld", ottodb_inode); break;
-		case DEBUG_ON: cfg.debug = OTTO_TRUE; break;
-		case DEBUG_OFF: cfg.debug = OTTO_FALSE; break;
-		case REFRESH: compile_dependencies(); break;
-		case PAUSE_DAEMON: cfg.pause = OTTO_TRUE; break;
-		case RESUME_DAEMON: cfg.pause = OTTO_FALSE; break;
-		case STOP_DAEMON: delete_pidfile(); exit(0); break;
-		default: pdu->option = NOOP; break;
+		case VERIFY_DB:     sprintf(pdu->name, "%ld", ottodb_inode); break;
+		case DEBUG_ON:      cfg.debug = OTTO_TRUE;                   break;
+		case DEBUG_OFF:     cfg.debug = OTTO_FALSE;                  break;
+		case REFRESH:       compile_dependencies();                  break;
+		case PAUSE_DAEMON:  cfg.pause = OTTO_TRUE;                   break;
+		case RESUME_DAEMON: cfg.pause = OTTO_FALSE;                  break;
+		case STOP_DAEMON:   delete_pidfile(); exit(0);               break;
+		default:            pdu->option = NOOP;                      break;
 	}
 
 	ottoipc_initialize_send();
@@ -1105,7 +1108,7 @@ finish_job(int sigNum)
 
 
 void
-set_job_status(int status, int id)
+set_job_status(int id, int status)
 {
 	switch(status)
 	{
@@ -1142,16 +1145,16 @@ set_job_status(int status, int id)
 
 
 void
-set_job_autohold(int action, int id)
+set_job_autohold(int id, int action)
 {
 	switch(action)
 	{
 		// just set this one job on autohold no matter what type it is
-		case ON:
+		case JOB_ON_AUTOHOLD:
 			job[id].on_autohold = OTTO_TRUE;
 			break;
 
-		case OFF:
+		case JOB_OFF_AUTOHOLD:
 			// just set this one job off autohold no matter what type it is
 			job[id].on_autohold = OTTO_FALSE;
 			break;
@@ -1163,11 +1166,11 @@ set_job_autohold(int action, int id)
 
 
 void
-set_job_hold(int action, int id)
+set_job_hold(int id, int action)
 {
 	switch(action)
 	{
-		case ON:
+		case JOB_ON_HOLD:
 			// just set this one job on hold no matter what type it is
 			if(job[id].status != STAT_OH && job[id].status != STAT_RU)
 			{
@@ -1175,7 +1178,7 @@ set_job_hold(int action, int id)
 			}
 			break;
 
-		case OFF:
+		case JOB_OFF_HOLD:
 			if(job[id].status == STAT_OH)
 			{
 				// check status of parent box
@@ -1211,11 +1214,11 @@ set_job_hold(int action, int id)
 
 
 void
-set_job_noexec(int action, int id)
+set_job_noexec(int id, int action)
 {
 	switch(action)
 	{
-		case ON:
+		case JOB_ON_NOEXEC:
 			if(job[id].on_noexec != OTTO_TRUE && job[id].status != STAT_RU)
 			{
 				job[id].on_noexec = OTTO_TRUE;
@@ -1225,7 +1228,7 @@ set_job_noexec(int action, int id)
 			}
 			break;
 
-		case OFF:
+		case JOB_OFF_NOEXEC:
 			if(job[id].on_noexec == OTTO_TRUE)
 			{
 				// check whether parent box is on noexec
@@ -1247,17 +1250,17 @@ set_job_noexec(int action, int id)
 
 
 void
-set_job_noexec_chain(int action, int id)
+set_job_noexec_chain(int id, int action)
 {
 	while(id != -1)
 	{
 		switch(action)
 		{
-			case ON:
+			case JOB_ON_NOEXEC:
 				job[id].on_noexec = OTTO_TRUE;
 				break;
 
-			case OFF:
+			case JOB_OFF_NOEXEC:
 				job[id].on_noexec = OTTO_FALSE;
 				break;
 
@@ -1376,12 +1379,79 @@ start_job(int id)
 
 
 void
-kill_job(int signal, int id)
+kill_job(int id, int signal)
 {
 	if(job[id].pid > 0)
 	{
 		// send signal to pid
 		kill((-1*job[id].pid), signal);
+	}
+}
+
+
+
+void
+move_job(int id, int direction)
+{
+	int steps  = cfg.ottodb_maxjobs; // assume the job will move the entire length of the DB
+	int new_prev, new_next;
+
+	switch(direction)
+	{
+		case MOVE_JOB_UP:
+			steps = 1;    // limit steps to one and fall through
+		case MOVE_JOB_TOP:
+			while(steps > 0 && job[id].prev != -1)
+			{
+				// save new siblings
+				new_next = job[id].prev;
+				new_prev = job[new_next].prev;
+
+				// remove job from list
+				job[job[id].prev].next = job[id].next;
+				job[job[id].next].prev = job[id].prev;
+
+				// insert job between new siblings
+				job[new_prev].next = id;
+				job[id].prev       = new_prev;
+				job[id].next       = new_next;
+				job[new_next].prev = id;
+
+				// update parent head/tail if necessary
+				if(job[job[id].box].head == job[id].next)
+					job[job[id].box].head = id;
+				if(job[job[id].box].tail == id)
+					job[job[id].box].tail = job[id].next;
+				steps--;
+			}
+			break;
+		case MOVE_JOB_DOWN:
+			steps = 1;    // limit steps to one and fall through
+		case MOVE_JOB_BOTTOM:
+			while(steps > 0 && job[id].next != -1)
+			{
+				// save new siblings
+				new_prev = job[id].next;
+				new_next = job[new_prev].next;
+
+				// remove job from list
+				job[job[id].prev].next = job[id].next;
+				job[job[id].next].prev = job[id].prev;
+
+				// insert job between new siblings
+				job[new_prev].next = id;
+				job[id].prev       = new_prev;
+				job[id].next       = new_next;
+				job[new_next].prev = id;
+
+				// update parent head/tail if necessary
+				if(job[job[id].box].head == id)
+					job[job[id].box].head = job[id].prev;
+				if(job[job[id].box].tail == job[id].prev)
+					job[job[id].box].tail = id;
+				steps--;
+			}
+			break;
 	}
 }
 

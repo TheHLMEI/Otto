@@ -1,0 +1,149 @@
+delete_box:      CNV_PRV
+
+/* ----------------- CNV_PRV ----------------- */
+
+insert_job:      CNV_PRV
+job_type:        b
+description:     "Provider Conversion"
+
+ /* ----------------- CNV_PRV_PRESAK ----------------- */
+
+ insert_job:      CNV_PRV_PRESAK
+ job_type:        b
+ box_name:        CNV_PRV
+ description:     "Provider presak"
+
+  /* ----------------- CNV_PRV_PRESAK_S ----------------- */
+
+  insert_job:      CNV_PRV_PRESAK_S
+  job_type:        c
+  box_name:        CNV_PRV_PRESAK
+  command:         cnv_autojob.sh cnvs
+  description:     "Unload data for the prv_ms_master conversion"
+
+  /* ----------------- CNV_PRV_PRESAK_H ----------------- */
+
+  insert_job:      CNV_PRV_PRESAK_H
+  job_type:        c
+  box_name:        CNV_PRV_PRESAK
+  command:         cnv_autojob.sh cnvh
+  description:     "Create .out files for dataload.sh and build local lookups"
+
+  /* ----------------- CNV_PRV_PRESAK_J ----------------- */
+
+  insert_job:      CNV_PRV_PRESAK_J
+  job_type:        c
+  box_name:        CNV_PRV_PRESAK
+  command:         cnv_autojob.sh cnvj RUNID
+  description:     "Perform the prv_ms_master conversion"
+
+  /* ----------------- CNV_PRV_PRESAK_L_CONV ----------------- */
+
+  insert_job:      CNV_PRV_PRESAK_L_CONV
+  job_type:        c
+  box_name:        CNV_PRV_PRESAK
+  command:         cnv_autojob.sh cnvl RUNID CONV
+  description:     "Load the converted data to the conversion database"
+
+  /* ----------------- CNV_PRV_PRESAK_F ----------------- */
+
+  insert_job:      CNV_PRV_PRESAK_F
+  job_type:        c
+  box_name:        CNV_PRV_PRESAK
+  command:         cnv_autojob.sh cnvf RUNID prv
+  description:     "Create the FASR for CNV_PRV_MS_MASTER"
+
+ /* ----------------- CNV_PRV_PREP_ADDR ----------------- */
+
+ insert_job:      CNV_PRV_PREP_ADDR
+ job_type:        b
+ box_name:        CNV_PRV
+ description:     "Prep addr"
+
+  /* ----------------- CNV_PRV_PREP_ADDR_S ----------------- */
+
+  insert_job:      CNV_PRV_PREP_ADDR_S
+  job_type:        c
+  box_name:        CNV_PRV_PREP_ADDR
+  command:         cnv_autojob.sh cnvs
+  description:     "Unload data for the prv_ms_master conversion"
+
+  /* ----------------- CNV_PRV_PREP_ADDR_H ----------------- */
+
+  insert_job:      CNV_PRV_PREP_ADDR_H
+  job_type:        c
+  box_name:        CNV_PRV_PREP_ADDR
+  command:         cnv_autojob.sh cnvh
+  description:     "Create .out files for dataload.sh and build local lookups"
+
+  /* ----------------- CNV_PRV_PREP_ADDR_J ----------------- */
+
+  insert_job:      CNV_PRV_PREP_ADDR_J
+  job_type:        c
+  box_name:        CNV_PRV_PREP_ADDR
+  command:         cnv_autojob.sh cnvj RUNID
+  description:     "Perform the prv_ms_master conversion"
+
+  /* ----------------- CNV_PRV_PREP_ADDR_L_CONV ----------------- */
+
+  insert_job:      CNV_PRV_PREP_ADDR_L_CONV
+  job_type:        c
+  box_name:        CNV_PRV_PREP_ADDR
+  command:         cnv_autojob.sh cnvl RUNID CONV
+  description:     "Load the converted data to the conversion database"
+
+  /* ----------------- CNV_PRV_PREP_ADDR_F ----------------- */
+
+  insert_job:      CNV_PRV_PREP_ADDR_F
+  job_type:        c
+  box_name:        CNV_PRV_PREP_ADDR
+  command:         cnv_autojob.sh cnvf RUNID prv
+  description:     "Create the FASR for CNV_PRV_MS_MASTER"
+
+ /* ----------------- CNV_PRV_SHARED_LOOKUP ----------------- */
+
+ insert_job:      CNV_PRV_SHARED_LOOKUP
+ job_type:        b
+ box_name:        CNV_PRV
+ description:     "Provider shared lookup"
+
+  /* ----------------- CNV_PRV_SHARED_LOOKUP_H ----------------- */
+
+  insert_job:      CNV_PRV_SHARED_LOOKUP_H
+  job_type:        c
+  box_name:        CNV_PRV_SHARED_LOOKUP
+  command:         cnv_autojob.sh cnvh
+  description:     "Create .out files for dataload.sh and build local lookups"
+
+ /* ----------------- CNV_PRV_MS_MSG ----------------- */
+
+ insert_job:      CNV_PRV_MS_MSG
+ job_type:        b
+ box_name:        CNV_PRV
+ description:     "Provider messages"
+
+  /* ----------------- CNV_PRV_MS_MASTER_M ----------------- */
+
+  insert_job:      CNV_PRV_MS_MASTER_M
+  job_type:        c
+  box_name:        CNV_PRV_MS_MSG
+  command:         cnv_autojob.sh cnvm RUNID
+  description:     "Load messages"
+
+  /* ----------------- CNV_PRV_MS_EFT_M ----------------- */
+
+  insert_job:      CNV_PRV_MS_EFT_M
+  job_type:        c
+  box_name:        CNV_PRV_MS_MSG
+  command:         cnv_autojob.sh cnvm RUNID
+  description:     "Load messages"
+
+  /* ----------------- CNV_PRV_MS_OWNER_M ----------------- */
+
+  insert_job:      CNV_PRV_MS_OWNER_M
+  job_type:        c
+  box_name:        CNV_PRV_MS_MSG
+  command:         cnv_autojob.sh cnvm RUNID
+  description:     "Load messages"
+
+

@@ -313,6 +313,6 @@ levelstr(int level)
 
 
 
-/*
-vim: ts=3 sw=3 ai
-*/
+//
+// vim: ts=3 sw=3 ai
+//
