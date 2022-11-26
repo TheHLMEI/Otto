@@ -1,0 +1,9 @@
+# Ignore all
+*
+
+# Unignore otto scripts
+!ottoping
+!ottostart
+!ottostop
+
+
