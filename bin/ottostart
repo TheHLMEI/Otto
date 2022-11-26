@@ -1,0 +1,76 @@
+#!/bin/sh
+
+user=`grep "^\s*user\s"  $OTTOCFG`
+user=`echo $user | cut -d" " -f2`
+USER=$(whoami)
+if [ "$user" != "" ] ; then
+   if [ "$user" != "$USER" ] ; then
+      echo "You must be logged in as "$user" to start Otto."
+      exit -1
+   fi
+fi
+
+enable_httpd=`grep "^\s*enable_httpd\s"  $OTTOCFG`
+enable_httpd=`echo $enable_httpd | cut -d" " -f2 | cut -c 1-1 | tr [A-Z] [a-z]`
+case ${enable_httpd} in
+   "t"|"y"|"1")
+      enable_httpd=t
+      ;;
+   *)
+      enable_httpd=f
+      ;;
+esac
+
+resp=`$OTTOBIN/ottocmd -E PING 2>&1`
+if [ "$resp" = "connect() failed: Connection refused" ] ; then
+   cd $OTTOLOG
+
+   archivelog=`grep "^\s*archivelog\s"  $OTTOCFG`
+   archivelog=`echo $archivelog | cut -d" " -f2 | cut -c 1-1 | tr [A-Z] [a-z]`
+
+   case ${archivelog} in
+      "t"|"y"|"1")
+         mkdir backups > /dev/null 2>/dev/null
+         suffix=$(date '+%Y%m%d.%H%M%S')
+         mv ottoerr.log  backups/ottoerr.log.$suffix  2>/dev/null
+         mv ottoout.log  backups/ottoout.log.$suffix  2>/dev/null
+         mv ottocmd.log  backups/ottocmd.log.$suffix  2>/dev/null
+         mv ottoimp.log  backups/ottojil.log.$suffix  2>/dev/null
+         mv ottoexp.log  backups/ottomsp.log.$suffix  2>/dev/null
+         mv ottorep.log  backups/ottorep.log.$suffix  2>/dev/null
+         mv ottosysd.log backups/ottosysd.log.$suffix 2>/dev/null
+         if [ "$enable_httpd" = "t" ] ; then
+            mv ottohttpd.log backups/ottohttpd.log.$suffix 2>/dev/null
+         fi
+
+         touch ottoerr.log  2>/dev/null
+         touch ottoout.log  2>/dev/null
+         touch ottocmd.log  2>/dev/null
+         touch ottoimp.log  2>/dev/null
+         touch ottoexp.log  2>/dev/null
+         touch ottorep.log  2>/dev/null
+         touch ottosysd.log 2>/dev/null
+         if [ "$enable_httpd" = "t" ] ; then
+            touch ottohttpd.log 2>/dev/null
+         fi
+
+         chmod 664 ottoerr.log
+         chmod 664 ottoout.log
+         chmod 664 ottocmd.log
+         chmod 664 ottoimp.log
+         chmod 664 ottoexp.log
+         chmod 664 ottorep.log
+         chmod 664 ottosysd.log
+         if [ "$enable_httpd" = "t" ] ; then
+            chmod 664 ottohttpd.log
+         fi
+      ;;
+   esac
+
+   ulimit -c unlimited
+   nohup $OTTOBIN/ottosysd 2>ottoerr.log > ottoout.log &
+   sleep .25
+   cat ottoerr.log
+else
+   echo "Otto is already running."
+fi

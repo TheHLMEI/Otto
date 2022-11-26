@@ -1,0 +1,28 @@
+#!/bin/sh
+
+user=`grep "^\s*user\s"  $OTTOCFG`
+user=`echo $user | cut -d" " -f2`
+USER=$(whoami)
+if [ "$user" != "" ] ; then
+   if [ "$user" != "$USER" ] ; then
+      echo "You must be logged in as "$user" to stop Otto."
+      exit -1
+   fi
+fi
+
+#
+# First try to do a clean shutdown through IPC
+#
+$OTTOBIN/ottocmd -E STOP_DAEMON 2>/dev/null
+
+#
+# if that didn't work then try to kill it via the PID
+#
+PID=`cat $OTTOLOG/ottosysd.pid 2>/dev/null`
+
+if [ "$PID" != "" ] ; then
+   present=`ps -eaf | grep " $PID " | grep ottosysd`
+   if [ "$present" != "" ] ; then
+      kill $PID
+   fi
+fi

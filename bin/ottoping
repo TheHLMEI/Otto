@@ -1,0 +1,18 @@
+#!/bin/sh
+
+quiet=""
+if [ $# -gt 0 ] ; then
+   if [ "$1" = "-q" ] ; then
+      quiet="TRUE"
+   fi
+fi
+
+resp=`$OTTOBIN/ottocmd -E PING 2>&1`
+if [ "$resp" = "connect() failed: Connection refused" ] ; then
+   echo -e "\nottosysd is not responding\n"
+else
+   if [ "$quiet" != "TRUE" ] ; then
+      echo -e "\n"$resp"\n"
+   fi
+fi
+
