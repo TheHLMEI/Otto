@@ -1,4 +1,6 @@
 .SUFFIXES:
+.SUFFIXES: .o .a .c
+
 
 # Where to install the executables
 insdir = ../../bin
@@ -7,45 +9,32 @@ PROG = ottorep
 
 SRC = ottorep.c
 OBJ = $(SRC:.c=.o)
-DEP = $(SRC:.c=.d)
 
-SHRS = ../ottolib/ottocfg.o         \
-       ../ottolib/ottocond.o        \
-       ../ottolib/ottodb.o          \
-       ../ottolib/ottojob.o         \
-       ../ottolib/ottoutil.o        \
-       ../ottolib/otto_dtl_writer.o \
-       ../ottolib/otto_jil_writer.o \
-       ../ottolib/otto_pid_writer.o \
-       ../ottolib/otto_sum_writer.o \
-       ../ottolib/signals.o         \
-       ../ottolib/simplelog.o
+LIB = -lotto
 
-CFLAGS=-g -Wall -Werror -Wno-unknown-pragmas -Wno-char-subscripts -I../ottolib
+CPPFLAGS=-I../../include
+CFLAGS=-g -Wall -Werror -Wno-unknown-pragmas -Wno-char-subscripts
 
-all: $(PROG)
-	@echo Make $(PROG) done
-
-install: $(PROG)
-	@echo cp $(PROG) $(insdir)
-	@rm -f $(insdir)/$(PROG)
-	@cp $(PROG) $(insdir)
-	@chmod 755 $(insdir)/$(PROG) $(insdir)
-
-$(PROG): $(OBJ) $(SHRS) Makefile
-	$(CC) -o $@ $(OBJ) $(SHRS)
+target: $(PROG)
 
 clean::
-	/bin/rm -f *.o *.d $(PROG)
+	/bin/rm -f $(PROG) *.o
 
--include $(DEP)   # include all dependancy files in the makefile
+rebuild: clean target
 
-# rule to specifically generate the program's object
-$(OBJ): $(SRC)
-	$(CC) $(CFLAGS) -c $(SRC)
+install: $(PROG)
+	/usr/bin/cp -f $(PROG) $(insdir)
+	@/usr/bin/chmod 755 $(insdir)/$(PROG) $(insdir)
 
-# rule to generate a dependancy file by using the C preprocessor
-%.d: %.c
-	@$(CC) $(CFLAGS) $< -MM -MT $(@:.d=.o) >$@
+uninstall:
+	/usr/bin/rm -f $(insdir)/$(PROG)
 
+distclean: clean uninstall
+
+$(PROG): $(OBJ) ../../lib/libotto.a Makefile
+	@/usr/bin/echo "Linking $(PROG)"
+	$(CC) -o $@ $(OBJ) -L../../lib $(LIB)
+	@/usr/bin/echo "Success!!"
+
+$(OBJ): $(SRC) ../../include/otto.h
 

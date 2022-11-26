@@ -5,9 +5,9 @@
 # Where to install the executables
 insdir = ../../bin
 
-PROG = ottosysd
+PROG = ottoexp
 
-SRC = ottosysd.c
+SRC = ottoexp.c
 OBJ = $(SRC:.c=.o)
 
 LIB = -lotto

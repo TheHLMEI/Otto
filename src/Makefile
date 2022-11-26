@@ -1,13 +1,13 @@
 #
 # This list order supports dependencies between modules
 #
-SUBDIRS := ottolib  \
-           ottojil  \
-	   ottomsp  \
-	   ottorep  \
-	   ottosend \
-	   ottosysd \
-           ottoxlat
+SUBDIRS := libotto   \
+           ottocmd   \
+           ottoexp   \
+           ottoimp   \
+           ottorep   \
+           ottosysd  \
+           ottotr
 
 
 all: $(SUBDIRS)
