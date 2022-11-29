@@ -1,0 +1,110 @@
+.box {
+display: flex;
+         flex-flow: column;
+height: 100vh;
+border: 0;
+}
+
+.box .row.header {
+flex: 0 1 auto;
+border: 0;
+}
+
+.box .row.content {
+flex: 1 1 auto;
+display: flex;
+border: 0;
+}
+
+.box .row.footer {
+flex: 0 1 auto;
+border: 0;
+}
+
+.row.content iframe {
+width: 100%;
+border: 0;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background-color: black;
+    color:  white;
+    font-weight: normal;
+    }
+
+div {
+    margin: 0;
+    padding: 0;
+  }
+
+
+
+.content-table {
+    font-family: courier;
+    color:  white;
+    font-weight: normal;
+}
+
+.summary-header {
+   position: sticky;
+   top: 0;
+   background: black;
+   font-weight: bold;
+   color:  white;
+}
+
+.normal-job {
+    font-weight: normal;
+    color: white;
+}
+
+.muted-job {
+    font-weight: normal;
+    color: lightgrey;
+}
+
+.highlighted-job {
+    color: white;
+    font-weight: bold;
+}
+
+.stat-in {
+    font-weight: normal;
+    color: darkgrey;
+}
+
+.stat-ac {
+    font-weight: normal;
+    color: white;
+}
+
+.stat-ru {
+    color: white;
+    font-weight: bold;
+}
+
+.stat-su {
+    font-weight: normal;
+    color: lime;
+}
+
+.stat-fa {
+    font-weight: bold;
+    color: red;
+}
+
+.stat-te {
+    font-weight: bold;
+    color: orange;
+}
+
+.stat-oh {
+    color: darkgrey;
+    font-weight: normal;
+}
+
+
+tr:nth-child(even) {background-color: #262525;}

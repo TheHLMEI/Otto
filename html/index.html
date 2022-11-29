@@ -1,0 +1,53 @@
+<html>
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <link rel="icon" href="favicon.ico" type="image/x-icon">
+   <link rel="stylesheet" href="otto.css" type="text/css">
+   <title>Otto HTTP</title>
+</head>
+<body>
+<div class="box">
+   <div class="row header">
+      <table width="100%">
+      <tr><td width="25%" align="left">
+      <img src="Otto.png" height="75px"> 
+      </td><td width="50%">
+      <center>
+      <form name="specform" id="specform" action="/otto/summary" method="get" target="content_frame" autocomplete="off">
+         <label for="jobname">Job Name:</label>
+         <input type="text" id="jobname" name="jobname">
+         <label for="level">Level:</label>
+         <input type="text" id="level" name="level">
+         <input type="submit" value="Submit"><br>
+         <input type="radio" name="radiofmt" onclick="document.getElementById('specform').action='/otto/summary';" checked="checked"/>Summary
+         <input type="radio" name="radiofmt" onclick="document.getElementById('specform').action='/otto/query';"/>Query
+         <input type="radio" name="radiofmt" onclick="document.getElementById('specform').action='/otto/detail';"/>Detail
+         <input type="radio" name="radiofmt" onclick="document.getElementById('specform').action='/otto/project';"/>MS Project
+         <br>
+         <input type="checkbox" name="IN" id="IN" value="1" checked="checked">
+         <label for="IN">IN</label>
+         <input type="checkbox" name="AC" id="AC" value="1" checked="checked">
+         <label for="AC">AC</label>
+         <input type="checkbox" name="OH" id="OH" value="1" checked="checked">
+         <label for="OH">OH</label>
+         <input type="checkbox" name="RU" id="RU" value="1" checked="checked">
+         <label for="RU">RU</label>
+         <input type="checkbox" name="SU" id="SU" value="1" checked="checked">
+         <label for="SU">SU</label>
+         <input type="checkbox" name="FA" id="FA" value="1" checked="checked">
+         <label for="FA">FA</label>
+         <input type="checkbox" name="TE" id="TE" value="1" checked="checked">
+         <label for="TE">TE</label>
+      </center>
+      </td><td width="25%" align="right">
+      </td></tr></table>
+   </div>
+   <div class="row content">
+      <iframe src="/otto/summary" name="content_frame" id="content_frame"></iframe>
+   </div>
+   <div class="row footer">
+      <center><small><small>Otto v1.4.0</small></small></center>
+   </div>
+</div>
+</body></html>
