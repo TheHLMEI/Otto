@@ -5,6 +5,12 @@
    <link rel="icon" href="favicon.ico" type="image/x-icon">
    <link rel="stylesheet" href="otto.css" type="text/css">
    <title>Otto HTTP</title>
+   <script>
+     function resizeIframe(obj) {
+        obj.style.height = 0;
+         obj.style.height = obj.contentWindow.document.documentElement.scrollHeight + 'px';
+     }
+   </script>
 </head>
 <body>
 <div class="box">
@@ -17,8 +23,6 @@
       <form name="specform" id="specform" action="/otto/summary" method="get" target="content_frame" autocomplete="off">
          <label for="jobname">Job Name:</label>
          <input type="text" id="jobname" name="jobname">
-         <label for="level">Level:</label>
-         <input type="text" id="level" name="level">
          <input type="submit" value="Submit"><br>
          <input type="radio" name="radiofmt" onclick="document.getElementById('specform').action='/otto/summary';" checked="checked"/>Summary
          <input type="radio" name="radiofmt" onclick="document.getElementById('specform').action='/otto/query';"/>Query
@@ -47,7 +51,7 @@
       <iframe src="/otto/summary" name="content_frame" id="content_frame"></iframe>
    </div>
    <div class="row footer">
-      <center><small><small>Otto v1.4.0</small></small></center>
+      <iframe src="/otto/version" name="footer_frame" id="footer_frame" scrolling="no" onload="resizeIframe(this);"></iframe>
    </div>
 </div>
 </body></html>

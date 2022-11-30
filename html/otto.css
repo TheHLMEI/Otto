@@ -26,6 +26,11 @@ width: 100%;
 border: 0;
 }
 
+.row.footer iframe {
+width: 100%;
+border: 0;
+}
+
 html, body {
     margin: 0;
     padding: 0;
