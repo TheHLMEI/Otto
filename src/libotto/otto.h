@@ -7,7 +7,7 @@
 #include <sys/types.h>
 #include <time.h>
 
-#define OTTO_VERSION "v2.0.3"
+#define OTTO_VERSION_STRING "v2.0.3"
 
 //
 // Defines
@@ -52,6 +52,7 @@
 #define OTTO_QUERY    2
 #define OTTO_SUMMARY  3
 #define OTTO_EXPORT   4
+#define OTTO_VERSION  5
 
 
 #define i64 int64_t
@@ -866,8 +867,9 @@ int buffer_mspdi(DYNBUF *b, JOBLIST *joblist, int autoschedule);
 
 int write_htmldtl(int fd, JOBLIST *joblist, ottohtml_query *q);
 int write_htmljil(int fd, JOBLIST *joblist, ottohtml_query *q);
-int write_htmlsum(int fd, JOBLIST *joblist, ottohtml_query *q);
 int write_htmlmspdi(int fd, JOBLIST *joblist, ottohtml_query *q);
+int write_htmlsum(int fd, JOBLIST *joblist, ottohtml_query *q);
+int write_htmlversion(int fd) ;
 
 
 

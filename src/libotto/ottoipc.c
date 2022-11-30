@@ -589,8 +589,23 @@ log_received_pdu(void *p)
    }
    else
    {
-      strcpy(ename, "unknown");
-      strcpy(rname, "unknown");
+      // the pdu stores a partial username in the bytes provided by euid and ruid
+      // assemble them into a string and then copy them into theename and rname
+      if(header->euid != 0)
+      {
+         char pduname[sizeof(header->euid) + sizeof(header->ruid) + 1];
+         memcpy(&pduname[0],                    (char *)&header->euid, sizeof(header->euid));
+         memcpy(&pduname[sizeof(header->euid)], (char *)&header->ruid, sizeof(header->ruid));
+         pduname[sizeof(header->euid) + sizeof(header->ruid)] = '\0';
+
+         strcpy(ename, pduname);
+         strcpy(rname, pduname);
+      }
+      else
+      {
+         strcpy(ename, "unknown");
+         strcpy(rname, "unknown");
+      }
    }
 
    lsprintf(logp, INFO, "Received PDU:\n");

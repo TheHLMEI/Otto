@@ -5,31 +5,32 @@
 libdir = ../../lib
 incdir = ../../include
 
-SRCS = ottocfg.c               \
-       ottocond.c              \
-       ottocrud.c              \
-       ottodb.c                \
-		 ottohtml.c              \
-       ottoipc.c               \
-       ottojob.c               \
-       ottolog.c               \
-       ottoutil.c              \
-       otto_cnd_writer.c       \
-       otto_csv_reader.c       \
-       otto_csv_writer.c       \
-       otto_dtl_writer.c       \
-		 otto_htmldtl_writer.c   \
-		 otto_htmljil_writer.c   \
-		 otto_htmlmspdi_writer.c \
-		 otto_htmlsum_writer.c   \
-       otto_jil_reader.c       \
-       otto_jil_writer.c       \
-       otto_mspdi_reader.c     \
-       otto_mspdi_writer.c     \
-       otto_pid_writer.c       \
-       otto_sum_writer.c       \
-       signals.c               \
-       strptime.c              \
+SRCS = ottocfg.c                 \
+       ottocond.c                \
+       ottocrud.c                \
+       ottodb.c                  \
+		 ottohtml.c                \
+       ottoipc.c                 \
+       ottojob.c                 \
+       ottolog.c                 \
+       ottoutil.c                \
+       otto_cnd_writer.c         \
+       otto_csv_reader.c         \
+       otto_csv_writer.c         \
+       otto_dtl_writer.c         \
+		 otto_htmldtl_writer.c     \
+		 otto_htmljil_writer.c     \
+		 otto_htmlmspdi_writer.c   \
+		 otto_htmlsum_writer.c     \
+		 otto_htmlversion_writer.c \
+       otto_jil_reader.c         \
+       otto_jil_writer.c         \
+       otto_mspdi_reader.c       \
+       otto_mspdi_writer.c       \
+       otto_pid_writer.c         \
+       otto_sum_writer.c         \
+       signals.c                 \
+       strptime.c                \
        linenoise.c
 
 OBJS = $(SRCS:.c=.o)

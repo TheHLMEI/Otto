@@ -29,7 +29,7 @@ char *strvars[VAR_TOTAL+1] =
 #define KEEP_VARNAME       OTTO_TRUE
 #define DONT_KEEP_VARNAME  OTTO_FALSE
 
-ottocfg_st cfg = {OTTO_VERSION, OTTODB_VERSION, OTTODB_MAXJOBS, 0};
+ottocfg_st cfg = {OTTO_VERSION_STRING, OTTODB_VERSION, OTTODB_MAXJOBS, 0};
 
 int  get_cfg_int(int *value, char *parm, char *val, int lowval, int highval, int defval);
 int  get_cfg_int16(int16_t *value, char *parm, char *val, int lowval, int highval, int defval);
@@ -134,11 +134,14 @@ read_cfgfile()
 {
    int   retval    = OTTO_SUCCESS;
    FILE  *infile   = NULL;
-   char  *e        = NULL;
    char  *instring = NULL;
+   char  *e        = NULL;
    char  *s        = NULL;
+   char  *t        = NULL;
    char  *word     = NULL;
    char  *word2    = NULL;
+   char  *logname  = NULL;
+   int    i        = 0;
    int    line     = 0;
    size_t islen;
    struct stat statbuf;
@@ -256,18 +259,6 @@ read_cfgfile()
                   lprintf(logp, MAJR, "Can't parse use_getpw.");
                   retval = OTTO_FAIL;
                }
-               else
-               {
-                  if(cfg.use_getpw == OTTO_TRUE)
-                  {
-                     // find out who is running this command
-                     pw = getpwnam(getlogin());
-                     cfg.ruid = pw->pw_uid;
-
-                     pw = getpwuid(getuid());
-                     cfg.euid = pw->pw_uid;
-                  }
-               }
                continue;
             }
 
@@ -338,6 +329,64 @@ read_cfgfile()
 
    if(word2 != NULL)
       free(word2);
+
+   if(retval == OTTO_SUCCESS)
+   {
+      if(cfg.use_getpw == OTTO_TRUE)
+      {
+         // find out who is running this command
+         pw = getpwuid(getuid());
+         cfg.euid = pw->pw_uid;
+
+         pw = getpwnam(getlogin());
+         cfg.ruid = pw->pw_uid;
+      }
+      else
+      {
+         // ruid and euid still provide a (small - 8 bytes) buffer to hold a name
+         if((logname = getenv("LOGNAME")) != NULL)
+         {
+            // find the last backslash to remove any domain name prefix
+            s = logname;
+
+            // advance to the end of the string
+            while(*s != '\0')
+               s++;
+
+            // now back up to the backslash
+            while(s != logname && *s != '\\')
+               s--;
+
+            if(*s == '\\')
+               s++;
+
+            // fill euid first
+            t = (char *)&cfg.euid;
+            for(i=0; i<sizeof(cfg.euid); i++)
+            {
+               if(s[i] == '\0')
+                  break;
+               else
+                  t[i] = s[i];
+            }
+
+            if(i == sizeof(cfg.euid))
+            {
+               // still characters left so fill ruid now
+               s += sizeof(cfg.euid);
+               t = (char *)&cfg.ruid;
+               for(i=0; i<sizeof(cfg.ruid); i++)
+               {
+                  if(s[i] == '\0')
+                     break;
+                  else
+                     t[i] = s[i];
+               }
+            }
+
+         }
+      }
+   }
 
    return(retval);
 }

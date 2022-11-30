@@ -2158,6 +2158,12 @@ handle_http(RECVBUF *recvbuf)
                // /status?name=string = jr string
                type = OTTO_EXPORT;
             }
+            if(strcmp(q.endpoint, "version") == 0)
+            {
+               // /status             = jr %
+               // /status?name=string = jr string
+               type = OTTO_VERSION;
+            }
 
             switch(type)
             {
@@ -2165,26 +2171,31 @@ handle_http(RECVBUF *recvbuf)
                case OTTO_QUERY:
                case OTTO_SUMMARY:
                case OTTO_EXPORT:
+               case OTTO_VERSION:
                   // a known endpoint was found
                   // generate endpoint output
-                  strcpy(jobname, "%");
-                  if(q.jobname[0] != '\0')
-                     strcpy(jobname, q.jobname);
+                  if(type != OTTO_VERSION)
+                  {
+                     strcpy(jobname, "%");
+                     if(q.jobname[0] != '\0')
+                        strcpy(jobname, q.jobname);
 
-                  report_level = q.level;
+                     report_level = q.level;
 
-                  copy_jobwork(&hctx);
+                     copy_jobwork(&hctx);
 
-                  hjoblist.nitems = 0;
+                     hjoblist.nitems = 0;
 
-                  build_joblist(&hjoblist, &hctx, jobname, root_job->head, 0, report_level, OTTO_TRUE);
+                     build_joblist(&hjoblist, &hctx, jobname, root_job->head, 0, report_level, OTTO_TRUE);
+                  }
 
                   switch(type)
                   {
-                     case OTTO_DETAIL:  write_htmldtl(recvbuf->fd, &hjoblist, &q); break;
-                     case OTTO_QUERY:   write_htmljil(recvbuf->fd, &hjoblist, &q); break;
-                     case OTTO_SUMMARY: write_htmlsum(recvbuf->fd, &hjoblist, &q); break;
-                     case OTTO_EXPORT:  write_htmlmspdi(recvbuf->fd, &hjoblist, &q); break;
+                     case OTTO_DETAIL:  write_htmldtl    (recvbuf->fd, &hjoblist, &q); break;
+                     case OTTO_QUERY:   write_htmljil    (recvbuf->fd, &hjoblist, &q); break;
+                     case OTTO_SUMMARY: write_htmlsum    (recvbuf->fd, &hjoblist, &q); break;
+                     case OTTO_EXPORT:  write_htmlmspdi  (recvbuf->fd, &hjoblist, &q); break;
+                     case OTTO_VERSION: write_htmlversion(recvbuf->fd);                break;
                   }
                   break;
 
