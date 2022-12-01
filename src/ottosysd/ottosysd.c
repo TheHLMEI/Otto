@@ -2152,11 +2152,17 @@ handle_http(RECVBUF *recvbuf)
                // /status?name=string = jr string
                type = OTTO_SUMMARY;
             }
-            if(strcmp(q.endpoint, "project") == 0)
+            if(strcmp(q.endpoint, "mspdi") == 0)
             {
                // /status             = jr %
                // /status?name=string = jr string
-               type = OTTO_EXPORT;
+               type = OTTO_EXPORT_MSP;
+            }
+            if(strcmp(q.endpoint, "csv") == 0)
+            {
+               // /status             = jr %
+               // /status?name=string = jr string
+               type = OTTO_EXPORT_CSV;
             }
             if(strcmp(q.endpoint, "version") == 0)
             {
@@ -2170,7 +2176,8 @@ handle_http(RECVBUF *recvbuf)
                case OTTO_DETAIL:
                case OTTO_QUERY:
                case OTTO_SUMMARY:
-               case OTTO_EXPORT:
+               case OTTO_EXPORT_MSP:
+               case OTTO_EXPORT_CSV:
                case OTTO_VERSION:
                   // a known endpoint was found
                   // generate endpoint output
@@ -2191,11 +2198,12 @@ handle_http(RECVBUF *recvbuf)
 
                   switch(type)
                   {
-                     case OTTO_DETAIL:  write_htmldtl    (recvbuf->fd, &hjoblist, &q); break;
-                     case OTTO_QUERY:   write_htmljil    (recvbuf->fd, &hjoblist, &q); break;
-                     case OTTO_SUMMARY: write_htmlsum    (recvbuf->fd, &hjoblist, &q); break;
-                     case OTTO_EXPORT:  write_htmlmspdi  (recvbuf->fd, &hjoblist, &q); break;
-                     case OTTO_VERSION: write_htmlversion(recvbuf->fd);                break;
+                     case OTTO_DETAIL:      write_htmldtl    (recvbuf->fd, &hjoblist, &q); break;
+                     case OTTO_QUERY:       write_htmljil    (recvbuf->fd, &hjoblist, &q); break;
+                     case OTTO_SUMMARY:     write_htmlsum    (recvbuf->fd, &hjoblist, &q); break;
+                     case OTTO_EXPORT_MSP:  write_htmlmspdi  (recvbuf->fd, &hjoblist, &q); break;
+                     case OTTO_EXPORT_CSV:  write_htmlcsv    (recvbuf->fd, &hjoblist, &q); break;
+                     case OTTO_VERSION:     write_htmlversion(recvbuf->fd);                break;
                   }
                   break;
 
@@ -2237,10 +2245,6 @@ handle_http(RECVBUF *recvbuf)
 
    return(retval);
 }
-
-
-
-
 
 
 

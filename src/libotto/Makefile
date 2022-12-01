@@ -18,6 +18,7 @@ SRCS = ottocfg.c                 \
        otto_csv_reader.c         \
        otto_csv_writer.c         \
        otto_dtl_writer.c         \
+		 otto_htmlcsv_writer.c     \
 		 otto_htmldtl_writer.c     \
 		 otto_htmljil_writer.c     \
 		 otto_htmlmspdi_writer.c   \
