@@ -620,7 +620,7 @@ validate_and_copy_csv_command(JOB *item, CSVCOL *commandp)
          {
             if(item->type == OTTO_CMD)
             {
-               rc = OTTO_MISSING_COMMAND;
+               rc = OTTO_MISSING_REQUIRED_VALUE;
             }
          }
          if(rc != OTTO_SUCCESS)

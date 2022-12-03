@@ -150,9 +150,10 @@ enum
 #define OTTO_LENGTH_EXCEEDED                         (1L<<21)
 #define OTTO_MALFORMED_ENV_ASSIGNMENT                (1L<<22)
 #define OTTO_MALFORMED_LOOP                          (1L<<23)
-#define OTTO_MISSING_COMMAND                         (1L<<24)
+#define OTTO_MISSING_REQUIRED_VALUE                  (1L<<24)
 #define OTTO_SAME_JOB_BOX_NAMES                      (1L<<25)
 #define OTTO_SAME_NAME                               (1L<<26)
+#define OTTO_SYNTAX_ERROR                            (1L<<27)
 
 #define AS_ASCII               1
 #define AS_HTML                2
@@ -227,7 +228,8 @@ enum JIL_KEYWORDS
    JIL_STRTMIN,
    JIL_STRTTIM,
    JIL_UPD_JOB,
-   JIL_UNSUPPD
+   JIL_UNSUPPD,
+   JIL_BADWORD
 };
 
 // ottodb enumerations

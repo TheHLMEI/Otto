@@ -540,7 +540,7 @@ validate_and_copy_mspdi(MSP_TASKLIST *tasklist, JOBLIST *joblist)
             {
                if(tasklist->item[i].extend[COMMAND] == NULL)
                {
-                  rc = OTTO_MISSING_COMMAND;
+                  rc = OTTO_MISSING_REQUIRED_VALUE;
                }
                else
                {

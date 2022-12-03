@@ -49,7 +49,7 @@ parse_jil(DYNBUF *b, JOBLIST *joblist)
 
       b->line = 0;
       b->s    = b->buffer;
-      while(b->s[0] != '\0')
+      while(retval == OTTO_SUCCESS && b->s[0] != '\0')
       {
          switch(jil_reserved_word(b->s))
          {
@@ -59,13 +59,16 @@ parse_jil(DYNBUF *b, JOBLIST *joblist)
             case JIL_DEL_JOB:
                joblist->nitems++;
                break;
+            case JIL_BADWORD:
+               retval = OTTO_FAIL;
+               break;
             default:
                break;
          }
          advance_word(b);
       }
 
-      if(joblist->nitems == 0)
+      if(retval == OTTO_SUCCESS && joblist->nitems == 0)
          retval = OTTO_FAIL;
    }
 
@@ -385,7 +388,47 @@ jil_reserved_word(char *s)
       default:                                        retval = JIL_UNKNOWN;
    }
 
-   if(retval != JIL_UNKNOWN && retval != JIL_UNSUPPD)
+   // if the result is JIL_UNKNOWN and the word has a colon adjacent to it (perhaps separater
+   // by spaces) the it is probably misspelled or intended to be a keyword Otto dopesn't
+   // recognize.  Warn for that here.
+   if(retval == JIL_UNKNOWN)
+   {
+      // consume the word
+      for(i=0; s[i] != '\0'; i++)
+      {
+         if(isspace(s[i]) || s[i] == ':')
+         {
+            break;
+         }
+      }
+
+      // consume potential spaces
+      for(; s[i] != '\0'; i++)
+      {
+         if(!isspace(s[i]))
+         {
+            break;
+         }
+      }
+
+      // if this is a potential keyword a colon should be the next character
+      if(s[i] == ':')
+      {
+         fprintf(stderr, "ERROR Unrecognized keyword found: '");
+         for(i=0; s[i] != '\0'; i++)
+         {
+            if(isspace(s[i]) || s[i] == ':')
+            {
+               break;
+            }
+            fprintf(stderr, "%c", s[i]);
+         }
+         fprintf(stderr, ":'\n");
+         retval = JIL_BADWORD;
+      }
+   }
+
+   if(retval != JIL_UNKNOWN && retval != JIL_UNSUPPD && retval != JIL_BADWORD)
    {
       // autosys allows whitespace between a keyword and the following
       // colon.  it's easier to parse if it's adjacent so fix it here
@@ -411,7 +454,7 @@ jil_reserved_word(char *s)
       }
    }
 
-   if(retval != JIL_UNKNOWN && retval != JIL_UNSUPPD)
+   if(retval != JIL_UNKNOWN && retval != JIL_UNSUPPD && retval != JIL_BADWORD)
    {
       // a supported JIL keyword (or a manufactured one) was found
       // the jil parser works best with newlines at the end of each
@@ -500,13 +543,15 @@ validate_and_copy_jil_name(JOB *item, char *namep)
       case DELETE_BOX: action = "delete_box"; kind = "box "; break;
    }
 
-   if(namep == NULL)
+   if(namep == NULL || *namep == '\n')
    {
+      rc = OTTO_MISSING_REQUIRED_VALUE;
       retval = OTTO_FAIL;
    }
 
    if(retval == OTTO_SUCCESS && jil_reserved_word(namep) != JIL_UNKNOWN)
    {
+      rc = OTTO_SYNTAX_ERROR;
       retval = OTTO_FAIL;
    }
 
@@ -514,10 +559,13 @@ validate_and_copy_jil_name(JOB *item, char *namep)
    {
       if((rc = ottojob_copy_name(item->name, namep, NAMLEN)) != OTTO_SUCCESS)
       {
-         ottojob_print_name_errors(rc, action, item->name, kind);
-
          retval = OTTO_FAIL;
       }
+   }
+
+   if(retval == OTTO_FAIL)
+   {
+      ottojob_print_name_errors(rc, action, item->name, kind);
    }
 
    return(retval);
@@ -538,23 +586,40 @@ validate_and_copy_jil_type(JOB *item, char *typep)
       case UPDATE_JOB: action = "update_job"; break;
    }
 
-   if(typep != NULL)
+   // it's okay to not have this keyword on an update_job specification
+   if(typep == NULL && item->opcode == CREATE_JOB)
+   {
+      rc = OTTO_MISSING_REQUIRED_VALUE;
+      retval = OTTO_FAIL;
+   }
+
+   // it's never okay to have the keyword with nothing else on the line
+   if(typep != NULL && *typep == '\n')
+   {
+      rc = OTTO_MISSING_REQUIRED_VALUE;
+      retval = OTTO_FAIL;
+   }
+
+   if(retval == OTTO_SUCCESS && jil_reserved_word(typep) != JIL_UNKNOWN)
+   {
+      rc = OTTO_SYNTAX_ERROR;
+      retval = OTTO_FAIL;
+   }
+
+   if(retval == OTTO_SUCCESS)
    {
       item->attributes |= HAS_TYPE;
 
-      if(jil_reserved_word(typep) == JIL_UNKNOWN)
-      {
-         if((rc = ottojob_copy_type(&item->type, typep, TYPLEN)) != OTTO_SUCCESS)
-         {
-            ottojob_print_type_errors(rc, action, item->name, typep);
-
-            retval = OTTO_FAIL;
-         }
-      }
-      else
+      if(typep != NULL &&
+         (rc = ottojob_copy_type(&item->type, typep, TYPLEN)) != OTTO_SUCCESS)
       {
          retval = OTTO_FAIL;
       }
+   }
+
+   if(retval != OTTO_SUCCESS)
+   {
+      ottojob_print_type_errors(rc, action, item->name, typep);
    }
 
    return(retval);
@@ -575,11 +640,25 @@ validate_and_copy_jil_box_name(JOB *item, char *box_namep)
       case UPDATE_JOB: action = "update_job"; break;
    }
 
-   if(box_namep != NULL)
+   // it's okay for this to be NULL in any case but it's not
+   // okay for it to be an empty line on an insert_job action
+   if(box_namep != NULL && *box_namep == '\n' && item->opcode == CREATE_JOB)
+   {
+      rc = OTTO_MISSING_REQUIRED_VALUE;
+      retval = OTTO_FAIL;
+   }
+
+   if(retval == OTTO_SUCCESS && jil_reserved_word(box_namep) != JIL_UNKNOWN)
+   {
+      rc = OTTO_SYNTAX_ERROR;
+      retval = OTTO_FAIL;
+   }
+
+   if(retval == OTTO_SUCCESS && box_namep != NULL)
    {
       item->attributes |= HAS_BOX_NAME;
 
-      if(jil_reserved_word(box_namep) == JIL_UNKNOWN)
+      if(*box_namep != '\n')
       {
          rc = ottojob_copy_name(item->box_name, box_namep, NAMLEN);
          if(item->type == OTTO_BOX && strcmp(item->name, item->box_name) == 0)
@@ -588,17 +667,14 @@ validate_and_copy_jil_box_name(JOB *item, char *box_namep)
          }
          if(rc != OTTO_SUCCESS)
          {
-            ottojob_print_box_name_errors(rc, action, item->name, item->box_name);
-
             retval = OTTO_FAIL;
          }
       }
-      else
-      {
-         // only a problem if creating a job
-         if(item->opcode == CREATE_JOB)
-            retval = OTTO_FAIL;
-      }
+   }
+
+   if(retval != OTTO_SUCCESS)
+   {
+      ottojob_print_box_name_errors(rc, action, item->name, item->box_name);
    }
 
    return(retval);
@@ -619,24 +695,37 @@ validate_and_copy_jil_command(JOB *item, char *commandp)
       case UPDATE_JOB: action = "update_job"; break;
    }
 
-   if(commandp != NULL)
+   // it's okay for this to be NULL in any case since the requirements
+   // check on job_type vs command will be done later. but it's not
+   // okay for it to be an empty line on an insert_job action
+   if(commandp != NULL && *commandp == '\n' && item->opcode == CREATE_JOB)
+   {
+      rc = OTTO_MISSING_REQUIRED_VALUE;
+      retval = OTTO_FAIL;
+   }
+
+   if(retval == OTTO_SUCCESS && jil_reserved_word(commandp) != JIL_UNKNOWN)
+   {
+      rc = OTTO_SYNTAX_ERROR;
+      retval = OTTO_FAIL;
+   }
+
+   if(retval == OTTO_SUCCESS && commandp != NULL)
    {
       item->attributes |= HAS_COMMAND;
 
-      if(jil_reserved_word(commandp) == JIL_UNKNOWN)
+      if(*commandp != '\n')
       {
-         rc = ottojob_copy_command(item->command, commandp, CMDLEN);
-         if(item->type == OTTO_CMD && item->command[0] == '\0')
+         if((rc = ottojob_copy_command(item->command, commandp, CMDLEN)) != OTTO_SUCCESS)
          {
-            rc |= OTTO_MISSING_COMMAND;
-         }
-         if(rc != OTTO_SUCCESS)
-         {
-            ottojob_print_command_errors(rc, action, item->name, CMDLEN);
-
             retval = OTTO_FAIL;
          }
       }
+   }
+
+   if(rc != OTTO_SUCCESS)
+   {
+      ottojob_print_command_errors(rc, action, item->name, CMDLEN);
    }
 
    return(retval);
@@ -657,25 +746,36 @@ validate_and_copy_jil_condition(JOB *item, char *conditionp)
       case UPDATE_JOB: action = "update_job"; break;
    }
 
-   if(conditionp != NULL)
+   // it's okay for this to be NULL in any case but it's not
+   // okay for it to be an empty line on an insert_job action
+   if(conditionp != NULL && *conditionp == '\n' && item->opcode == CREATE_JOB)
+   {
+      rc = OTTO_MISSING_REQUIRED_VALUE;
+      retval = OTTO_FAIL;
+   }
+
+   if(retval == OTTO_SUCCESS && jil_reserved_word(conditionp) != JIL_UNKNOWN)
+   {
+      rc = OTTO_SYNTAX_ERROR;
+      retval = OTTO_FAIL;
+   }
+
+   if(retval == OTTO_SUCCESS && conditionp != NULL)
    {
       item->attributes |= HAS_CONDITION;
 
-      if(jil_reserved_word(conditionp) == JIL_UNKNOWN)
+      if(*conditionp != '\n')
       {
          if((rc = ottojob_copy_condition(item->condition, conditionp, CNDLEN)) != OTTO_SUCCESS)
          {
-            ottojob_print_condition_errors(rc, action, item->name, CMDLEN);
-
             retval = OTTO_FAIL;
          }
       }
-      else
-      {
-         // only a problem if creating a job
-         if(item->opcode == CREATE_JOB)
-            retval = OTTO_FAIL;
-      }
+   }
+
+   if(retval != OTTO_SUCCESS)
+   {
+      ottojob_print_condition_errors(rc, action, item->name, CMDLEN);
    }
 
    return(retval);
@@ -696,19 +796,36 @@ validate_and_copy_jil_description(JOB *item, char *descriptionp)
       case UPDATE_JOB: action = "update_job"; break;
    }
 
-   if(descriptionp != NULL)
+   // it's okay for this to be NULL in any case but it's not
+   // okay for it to be an empty line on an insert_job action
+   if(descriptionp != NULL && *descriptionp == '\n' && item->opcode == CREATE_JOB)
+   {
+      rc = OTTO_MISSING_REQUIRED_VALUE;
+      retval = OTTO_FAIL;
+   }
+
+   if(retval == OTTO_SUCCESS && jil_reserved_word(descriptionp) != JIL_UNKNOWN)
+   {
+      rc = OTTO_SYNTAX_ERROR;
+      retval = OTTO_FAIL;
+   }
+
+   if(retval == OTTO_SUCCESS && descriptionp != NULL)
    {
       item->attributes |= HAS_DESCRIPTION;
 
-      if(jil_reserved_word(descriptionp) == JIL_UNKNOWN)
+      if(*descriptionp != '\n')
       {
          if((rc = ottojob_copy_description(item->description, descriptionp, DSCLEN)) != OTTO_SUCCESS)
          {
-            ottojob_print_description_errors(rc, action, item->name, DSCLEN);
-
             retval = OTTO_FAIL;
          }
       }
+   }
+
+   if(retval != OTTO_SUCCESS)
+   {
+      ottojob_print_description_errors(rc, action, item->name, DSCLEN);
    }
 
    return(retval);
@@ -729,19 +846,36 @@ validate_and_copy_jil_environment(JOB *item, char *environmentp)
       case UPDATE_JOB: action = "update_job"; break;
    }
 
-   if(environmentp != NULL)
+   // it's okay for this to be NULL in any case but it's not
+   // okay for it to be an empty line on an insert_job action
+   if(environmentp != NULL && *environmentp == '\n' && item->opcode == CREATE_JOB)
+   {
+      rc = OTTO_MISSING_REQUIRED_VALUE;
+      retval = OTTO_FAIL;
+   }
+
+   if(retval == OTTO_SUCCESS && jil_reserved_word(environmentp) != JIL_UNKNOWN)
+   {
+      rc = OTTO_SYNTAX_ERROR;
+      retval = OTTO_FAIL;
+   }
+
+   if(retval == OTTO_SUCCESS && environmentp != NULL)
    {
       item->attributes |= HAS_ENVIRONMENT;
 
-      if(jil_reserved_word(environmentp) == JIL_UNKNOWN)
+      if(*environmentp != '\n')
       {
          if((rc = ottojob_copy_environment(item->environment, environmentp, ENVLEN)) != OTTO_SUCCESS)
          {
-            ottojob_print_environment_errors(rc, action, item->name, ENVLEN);
-
             retval = OTTO_FAIL;
          }
       }
+   }
+
+   if(retval != OTTO_SUCCESS)
+   {
+      ottojob_print_environment_errors(rc, action, item->name, ENVLEN);
    }
 
    return(retval);
@@ -762,26 +896,34 @@ validate_and_copy_jil_auto_hold(JOB *item, char *auto_holdp)
       case UPDATE_JOB: action = "update_job"; break;
    }
 
-   if(auto_holdp != NULL)
+   // it's okay for this to be NULL in any case but it's never
+   // okay for it to be an empty line
+   if(auto_holdp != NULL && *auto_holdp == '\n')
+   {
+      rc = OTTO_MISSING_REQUIRED_VALUE;
+      retval = OTTO_FAIL;
+   }
+
+   if(retval == OTTO_SUCCESS && jil_reserved_word(auto_holdp) != JIL_UNKNOWN)
+   {
+      rc = OTTO_SYNTAX_ERROR;
+      retval = OTTO_FAIL;
+   }
+
+   if(retval == OTTO_SUCCESS)
    {
       item->attributes |= HAS_AUTO_HOLD;
 
-      if(jil_reserved_word(auto_holdp) == JIL_UNKNOWN)
+      if((rc = ottojob_copy_flag(&item->autohold, auto_holdp, FLGLEN)) != OTTO_SUCCESS)
       {
-         if((rc = ottojob_copy_flag(&item->autohold, auto_holdp, FLGLEN)) != OTTO_SUCCESS)
-         {
-            ottojob_print_auto_hold_errors(rc, action, item->name, auto_holdp);
+         retval = OTTO_FAIL;
+      }
+      item->on_autohold = item->autohold;
+   }
 
-            retval = OTTO_FAIL;
-         }
-         item->on_autohold = item->autohold;
-      }
-      else
-      {
-         // only a problem if creating a job
-         if(item->opcode == CREATE_JOB)
-            retval = OTTO_FAIL;
-      }
+   if(retval != OTTO_SUCCESS)
+   {
+      ottojob_print_auto_hold_errors(rc, action, item->name, auto_holdp);
    }
 
    return(retval);
@@ -918,11 +1060,25 @@ validate_and_copy_jil_loop(JOB *item, char *loopp)
       case UPDATE_JOB: action = "update_job"; break;
    }
 
-   if(loopp != NULL)
+   // it's okay for this to be NULL in any case but it's not
+   // okay for it to be an empty line on an insert_job action
+   if(loopp != NULL && *loopp == '\n' && item->opcode == CREATE_JOB)
+   {
+      rc = OTTO_MISSING_REQUIRED_VALUE;
+      retval = OTTO_FAIL;
+   }
+
+   if(retval == OTTO_SUCCESS && jil_reserved_word(loopp) != JIL_UNKNOWN)
+   {
+      rc = OTTO_SYNTAX_ERROR;
+      retval = OTTO_FAIL;
+   }
+
+   if(retval == OTTO_SUCCESS && loopp != NULL)
    {
       item->attributes |= HAS_LOOP;
 
-      if(jil_reserved_word(loopp) == JIL_UNKNOWN)
+      if(*loopp != '\n')
       {
          if((rc = ottojob_copy_loop(item->loopname, &item->loopmin, &item->loopmax,  &item->loopsgn,  loopp)) != OTTO_SUCCESS)
          {
@@ -931,12 +1087,11 @@ validate_and_copy_jil_loop(JOB *item, char *loopp)
             retval = OTTO_FAIL;
          }
       }
-      else
-      {
-         // only a problem if creating a job
-         if(item->opcode == CREATE_JOB)
-            retval = OTTO_FAIL;
-      }
+   }
+
+   if(retval != OTTO_SUCCESS)
+   {
+      ottojob_print_loop_errors(rc, action, item->name);
    }
 
    return(retval);
@@ -952,32 +1107,49 @@ validate_and_copy_jil_new_name(JOB *item, char *new_namep)
    int rc;
 
    // don't perform a name change on anything but an update
-   if(item->opcode == UPDATE_JOB)
+   if(item->opcode != UPDATE_JOB)
    {
-      if(new_namep != NULL)
+      rc = OTTO_INVALID_APPLICATION;
+      retval = OTTO_FAIL;
+   }
+
+   // it's okay for this to be NULL but it's not
+   // okay for it to be an empty line
+   if(new_namep != NULL && *new_namep == '\n')
+   {
+      rc = OTTO_MISSING_REQUIRED_VALUE;
+      retval = OTTO_FAIL;
+   }
+
+   if(retval == OTTO_SUCCESS && jil_reserved_word(new_namep) != JIL_UNKNOWN)
+   {
+      rc = OTTO_SYNTAX_ERROR;
+      retval = OTTO_FAIL;
+   }
+
+   if(retval == OTTO_SUCCESS && new_namep != NULL)
+   {
+      item->attributes |= HAS_NEW_NAME;
+
+      rc = ottojob_copy_name(item->expression, new_namep, NAMLEN);
+      if(strcmp(item->name, item->expression) == 0)
       {
-         item->attributes |= HAS_NEW_NAME;
-
-         if(jil_reserved_word(new_namep) == JIL_UNKNOWN)
-         {
-            rc = ottojob_copy_name(item->expression, new_namep, NAMLEN);
-            if(strcmp(item->name, item->expression) == 0)
-            {
-               rc |= OTTO_SAME_NAME;
-            }
-            if(strcmp(item->box_name, item->expression) == 0)
-            {
-               rc |= OTTO_SAME_JOB_BOX_NAMES;
-            }
-
-            if((rc = ottojob_copy_name(item->expression, new_namep, NAMLEN)) != OTTO_SUCCESS)
-            {
-               ottojob_print_new_name_errors(rc, action, item->name, item->expression);
-
-               retval = OTTO_FAIL;
-            }
-         }
+         rc |= OTTO_SAME_NAME;
       }
+      if(strcmp(item->box_name, item->expression) == 0)
+      {
+         rc |= OTTO_SAME_JOB_BOX_NAMES;
+      }
+
+      if(rc != OTTO_SUCCESS)
+      {
+         retval = OTTO_FAIL;
+      }
+   }
+
+   if(retval != OTTO_SUCCESS)
+   {
+      ottojob_print_new_name_errors(rc, action, item->name, item->expression);
    }
 
    return(retval);
@@ -993,22 +1165,34 @@ validate_and_copy_jil_start(JOB *item, char *startp)
    int rc;
 
    // don't perform a start time change on anything but an update
-   if(item->opcode == UPDATE_JOB)
+   if(item->opcode != UPDATE_JOB)
    {
-      if(startp != NULL)
+      rc = OTTO_INVALID_APPLICATION;
+      retval = OTTO_FAIL;
+   }
+
+   if(retval == OTTO_SUCCESS && jil_reserved_word(startp) != JIL_UNKNOWN)
+   {
+      rc = OTTO_SYNTAX_ERROR;
+      retval = OTTO_FAIL;
+   }
+
+   if(retval == OTTO_SUCCESS && startp != NULL)
+   {
+      item->attributes |= HAS_START;
+
+      if(*startp != '\n')
       {
-         item->attributes |= HAS_START;
-
-         if(jil_reserved_word(startp) == JIL_UNKNOWN)
+         if((rc = ottojob_copy_time(&item->start, startp)) != OTTO_SUCCESS)
          {
-            if((rc = ottojob_copy_time(&item->start, startp)) != OTTO_SUCCESS)
-            {
-               ottojob_print_start_errors(rc, action, item->name);
-
-               retval = OTTO_FAIL;
-            }
+            retval = OTTO_FAIL;
          }
       }
+   }
+
+   if(retval != OTTO_SUCCESS)
+   {
+      ottojob_print_start_errors(rc, action, item->name);
    }
 
    return(retval);
@@ -1024,22 +1208,34 @@ validate_and_copy_jil_finish(JOB *item, char *finishp)
    int rc;
 
    // don't perform a finish time change on anything but an update
-   if(item->opcode == UPDATE_JOB)
+   if(item->opcode != UPDATE_JOB)
    {
-      if(finishp != NULL)
+      rc = OTTO_INVALID_APPLICATION;
+      retval = OTTO_FAIL;
+   }
+
+   if(retval == OTTO_SUCCESS && jil_reserved_word(finishp) != JIL_UNKNOWN)
+   {
+      rc = OTTO_SYNTAX_ERROR;
+      retval = OTTO_FAIL;
+   }
+
+   if(retval == OTTO_SUCCESS && finishp != NULL)
+   {
+      item->attributes |= HAS_FINISH;
+
+      if(*finishp != '\n')
       {
-         item->attributes |= HAS_FINISH;
-
-         if(jil_reserved_word(finishp) == JIL_UNKNOWN)
+         if((rc = ottojob_copy_time(&item->finish, finishp)) != OTTO_SUCCESS)
          {
-            if((rc = ottojob_copy_time(&item->finish, finishp)) != OTTO_SUCCESS)
-            {
-               ottojob_print_finish_errors(rc, action, item->name);
-
-               retval = OTTO_FAIL;
-            }
+            retval = OTTO_FAIL;
          }
       }
+   }
+
+   if(retval != OTTO_SUCCESS)
+   {
+      ottojob_print_finish_errors(rc, action, item->name);
    }
 
    return(retval);
@@ -1054,11 +1250,15 @@ advance_jilword(DYNBUF *b)
    while(!isspace(*(b->s)) && *(b->s) != ':' && *(b->s) != '\0')
       b->s++;
 
-   // consume space
+   // consume space but break if a newline is found since that
+   // would indicate an empty value for a jil keyword
    while((isspace(*(b->s)) || *(b->s) == ':') && *(b->s) != '\0')
    {
       if(*(b->s) == '\n')
+      {
          b->line++;
+         break;
+      }
       b->s++;
    }
 }

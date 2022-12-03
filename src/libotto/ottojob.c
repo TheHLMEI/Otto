@@ -1771,7 +1771,7 @@ ottojob_print_command_errors(int error_mask, char *action, char *name, int outle
 {
    int retval = 0;
 
-   if(error_mask & OTTO_MISSING_COMMAND)
+   if(error_mask & OTTO_MISSING_REQUIRED_VALUE)
    {
       fprintf(stderr, "ERROR for %s: %s < required \"command\" is missing >.\n", action, name);
       retval++;
