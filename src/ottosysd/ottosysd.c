@@ -553,6 +553,10 @@ fire_this_minute(int this_wday, int this_hour, int this_min)
    int do_check = OTTO_FALSE;
    int expr_ret;
 
+   // don't start any new jobs if the daemon is paused
+   if(cfg.pause == OTTO_TRUE)
+      return;
+
    // only do work if this hour on this minute has a job to fire off
    if(check_times[this_wday][this_hour] & (1L << this_min))
    {
@@ -1682,6 +1686,10 @@ check_reset_chain(int id)
 void
 force_start_job(int id)
 {
+   // don't start any new jobs if the daemon is paused
+   if(cfg.pause == OTTO_TRUE)
+      return;
+
    switch(job[id].type)
    {
       case OTTO_BOX:
@@ -1698,6 +1706,10 @@ force_start_job(int id)
 void
 start_job(int id)
 {
+   // don't start any new jobs if the daemon is paused
+   if(cfg.pause == OTTO_TRUE)
+      return;
+
    if(job[id].status != STAT_OH &&
       job[id].status != STAT_RU)
    {
