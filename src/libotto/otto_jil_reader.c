@@ -945,38 +945,72 @@ validate_and_copy_jil_date_conditions(JOB *item, char *date_conditionsp, char *d
    int     i;
    int     rc = OTTO_SUCCESS;
 
+   // set bitmask describing state of inbound data
+   if(date_conditionsp != NULL) {if(*date_conditionsp == '\n') {date_check |= DTECOND_EMPTY;} else {date_check |= DTECOND_CHECK;}}
+   if(days_of_weekp    != NULL) {if(*days_of_weekp    == '\n') {date_check |= DYSOFWK_EMPTY;} else {date_check |= DYSOFWK_CHECK;}}
+   if(start_minsp      != NULL) {if(*start_minsp      == '\n') {date_check |= STRTMNS_EMPTY;} else {date_check |= STRTMNS_CHECK;}}
+   if(start_timesp     != NULL) {if(*start_timesp     == '\n') {date_check |= STRTTMS_EMPTY;} else {date_check |= STRTTMS_CHECK;}}
+
    switch(item->opcode)
    {
-      case CREATE_JOB: action = "insert_job"; break;
-      case UPDATE_JOB: action = "update_job"; break;
+      case CREATE_JOB:
+         action = "insert_job";
+
+         // check if a valid comination of date conditions attributes was specified
+         switch(date_check)
+         {
+            case 0:
+               // do nothing
+               break;
+            case (DTECOND_CHECK | DYSOFWK_CHECK | STRTMNS_CHECK):
+            case (DTECOND_CHECK | DYSOFWK_CHECK | STRTTMS_CHECK):
+               if(item->box_name[0] != '\0')
+               {
+                  rc = OTTO_INVALID_APPLICATION;
+               }
+               else
+               {
+                  parse_date_conditions = OTTO_TRUE;
+               }
+               break;
+            default:
+               rc = OTTO_INVALID_COMBINATION;
+               break;
+         }
+
+         break;
+      case UPDATE_JOB:
+         action = "update_job";
+
+         // check if a valid comination of date conditions attributes was specified
+         switch(date_check)
+         {
+            case 0:
+               // do nothing
+               break;
+            case (DTECOND_EMPTY):
+            case (DTECOND_EMPTY | DYSOFWK_EMPTY | STRTMNS_EMPTY | STRTTMS_EMPTY):
+            case (DTECOND_CHECK | DYSOFWK_CHECK | STRTMNS_CHECK):
+            case (DTECOND_CHECK | DYSOFWK_CHECK | STRTMNS_CHECK | STRTTMS_EMPTY):
+            case (DTECOND_CHECK | DYSOFWK_CHECK | STRTTMS_CHECK):
+            case (DTECOND_CHECK | DYSOFWK_CHECK | STRTMNS_EMPTY | STRTTMS_CHECK):
+               if(item->box_name[0] != '\0')
+               {
+                  rc = OTTO_INVALID_APPLICATION;
+               }
+               else
+               {
+                  parse_date_conditions = OTTO_TRUE;
+               }
+               break;
+            default:
+               rc = OTTO_INVALID_COMBINATION;
+               break;
+         }
+
+         break;
    }
 
-   // check if a valid comination of date conditions attributes was specified
-   if(date_conditionsp != NULL && jil_reserved_word(date_conditionsp) == JIL_UNKNOWN) date_check |= DTECOND_BIT;
-   if(days_of_weekp    != NULL && jil_reserved_word(days_of_weekp)    == JIL_UNKNOWN) date_check |= DYSOFWK_BIT;
-   if(start_minsp      != NULL && jil_reserved_word(start_minsp)      == JIL_UNKNOWN) date_check |= STRTMNS_BIT;
-   if(start_timesp     != NULL && jil_reserved_word(start_timesp)     == JIL_UNKNOWN) date_check |= STRTTMS_BIT;
-
-   switch(date_check)
-   {
-      case 0:
-         // do nothing
-         break;
-      case (DTECOND_BIT | DYSOFWK_BIT | STRTMNS_BIT):
-      case (DTECOND_BIT | DYSOFWK_BIT | STRTTMS_BIT):
-         if(item->box_name[0] != '\0')
-         {
-            rc = OTTO_INVALID_APPLICATION;
-         }
-         else
-         {
-            parse_date_conditions = OTTO_TRUE;
-         }
-         break;
-      default:
-         rc = OTTO_INVALID_COMBINATION;
-         break;
-   }
    if(rc != OTTO_SUCCESS)
    {
       ottojob_print_date_conditions_errors(rc, action, item->name, date_conditionsp);
@@ -987,58 +1021,66 @@ validate_and_copy_jil_date_conditions(JOB *item, char *date_conditionsp, char *d
 
    if(parse_date_conditions == OTTO_TRUE)
    {
-      if((rc = ottojob_copy_flag(&date_conditions, date_conditionsp, FLGLEN)) != OTTO_SUCCESS)
+      // quick and dirty if an update job is just trying to clear date consitions
+      if(date_check & DTECOND_EMPTY)
       {
-         ottojob_print_date_conditions_errors(rc, action, item->name, date_conditionsp);
-
-         retval = OTTO_FAIL;
+         item->attributes |= HAS_DATE_CONDITIONS;
       }
-
-      if((rc = ottojob_copy_days_of_week(&days_of_week, days_of_weekp)) != OTTO_SUCCESS)
+      else
       {
-         ottojob_print_days_of_week_errors(rc, action, item->name);
-
-         retval = OTTO_FAIL;
-      }
-
-      if(start_minsp != NULL)
-      {
-         if((rc = ottojob_copy_start_minutes(&start_minutes, start_minsp)) != OTTO_SUCCESS)
+         if((rc = ottojob_copy_flag(&date_conditions, date_conditionsp, FLGLEN)) != OTTO_SUCCESS)
          {
-            ottojob_print_start_mins_errors(rc, action, item->name);
+            ottojob_print_date_conditions_errors(rc, action, item->name, date_conditionsp);
 
             retval = OTTO_FAIL;
          }
-      }
 
-      if(start_timesp != NULL)
-      {
-         if((rc = ottojob_copy_start_times(start_times, start_timesp)) != OTTO_SUCCESS)
+         if((rc = ottojob_copy_days_of_week(&days_of_week, days_of_weekp)) != OTTO_SUCCESS)
          {
-            ottojob_print_start_times_errors(rc, action, item->name);
+            ottojob_print_days_of_week_errors(rc, action, item->name);
 
             retval = OTTO_FAIL;
          }
-      }
 
-      if(retval == OTTO_SUCCESS)
-      {
-         // assume the job uses start times
-         item->date_conditions = OTTO_USE_START_TIMES;
-
-         // modify if it's using start_minutes
-         if(start_minsp != NULL)
+         if(date_check & STRTMNS_CHECK)
          {
-            item->date_conditions = OTTO_USE_START_MINUTES;
-            for(i=0; i<24; i++)
-               start_times[i] = start_minutes;
+            if((rc = ottojob_copy_start_minutes(&start_minutes, start_minsp)) != OTTO_SUCCESS)
+            {
+               ottojob_print_start_mins_errors(rc, action, item->name);
+
+               retval = OTTO_FAIL;
+            }
          }
 
-         // copy the data to the structure
-         item->attributes    |= HAS_DATE_CONDITIONS;
-         item->days_of_week   = days_of_week;
-         item->start_minutes  = start_minutes;
-         memcpy(item->start_times, start_times, sizeof(start_times));
+         if(date_check & STRTTMS_CHECK)
+         {
+            if((rc = ottojob_copy_start_times(start_times, start_timesp)) != OTTO_SUCCESS)
+            {
+               ottojob_print_start_times_errors(rc, action, item->name);
+
+               retval = OTTO_FAIL;
+            }
+         }
+
+         if(retval == OTTO_SUCCESS)
+         {
+            // assume the job uses start times
+            item->date_conditions = OTTO_USE_START_TIMES;
+
+            // modify if it's using start_minutes
+            if(start_minsp != NULL)
+            {
+               item->date_conditions = OTTO_USE_START_MINUTES;
+               for(i=0; i<24; i++)
+                  start_times[i] = start_minutes;
+            }
+
+            // copy the data to the structure
+            item->attributes    |= HAS_DATE_CONDITIONS;
+            item->days_of_week   = days_of_week;
+            item->start_minutes  = start_minutes;
+            memcpy(item->start_times, start_times, sizeof(start_times));
+         }
       }
    }
 

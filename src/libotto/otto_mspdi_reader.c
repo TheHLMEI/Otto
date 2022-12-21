@@ -618,10 +618,10 @@ validate_and_copy_mspdi(MSP_TASKLIST *tasklist, JOBLIST *joblist)
             // check if a valid combination of date conditions attributes was specified
             rc = OTTO_SUCCESS;
             date_check = 0;
-            if(tasklist->item[i].extend[DATE_CONDITIONS] != NULL) date_check |= DTECOND_BIT;
-            if(tasklist->item[i].extend[DAYS_OF_WEEK]    != NULL) date_check |= DYSOFWK_BIT;
-            if(tasklist->item[i].extend[START_MINUTES]   != NULL) date_check |= STRTMNS_BIT;
-            if(tasklist->item[i].extend[START_TIMES]     != NULL) date_check |= STRTTMS_BIT;
+            if(tasklist->item[i].extend[DATE_CONDITIONS] != NULL) date_check |= DTECOND_CHECK;
+            if(tasklist->item[i].extend[DAYS_OF_WEEK]    != NULL) date_check |= DYSOFWK_CHECK;
+            if(tasklist->item[i].extend[START_MINUTES]   != NULL) date_check |= STRTMNS_CHECK;
+            if(tasklist->item[i].extend[START_TIMES]     != NULL) date_check |= STRTTMS_CHECK;
 
             parse_date_conditions = OTTO_FALSE;
             switch(date_check)
@@ -629,8 +629,8 @@ validate_and_copy_mspdi(MSP_TASKLIST *tasklist, JOBLIST *joblist)
                case 0:
                   // do nothing
                   break;
-               case (DTECOND_BIT | DYSOFWK_BIT | STRTMNS_BIT):
-               case (DTECOND_BIT | DYSOFWK_BIT | STRTTMS_BIT):
+               case (DTECOND_CHECK | DYSOFWK_CHECK | STRTMNS_CHECK):
+               case (DTECOND_CHECK | DYSOFWK_CHECK | STRTTMS_CHECK):
                   if(tasklist->item[i].level > 0)
                   {
                      rc = OTTO_INVALID_APPLICATION;
@@ -678,7 +678,7 @@ validate_and_copy_mspdi(MSP_TASKLIST *tasklist, JOBLIST *joblist)
                joblist->item[i].date_conditions = OTTO_USE_START_TIMES;
 
                // modify if it's using start_mins
-               if(date_check & STRTMNS_BIT)
+               if(date_check & STRTMNS_CHECK)
                {
                   joblist->item[i].date_conditions = OTTO_USE_START_MINUTES;
                   for(j=0; j<24; j++)

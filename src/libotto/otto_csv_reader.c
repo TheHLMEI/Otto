@@ -434,7 +434,7 @@ validate_and_copy_csv_name(JOB *item, CSVCOL *namep)
    char *action = "action";
    char *kind   = "";
    int rc;
-   char name[NAMLEN+5];
+   char s_name[NAMLEN+5];
 
    switch(item->opcode)
    {
@@ -444,33 +444,36 @@ validate_and_copy_csv_name(JOB *item, CSVCOL *namep)
       case DELETE_BOX: action = "delete"; kind = "box "; break;
    }
 
-   // reset pointer if its first character is ','
-   if(namep != NULL && *namep->start == ',') namep = NULL;
+   // get the data into a local variable
+   if(namep != NULL) csv_getcol(s_name, sizeof(s_name), namep, WITHOUT_QUOTES);
 
-   if(namep == NULL)
+   // reset the pointer if the string version is empty
+   if(namep != NULL && s_name[0] == '\0') namep = NULL;
+
+   if(namep == NULL || s_name[0] == '\n')
    {
+      rc = OTTO_MISSING_REQUIRED_VALUE;
       retval = OTTO_FAIL;
-   }
-   else
-   {
-      // unpack the value - convert to what it would look like in JIL
-      csv_getcol(name, sizeof(name), namep, WITHOUT_QUOTES);
    }
 
    // compatibility check with JIL
-   if(retval == OTTO_SUCCESS && jil_reserved_word(name) != JIL_UNKNOWN)
+   if(retval == OTTO_SUCCESS && jil_reserved_word(s_name) != JIL_UNKNOWN)
    {
+      rc = OTTO_SYNTAX_ERROR;
       retval = OTTO_FAIL;
    }
 
    if(retval == OTTO_SUCCESS)
    {
-      if((rc = ottojob_copy_name(item->name, name, NAMLEN)) != OTTO_SUCCESS)
+      if((rc = ottojob_copy_name(item->name, s_name, NAMLEN)) != OTTO_SUCCESS)
       {
-         ottojob_print_name_errors(rc, action, item->name, kind);
-
          retval = OTTO_FAIL;
       }
+   }
+
+   if(retval == OTTO_FAIL)
+   {
+      ottojob_print_name_errors(rc, action, item->name, kind);
    }
 
    return(retval);
@@ -484,7 +487,7 @@ validate_and_copy_csv_type(JOB *item, CSVCOL *typep)
    int retval = OTTO_SUCCESS;
    char *action = "action";
    int rc;
-   char type[10];
+   char s_type[10];
 
    switch(item->opcode)
    {
@@ -492,36 +495,47 @@ validate_and_copy_csv_type(JOB *item, CSVCOL *typep)
       case UPDATE_JOB: action = "update_job"; break;
    }
 
-   // reset pointer if its first character is ','
-   if(typep != NULL && *typep->start == ',') typep = NULL;
+   // get the data into a local variable
+   if(typep != NULL) csv_getcol(s_type, sizeof(s_type), typep, WITHOUT_QUOTES);
 
-   if(typep == NULL)  // must have a type
+   // reset the pointer if the string version is empty
+   if(typep != NULL && s_type[0] == '\0') typep = NULL;
+
+   // it's okay to not have this keyword on an update_job specification
+   if(typep == NULL && item->opcode == CREATE_JOB)
    {
+      rc = OTTO_MISSING_REQUIRED_VALUE;
       retval = OTTO_FAIL;
    }
-   else
+
+   // it's never okay to have the keyword with nothing else on the line
+   if(typep != NULL && s_type[0] == '\n')
    {
-      // unpack the value - convert to what it would look like in JIL
-      csv_getcol(type, sizeof(type), typep, WITHOUT_QUOTES);
+      rc = OTTO_MISSING_REQUIRED_VALUE;
+      retval = OTTO_FAIL;
+   }
 
-      if(type[0] != '\0')
-      {
-         item->attributes |= HAS_TYPE;
+   // compatibility check with JIL
+   if(retval == OTTO_SUCCESS && jil_reserved_word(s_type) != JIL_UNKNOWN)
+   {
+      rc = OTTO_SYNTAX_ERROR;
+      retval = OTTO_FAIL;
+   }
 
-         if(jil_reserved_word(type) == JIL_UNKNOWN)
-         {
-            if((rc = ottojob_copy_type(&item->type, type, TYPLEN)) != OTTO_SUCCESS)
-            {
-               ottojob_print_type_errors(rc, action, item->name, type);
+   if(retval == OTTO_SUCCESS)
+   {
+      item->attributes |= HAS_TYPE;
 
-               retval = OTTO_FAIL;
-            }
-         }
-      }
-      else
+      if(typep != NULL &&
+         (rc = ottojob_copy_type(&item->type, s_type, TYPLEN)) != OTTO_SUCCESS)
       {
          retval = OTTO_FAIL;
       }
+   }
+
+   if(retval != OTTO_SUCCESS)
+   {
+      ottojob_print_type_errors(rc, action, item->name, s_type);
    }
 
    return(retval);
@@ -535,7 +549,7 @@ validate_and_copy_csv_box_name(JOB *item, CSVCOL *box_namep)
    int retval = OTTO_SUCCESS;
    char *action = "action";
    int rc;
-   char box_name[NAMLEN+5];
+   char s_box_name[NAMLEN+5];
 
    switch(item->opcode)
    {
@@ -543,38 +557,48 @@ validate_and_copy_csv_box_name(JOB *item, CSVCOL *box_namep)
       case UPDATE_JOB: action = "update_job"; break;
    }
 
-   // reset pointer if its first character is ','
-   if(box_namep != NULL && *box_namep->start == ',') box_namep = NULL;
+   // get the data into a local variable
+   if(box_namep != NULL) csv_getcol(s_box_name, sizeof(s_box_name), box_namep, WITHOUT_QUOTES);
 
-   if(box_namep != NULL)
+   // reset the pointer if the string version is empty
+   if(box_namep != NULL && s_box_name[0] == '\0') box_namep = NULL;
+
+   // it's okay for this to be NULL in any case but it's not
+   // okay for it to be an empty line on an insert_job action
+   if(box_namep != NULL && s_box_name[0] == '\n' && item->opcode == CREATE_JOB)
    {
-      // unpack the value - convert to what it would look like in JIL
-      csv_getcol(box_name, sizeof(box_name), box_namep, WITHOUT_QUOTES);
+      rc = OTTO_MISSING_REQUIRED_VALUE;
+      retval = OTTO_FAIL;
+   }
 
-      if(box_name[0] != '\0')
+   // compatibility check with JIL
+   if(retval == OTTO_SUCCESS && jil_reserved_word(s_box_name) != JIL_UNKNOWN)
+   {
+      rc = OTTO_SYNTAX_ERROR;
+      retval = OTTO_FAIL;
+   }
+
+   if(retval == OTTO_SUCCESS && box_namep != NULL)
+   {
+      item->attributes |= HAS_BOX_NAME;
+
+      if(s_box_name[0] != '\n')
       {
-         item->attributes |= HAS_BOX_NAME;
-
-         // only try to copy data if the first character isn't a bang
-         if(box_name[0] != '!')
+         rc = ottojob_copy_name(item->box_name, s_box_name, NAMLEN);
+         if(item->type == OTTO_BOX && strcmp(item->name, item->box_name) == 0)
          {
-            if(jil_reserved_word(box_name) == JIL_UNKNOWN)
-            {
-               rc = ottojob_copy_name(item->box_name, box_name, NAMLEN);
-               if(item->type == OTTO_BOX && strcmp(item->name, item->box_name) == 0)
-               {
-                  rc |= OTTO_SAME_JOB_BOX_NAMES;
-               }
-
-               if(rc != OTTO_SUCCESS)
-               {
-                  ottojob_print_box_name_errors(rc, action, item->name, item->box_name);
-
-                  retval = OTTO_FAIL;
-               }
-            }
+            rc |= OTTO_SAME_JOB_BOX_NAMES;
+         }
+         if(rc != OTTO_SUCCESS)
+         {
+            retval = OTTO_FAIL;
          }
       }
+   }
+
+   if(retval != OTTO_SUCCESS)
+   {
+      ottojob_print_box_name_errors(rc, action, item->name, item->box_name);
    }
 
    return(retval);
@@ -588,7 +612,7 @@ validate_and_copy_csv_command(JOB *item, CSVCOL *commandp)
    int retval = OTTO_SUCCESS;
    char *action = "action";
    int rc;
-   char command[CMDLEN+5];
+   char s_command[CMDLEN+5];
 
    switch(item->opcode)
    {
@@ -596,40 +620,44 @@ validate_and_copy_csv_command(JOB *item, CSVCOL *commandp)
       case UPDATE_JOB: action = "update_job"; break;
    }
 
-   // reset pointer if its first character is ','
-   if(commandp != NULL && *commandp->start == ',') commandp = NULL;
+   // get the data into a local variable
+   if(commandp != NULL) csv_getcol(s_command, sizeof(s_command), commandp, WITHOUT_QUOTES);
 
-   if(commandp != NULL)
+   // reset the pointer if the string version is empty
+   if(commandp != NULL && s_command[0] == '\0') commandp = NULL;
+
+   // it's okay for this to be NULL in any case since the requirements
+   // check on job_type vs command will be done later. but it's not
+   // okay for it to be an empty line on an insert_job action
+   if(commandp != NULL && s_command[0] == '\n' && item->opcode == CREATE_JOB)
    {
-      // unpack the value - convert to what it would look like in JIL
-      csv_getcol(command, sizeof(command), commandp, WITHOUT_QUOTES);
+      rc = OTTO_MISSING_REQUIRED_VALUE;
+      retval = OTTO_FAIL;
+   }
 
-      if(command[0] != '\0')
+   // compatibility check with JIL
+   if(retval == OTTO_SUCCESS && jil_reserved_word(s_command) != JIL_UNKNOWN)
+   {
+      rc = OTTO_SYNTAX_ERROR;
+      retval = OTTO_FAIL;
+   }
+
+   if(retval == OTTO_SUCCESS && s_command != NULL)
+   {
+      item->attributes |= HAS_COMMAND;
+
+      if(s_command[0] != '\n')
       {
-         item->attributes |= HAS_COMMAND;
-
-         // only try to copy data if the first character isn't a bang
-         if(command[0] != '!')
+         if((rc = ottojob_copy_command(item->command, s_command, CMDLEN)) != OTTO_SUCCESS)
          {
-            if(jil_reserved_word(command) == JIL_UNKNOWN)
-            {
-               rc = ottojob_copy_command(item->command, command, CMDLEN);
-            }
-         }
-         else
-         {
-            if(item->type == OTTO_CMD)
-            {
-               rc = OTTO_MISSING_REQUIRED_VALUE;
-            }
-         }
-         if(rc != OTTO_SUCCESS)
-         {
-            ottojob_print_command_errors(rc, action, item->name, CMDLEN);
-
             retval = OTTO_FAIL;
          }
       }
+   }
+
+   if(rc != OTTO_SUCCESS)
+   {
+      ottojob_print_command_errors(rc, action, item->name, CMDLEN);
    }
 
    return(retval);
@@ -643,7 +671,7 @@ validate_and_copy_csv_condition(JOB *item, CSVCOL *conditionp)
    int retval = OTTO_SUCCESS;
    char *action = "action";
    int rc;
-   char condition[CNDLEN+5]; // maximum number of characters in an excel cell + 1
+   char s_condition[CNDLEN+5]; // maximum number of characters in an excel cell + 1
 
    switch(item->opcode)
    {
@@ -651,32 +679,43 @@ validate_and_copy_csv_condition(JOB *item, CSVCOL *conditionp)
       case UPDATE_JOB: action = "update_job"; break;
    }
 
-   // reset pointer if its first character is ','
-   if(conditionp != NULL && *conditionp->start == ',') conditionp = NULL;
+   // get the data into a local variable
+   if(conditionp != NULL) csv_getcol(s_condition, sizeof(s_condition), conditionp, WITHOUT_QUOTES);
 
-   if(conditionp != NULL)
+   // reset the pointer if the string version is empty
+   if(conditionp != NULL && s_condition[0] == '\0') conditionp = NULL;
+
+   // it's okay for this to be NULL in any case but it's not
+   // okay for it to be an empty line on an insert_job action
+   if(conditionp != NULL && s_condition[0] == '\n' && item->opcode == CREATE_JOB)
    {
-      // unpack the value - convert to what it would look like in JIL
-      csv_getcol(condition, sizeof(condition), conditionp, WITHOUT_QUOTES);
+      rc = OTTO_MISSING_REQUIRED_VALUE;
+      retval = OTTO_FAIL;
+   }
 
-      if(condition[0] != '\0')
+   // compatibility check with JIL
+   if(retval == OTTO_SUCCESS && jil_reserved_word(s_condition) != JIL_UNKNOWN)
+   {
+      rc = OTTO_SYNTAX_ERROR;
+      retval = OTTO_FAIL;
+   }
+
+   if(retval == OTTO_SUCCESS && conditionp != NULL)
+   {
+      item->attributes |= HAS_CONDITION;
+
+      if(s_condition[0] != '\n')
       {
-         item->attributes |= HAS_CONDITION;
-
-         // only try to copy data if the first character isn't a bang
-         if(condition[0] != '!')
+         if((rc = ottojob_copy_condition(item->condition, s_condition, CNDLEN)) != OTTO_SUCCESS)
          {
-            if(jil_reserved_word(condition) == JIL_UNKNOWN)
-            {
-               if((rc = ottojob_copy_condition(item->condition, condition, CNDLEN)) != OTTO_SUCCESS)
-               {
-                  ottojob_print_condition_errors(rc, action, item->name, CMDLEN);
-
-                  retval = OTTO_FAIL;
-               }
-            }
+            retval = OTTO_FAIL;
          }
       }
+   }
+
+   if(retval != OTTO_SUCCESS)
+   {
+      ottojob_print_condition_errors(rc, action, item->name, CMDLEN);
    }
 
    return(retval);
@@ -690,7 +729,7 @@ validate_and_copy_csv_description(JOB *item, CSVCOL *descriptionp)
    int retval = OTTO_SUCCESS;
    char *action = "action";
    int rc;
-   char description[DSCLEN+5];
+   char s_description[DSCLEN+5];
 
    switch(item->opcode)
    {
@@ -698,32 +737,43 @@ validate_and_copy_csv_description(JOB *item, CSVCOL *descriptionp)
       case UPDATE_JOB: action = "update_job"; break;
    }
 
-   // reset pointer if its first character is ','
-   if(descriptionp != NULL && *descriptionp->start == ',') descriptionp = NULL;
+   // get the data into a local variable
+   if(descriptionp != NULL) csv_getcol(s_description, sizeof(s_description), descriptionp, WITH_QUOTES);
 
-   if(descriptionp != NULL)
+   // reset the pointer if the string version is empty
+   if(descriptionp != NULL && s_description[0] == '\0') descriptionp = NULL;
+
+   // it's okay for this to be NULL in any case but it's not
+   // okay for it to be an empty line on an insert_job action
+   if(descriptionp != NULL && s_description[0] == '\n' && item->opcode == CREATE_JOB)
    {
-      // unpack the value - convert to what it would look like in JIL
-      csv_getcol(description, sizeof(description), descriptionp, WITH_QUOTES);
+      rc = OTTO_MISSING_REQUIRED_VALUE;
+      retval = OTTO_FAIL;
+   }
 
-      if(description[0] != '\0')
+   // compatibility check with JIL
+   if(retval == OTTO_SUCCESS && jil_reserved_word(s_description) != JIL_UNKNOWN)
+   {
+      rc = OTTO_SYNTAX_ERROR;
+      retval = OTTO_FAIL;
+   }
+
+   if(retval == OTTO_SUCCESS && descriptionp != NULL)
+   {
+      item->attributes |= HAS_DESCRIPTION;
+
+      if(s_description[0] != '\n')
       {
-         item->attributes |= HAS_DESCRIPTION;
-
-         // only try to copy data if the first character isn't a bang
-         if(description[0] != '!')
+         if((rc = ottojob_copy_description(item->description, s_description, DSCLEN)) != OTTO_SUCCESS)
          {
-            if(jil_reserved_word(description) == JIL_UNKNOWN)
-            {
-               if((rc = ottojob_copy_description(item->description, description, DSCLEN)) != OTTO_SUCCESS)
-               {
-                  ottojob_print_description_errors(rc, action, item->name, DSCLEN);
-
-                  retval = OTTO_FAIL;
-               }
-            }
+            retval = OTTO_FAIL;
          }
       }
+   }
+
+   if(retval != OTTO_SUCCESS)
+   {
+      ottojob_print_description_errors(rc, action, item->name, DSCLEN);
    }
 
    return(retval);
@@ -737,7 +787,7 @@ validate_and_copy_csv_environment(JOB *item, CSVCOL *environmentp)
    int retval = OTTO_SUCCESS;
    char *action = "action";
    int rc;
-   char environment[ENVLEN+5];
+   char s_environment[ENVLEN+5];
 
    switch(item->opcode)
    {
@@ -745,32 +795,43 @@ validate_and_copy_csv_environment(JOB *item, CSVCOL *environmentp)
       case UPDATE_JOB: action = "update_job"; break;
    }
 
-   // reset pointer if its first character is ','
-   if(environmentp != NULL && *environmentp->start == ',') environmentp = NULL;
+   // get the data into a local variable
+   if(environmentp != NULL) csv_getcol(s_environment, sizeof(s_environment), environmentp, WITHOUT_QUOTES);
 
-   if(environmentp != NULL)
+   // reset the pointer if the string version is empty
+   if(environmentp != NULL && s_environment[0] == '\0') environmentp = NULL;
+
+   // it's okay for this to be NULL in any case but it's not
+   // okay for it to be an empty line on an insert_job action
+   if(environmentp != NULL && s_environment[0] == '\n' && item->opcode == CREATE_JOB)
    {
-      // unpack the value - convert to what it would look like in JIL
-      csv_getcol(environment, sizeof(environment), environmentp, WITHOUT_QUOTES);
+      rc = OTTO_MISSING_REQUIRED_VALUE;
+      retval = OTTO_FAIL;
+   }
 
-      if(environment[0] != '\0')
+   // compatibility check with JIL
+   if(retval == OTTO_SUCCESS && jil_reserved_word(s_environment) != JIL_UNKNOWN)
+   {
+      rc = OTTO_SYNTAX_ERROR;
+      retval = OTTO_FAIL;
+   }
+
+   if(retval == OTTO_SUCCESS && environmentp != NULL)
+   {
+      item->attributes |= HAS_ENVIRONMENT;
+
+      if(s_environment[0] != '\n')
       {
-         item->attributes |= HAS_ENVIRONMENT;
-
-         // only try to copy data if the first character isn't a bang
-         if(environment[0] != '!')
+         if((rc = ottojob_copy_environment(item->environment, s_environment, ENVLEN)) != OTTO_SUCCESS)
          {
-            if(jil_reserved_word(environment) == JIL_UNKNOWN)
-            {
-               if((rc = ottojob_copy_environment(item->environment, environment, ENVLEN)) != OTTO_SUCCESS)
-               {
-                  ottojob_print_environment_errors(rc, action, item->name, DSCLEN);
-
-                  retval = OTTO_FAIL;
-               }
-            }
+            retval = OTTO_FAIL;
          }
       }
+   }
+
+   if(retval != OTTO_SUCCESS)
+   {
+      ottojob_print_environment_errors(rc, action, item->name, ENVLEN);
    }
 
    return(retval);
@@ -784,7 +845,7 @@ validate_and_copy_csv_auto_hold(JOB *item, CSVCOL *auto_holdp)
    int retval = OTTO_SUCCESS;
    char *action = "action";
    int rc;
-   char auto_hold[10]; // maximum number of characters in an excel cell + 1
+   char s_auto_hold[10]; // maximum number of characters in an excel cell + 1
 
    switch(item->opcode)
    {
@@ -792,33 +853,41 @@ validate_and_copy_csv_auto_hold(JOB *item, CSVCOL *auto_holdp)
       case UPDATE_JOB: action = "update_job"; break;
    }
 
-   // reset pointer if its first character is ','
-   if(auto_holdp != NULL && *auto_holdp->start == ',') auto_holdp = NULL;
+   // get the data into a local variable
+   if(auto_holdp != NULL) csv_getcol(s_auto_hold, sizeof(s_auto_hold), auto_holdp, WITHOUT_QUOTES);
 
-   if(auto_holdp != NULL)
+   // reset the pointer if the string version is empty
+   if(auto_holdp != NULL && s_auto_hold[0] == '\0') auto_holdp = NULL;
+
+   // it's okay for this to be NULL in any case but it's never
+   // okay for it to be an empty line
+   if(auto_holdp != NULL && s_auto_hold[0] == '\n')
    {
-      // unpack the value - convert to what it would look like in JIL
-      csv_getcol(auto_hold, sizeof(auto_hold), auto_holdp, WITHOUT_QUOTES);
+      rc = OTTO_MISSING_REQUIRED_VALUE;
+      retval = OTTO_FAIL;
+   }
 
-      if(auto_hold[0] != '\0')
+   // compatibility check with JIL
+   if(retval == OTTO_SUCCESS && jil_reserved_word(s_auto_hold) != JIL_UNKNOWN)
+   {
+      rc = OTTO_SYNTAX_ERROR;
+      retval = OTTO_FAIL;
+   }
+
+   if(retval == OTTO_SUCCESS)
+   {
+      item->attributes |= HAS_AUTO_HOLD;
+
+      if((rc = ottojob_copy_flag(&item->autohold, s_auto_hold, FLGLEN)) != OTTO_SUCCESS)
       {
-         item->attributes |= HAS_AUTO_HOLD;
-
-         // only try to copy data if the first character isn't a bang
-         if(auto_hold[0] != '!')
-         {
-            if(jil_reserved_word(auto_hold) == JIL_UNKNOWN)
-            {
-               if((rc = ottojob_copy_flag(&item->autohold, auto_hold, FLGLEN)) != OTTO_SUCCESS)
-               {
-                  ottojob_print_auto_hold_errors(rc, action, item->name, auto_hold);
-
-                  retval = OTTO_FAIL;
-               }
-               item->on_autohold = item->autohold;
-            }
-         }
+         retval = OTTO_FAIL;
       }
+      item->on_autohold = item->autohold;
+   }
+
+   if(retval != OTTO_SUCCESS)
+   {
+      ottojob_print_auto_hold_errors(rc, action, item->name, s_auto_hold);
    }
 
    return(retval);
@@ -844,49 +913,84 @@ validate_and_copy_csv_date_conditions(JOB *item, CSVCOL *date_conditionsp, CSVCO
    char s_start_mins[2048];
    char s_start_times[2048];
 
-   switch(item->opcode)
-   {
-      case CREATE_JOB: action = "insert_job"; break;
-      case UPDATE_JOB: action = "update_job"; break;
-   }
-
-   // reset pointers if any of their first characters is ','
-   if(date_conditionsp != NULL && *date_conditionsp->start == ',') date_conditionsp = NULL;
-   if(days_of_weekp    != NULL && *days_of_weekp->start    == ',') days_of_weekp    = NULL;
-   if(start_minsp      != NULL && *start_minsp->start      == ',') start_minsp      = NULL;
-   if(start_timesp     != NULL && *start_timesp->start     == ',') start_timesp     = NULL;
-
+   // get the data into a local variables
    if(date_conditionsp != NULL) csv_getcol(s_date_conditions, sizeof(s_date_conditions), date_conditionsp, WITHOUT_QUOTES);
    if(days_of_weekp    != NULL) csv_getcol(s_days_of_week,    sizeof(s_days_of_week),    days_of_weekp,    WITH_QUOTES);
    if(start_minsp      != NULL) csv_getcol(s_start_mins,      sizeof(s_start_mins),      start_minsp,      WITH_QUOTES);
    if(start_timesp     != NULL) csv_getcol(s_start_times,     sizeof(s_start_times),     start_timesp,     WITH_QUOTES);
 
-   // check if a valid comination of date conditions attributes was specified
-   if(date_conditionsp != NULL && jil_reserved_word(s_date_conditions) == JIL_UNKNOWN) date_check |= DTECOND_BIT;
-   if(days_of_weekp    != NULL && jil_reserved_word(s_days_of_week)    == JIL_UNKNOWN) date_check |= DYSOFWK_BIT;
-   if(start_minsp      != NULL && jil_reserved_word(s_start_mins)      == JIL_UNKNOWN) date_check |= STRTMNS_BIT;
-   if(start_timesp     != NULL && jil_reserved_word(s_start_times)     == JIL_UNKNOWN) date_check |= STRTTMS_BIT;
+   // reset the pointers if any string version is empty
+   if(date_conditionsp != NULL && s_date_conditions[0] == '\0') date_conditionsp = NULL;
+   if(days_of_weekp    != NULL && s_days_of_week[0]    == '\0') days_of_weekp    = NULL;
+   if(start_minsp      != NULL && s_start_mins[0]      == '\0') start_minsp      = NULL;
+   if(start_timesp     != NULL && s_start_times[0]     == '\0') start_timesp     = NULL;
 
-   switch(date_check)
+   // set bitmask describing state of inbound data
+   if(date_conditionsp != NULL) {if(s_date_conditions[0] == '\n') {date_check |= DTECOND_EMPTY;} else {date_check |= DTECOND_CHECK;}}
+   if(days_of_weekp    != NULL) {if(s_days_of_week[0]    == '\n') {date_check |= DYSOFWK_EMPTY;} else {date_check |= DYSOFWK_CHECK;}}
+   if(start_minsp      != NULL) {if(s_start_mins[0]      == '\n') {date_check |= STRTMNS_EMPTY;} else {date_check |= STRTMNS_CHECK;}}
+   if(start_timesp     != NULL) {if(s_start_times[0]     == '\n') {date_check |= STRTTMS_EMPTY;} else {date_check |= STRTTMS_CHECK;}}
+
+   switch(item->opcode)
    {
-      case 0:
-         ; // do nothing
-         break;
-      case (DTECOND_BIT | DYSOFWK_BIT | STRTMNS_BIT):
-      case (DTECOND_BIT | DYSOFWK_BIT | STRTTMS_BIT):
-         if(item->box_name[0] != '\0')
+      case CREATE_JOB:
+         action = "insert_job";
+
+         // check if a valid comination of date conditions attributes was specified
+         switch(date_check)
          {
-            rc = OTTO_INVALID_APPLICATION;
+            case 0:
+               // do nothing
+               break;
+            case (DTECOND_CHECK | DYSOFWK_CHECK | STRTMNS_CHECK):
+            case (DTECOND_CHECK | DYSOFWK_CHECK | STRTTMS_CHECK):
+               if(item->box_name[0] != '\0')
+               {
+                  rc = OTTO_INVALID_APPLICATION;
+               }
+               else
+               {
+                  parse_date_conditions = OTTO_TRUE;
+               }
+               break;
+            default:
+               rc = OTTO_INVALID_COMBINATION;
+               break;
          }
-         else
-         {
-            parse_date_conditions = OTTO_TRUE;
-         }
+
          break;
-      default:
-         rc = OTTO_INVALID_COMBINATION;
+      case UPDATE_JOB:
+         action = "update_job";
+
+         // check if a valid comination of date conditions attributes was specified
+         switch(date_check)
+         {
+            case 0:
+               // do nothing
+               break;
+            case (DTECOND_EMPTY):
+            case (DTECOND_EMPTY | DYSOFWK_EMPTY | STRTMNS_EMPTY | STRTTMS_EMPTY):
+            case (DTECOND_CHECK | DYSOFWK_CHECK | STRTMNS_CHECK):
+            case (DTECOND_CHECK | DYSOFWK_CHECK | STRTMNS_CHECK | STRTTMS_EMPTY):
+            case (DTECOND_CHECK | DYSOFWK_CHECK | STRTTMS_CHECK):
+            case (DTECOND_CHECK | DYSOFWK_CHECK | STRTMNS_EMPTY | STRTTMS_CHECK):
+               if(item->box_name[0] != '\0')
+               {
+                  rc = OTTO_INVALID_APPLICATION;
+               }
+               else
+               {
+                  parse_date_conditions = OTTO_TRUE;
+               }
+               break;
+            default:
+               rc = OTTO_INVALID_COMBINATION;
+               break;
+         }
+
          break;
    }
+
    if(rc != OTTO_SUCCESS)
    {
       ottojob_print_date_conditions_errors(rc, action, item->name, s_date_conditions);
@@ -896,58 +1000,66 @@ validate_and_copy_csv_date_conditions(JOB *item, CSVCOL *date_conditionsp, CSVCO
 
    if(parse_date_conditions == OTTO_TRUE)
    {
-      if((rc = ottojob_copy_flag(&date_conditions, s_date_conditions, FLGLEN)) != OTTO_SUCCESS)
+      // quick and dirty if an update job is just trying to clear date consitions
+      if(date_check & DTECOND_EMPTY)
       {
-         ottojob_print_date_conditions_errors(rc, action, item->name, s_date_conditions);
-
-         retval = OTTO_FAIL;
+         item->attributes |= HAS_DATE_CONDITIONS;
       }
-
-      if((rc = ottojob_copy_days_of_week(&days_of_week, s_days_of_week)) != OTTO_SUCCESS)
+      else
       {
-         ottojob_print_days_of_week_errors(rc, action, item->name);
-
-         retval = OTTO_FAIL;
-      }
-
-      if(start_minsp != NULL)
-      {
-         if((rc = ottojob_copy_start_minutes(&start_minutes, s_start_mins)) != OTTO_SUCCESS)
+         if((rc = ottojob_copy_flag(&date_conditions, s_date_conditions, FLGLEN)) != OTTO_SUCCESS)
          {
-            ottojob_print_start_mins_errors(rc, action, item->name);
+            ottojob_print_date_conditions_errors(rc, action, item->name, s_date_conditions);
 
             retval = OTTO_FAIL;
          }
-      }
 
-      if(start_timesp != NULL)
-      {
-         if((rc = ottojob_copy_start_times(start_times, s_start_times)) != OTTO_SUCCESS)
+         if((rc = ottojob_copy_days_of_week(&days_of_week, s_days_of_week)) != OTTO_SUCCESS)
          {
-            ottojob_print_start_times_errors(rc, action, item->name);
+            ottojob_print_days_of_week_errors(rc, action, item->name);
 
             retval = OTTO_FAIL;
          }
-      }
 
-      if(retval == OTTO_SUCCESS)
-      {
-         // assume the job uses start times
-         item->date_conditions = OTTO_USE_START_TIMES;
-
-         // modify if it's using start_minutes
-         if(start_minsp != NULL)
+         if(date_check & STRTMNS_CHECK)
          {
-            item->date_conditions = OTTO_USE_START_MINUTES;
-            for(i=0; i<24; i++)
-               start_times[i] = start_minutes;
+            if((rc = ottojob_copy_start_minutes(&start_minutes, s_start_mins)) != OTTO_SUCCESS)
+            {
+               ottojob_print_start_mins_errors(rc, action, item->name);
+
+               retval = OTTO_FAIL;
+            }
          }
 
-         // copy the data to the structure
-         item->attributes    |= HAS_DATE_CONDITIONS;
-         item->days_of_week   = days_of_week;
-         item->start_minutes  = start_minutes;
-         memcpy(item->start_times, start_times, sizeof(start_times));
+         if(date_check & STRTTMS_CHECK)
+         {
+            if((rc = ottojob_copy_start_times(start_times, s_start_times)) != OTTO_SUCCESS)
+            {
+               ottojob_print_start_times_errors(rc, action, item->name);
+
+               retval = OTTO_FAIL;
+            }
+         }
+
+         if(retval == OTTO_SUCCESS)
+         {
+            // assume the job uses start times
+            item->date_conditions = OTTO_USE_START_TIMES;
+
+            // modify if it's using start_minutes
+            if(start_minsp != NULL)
+            {
+               item->date_conditions = OTTO_USE_START_MINUTES;
+               for(i=0; i<24; i++)
+                  start_times[i] = start_minutes;
+            }
+
+            // copy the data to the structure
+            item->attributes    |= HAS_DATE_CONDITIONS;
+            item->days_of_week   = days_of_week;
+            item->start_minutes  = start_minutes;
+            memcpy(item->start_times, start_times, sizeof(start_times));
+         }
       }
    }
 
@@ -962,7 +1074,7 @@ validate_and_copy_csv_loop(JOB *item, CSVCOL *loopp)
    int retval = OTTO_SUCCESS;
    char *action = "action";
    int rc;
-   char loop[10];
+   char s_loop[10];
 
    switch(item->opcode)
    {
@@ -970,32 +1082,45 @@ validate_and_copy_csv_loop(JOB *item, CSVCOL *loopp)
       case UPDATE_JOB: action = "update_job"; break;
    }
 
-   // reset pointer if its first character is ','
-   if(loopp != NULL && *loopp->start == ',') loopp = NULL;
+   // get the data into a local variable
+   if(loopp != NULL) csv_getcol(s_loop, sizeof(s_loop), loopp, WITHOUT_QUOTES);
 
-   if(loopp != NULL)
+   // reset the pointer if the string version is empty
+   if(loopp != NULL && s_loop[0] == '\0') loopp = NULL;
+
+   // it's okay for this to be NULL in any case but it's not
+   // okay for it to be an empty line on an insert_job action
+   if(loopp != NULL && s_loop[0] == '\n' && item->opcode == CREATE_JOB)
    {
-      // unpack the value - convert to what it would look like in JIL
-      csv_getcol(loop, sizeof(loop), loopp, WITHOUT_QUOTES);
+      rc = OTTO_MISSING_REQUIRED_VALUE;
+      retval = OTTO_FAIL;
+   }
 
-      if(loop[0] != '\0')
+   // compatibility check with JIL
+   if(retval == OTTO_SUCCESS && jil_reserved_word(s_loop) != JIL_UNKNOWN)
+   {
+      rc = OTTO_SYNTAX_ERROR;
+      retval = OTTO_FAIL;
+   }
+
+   if(retval == OTTO_SUCCESS && loopp != NULL)
+   {
+      item->attributes |= HAS_LOOP;
+
+      if(s_loop[0] != '\n')
       {
-         item->attributes |= HAS_LOOP;
-
-         // only try to copy data if the first character isn't a bang
-         if(loop[0] != '!')
+         if((rc = ottojob_copy_loop(item->loopname, &item->loopmin, &item->loopmax,  &item->loopsgn,  s_loop)) != OTTO_SUCCESS)
          {
-            if(jil_reserved_word(loop) == JIL_UNKNOWN)
-            {
-               if((rc = ottojob_copy_loop(item->loopname, &item->loopmin, &item->loopmax,  &item->loopsgn, loop)) != OTTO_SUCCESS)
-               {
-                  ottojob_print_loop_errors(rc, action, item->name);
+            ottojob_print_loop_errors(rc, action, item->name);
 
-                  retval = OTTO_FAIL;
-               }
-            }
+            retval = OTTO_FAIL;
          }
       }
+   }
+
+   if(retval != OTTO_SUCCESS)
+   {
+      ottojob_print_loop_errors(rc, action, item->name);
    }
 
    return(retval);
@@ -1009,41 +1134,59 @@ validate_and_copy_csv_new_name(JOB *item, CSVCOL *new_namep)
    int retval = OTTO_SUCCESS;
    char *action = "update_job";
    int rc;
-   char new_name[NAMLEN+5];
+   char s_new_name[NAMLEN+5];
 
    // don't perform a name change on anything but an update
-   if(item->opcode == UPDATE_JOB)
+   if(item->opcode != UPDATE_JOB)
    {
-      // reset pointer if its first character is ','
-      if(new_namep != NULL && *new_namep->start == ',') new_namep = NULL;
+      rc = OTTO_INVALID_APPLICATION;
+      retval = OTTO_FAIL;
+   }
 
-      if(new_namep != NULL)
+   // get the data into a local variable
+   if(new_namep != NULL) csv_getcol(s_new_name, sizeof(s_new_name), new_namep, WITHOUT_QUOTES);
+
+   // reset the pointer if the string version is empty
+   if(new_namep != NULL && s_new_name[0] == '\0') new_namep = NULL;
+
+   // it's okay for this to be NULL but it's not
+   // okay for it to be an empty line
+   if(new_namep != NULL && s_new_name[0] == '\n')
+   {
+      rc = OTTO_MISSING_REQUIRED_VALUE;
+      retval = OTTO_FAIL;
+   }
+
+   // compatibility check with JIL
+   if(retval == OTTO_SUCCESS && jil_reserved_word(s_new_name) != JIL_UNKNOWN)
+   {
+      rc = OTTO_SYNTAX_ERROR;
+      retval = OTTO_FAIL;
+   }
+
+   if(retval == OTTO_SUCCESS && new_namep != NULL)
+   {
+      item->attributes |= HAS_NEW_NAME;
+
+      rc = ottojob_copy_name(item->expression, s_new_name, NAMLEN);
+      if(strcmp(item->name, item->expression) == 0)
       {
-         item->attributes |= HAS_NEW_NAME;
-
-         // unpack the value - convert to what it would look like in JIL
-         csv_getcol(new_name, sizeof(new_name), new_namep, WITHOUT_QUOTES);
-
-         if(jil_reserved_word(new_name) == JIL_UNKNOWN)
-         {
-            rc = ottojob_copy_name(item->expression, new_name, NAMLEN);
-            if(strcmp(item->name, item->expression) == 0)
-            {
-               rc |= OTTO_SAME_NAME;
-            }
-            if(strcmp(item->box_name, item->expression) == 0)
-            {
-               rc |= OTTO_SAME_JOB_BOX_NAMES;
-            }
-
-            if((rc = ottojob_copy_name(item->expression, new_name, NAMLEN)) != OTTO_SUCCESS)
-            {
-               ottojob_print_new_name_errors(rc, action, item->name, item->expression);
-
-               retval = OTTO_FAIL;
-            }
-         }
+         rc |= OTTO_SAME_NAME;
       }
+      if(strcmp(item->box_name, item->expression) == 0)
+      {
+         rc |= OTTO_SAME_JOB_BOX_NAMES;
+      }
+
+      if(rc != OTTO_SUCCESS)
+      {
+         retval = OTTO_FAIL;
+      }
+   }
+
+   if(retval != OTTO_SUCCESS)
+   {
+      ottojob_print_new_name_errors(rc, action, item->name, item->expression);
    }
 
    return(retval);
@@ -1057,31 +1200,44 @@ validate_and_copy_csv_start(JOB *item, CSVCOL *startp)
    int retval = OTTO_SUCCESS;
    char *action = "update_job";
    int rc;
-   char start[30];
+   char s_start[30];
 
    // don't perform a start time change on anything but an update
    if(item->opcode == UPDATE_JOB)
    {
-      // reset pointer if its first character is ','
-      if(startp != NULL && *startp->start == ',') startp = NULL;
+      rc = OTTO_INVALID_APPLICATION;
+      retval = OTTO_FAIL;
+   }
 
-      if(startp != NULL)
+   // get the data into a local variable
+   if(startp != NULL) csv_getcol(s_start, sizeof(s_start), startp, WITH_QUOTES);
+
+   // reset the pointer if the string version is empty
+   if(startp != NULL && s_start[0] == '\0') startp = NULL;
+
+   // compatibility check with JIL
+   if(retval == OTTO_SUCCESS && jil_reserved_word(s_start) != JIL_UNKNOWN)
+   {
+      rc = OTTO_SYNTAX_ERROR;
+      retval = OTTO_FAIL;
+   }
+
+   if(retval == OTTO_SUCCESS && startp != NULL)
+   {
+      item->attributes |= HAS_START;
+
+      if(s_start[0] != '\n')
       {
-         item->attributes |= HAS_START;
-
-         // unpack the value - convert to what it would look like in JIL
-         csv_getcol(start, sizeof(start), startp, WITH_QUOTES);
-
-         if(jil_reserved_word(start) == JIL_UNKNOWN)
+         if((rc = ottojob_copy_time(&item->start, s_start)) != OTTO_SUCCESS)
          {
-            if((rc = ottojob_copy_time(&item->start, start)) != OTTO_SUCCESS)
-            {
-               ottojob_print_start_errors(rc, action, item->name);
-
-               retval = OTTO_FAIL;
-            }
+            retval = OTTO_FAIL;
          }
       }
+   }
+
+   if(retval != OTTO_SUCCESS)
+   {
+      ottojob_print_start_errors(rc, action, item->name);
    }
 
    return(retval);
@@ -1095,31 +1251,44 @@ validate_and_copy_csv_finish(JOB *item, CSVCOL *finishp)
    int retval = OTTO_SUCCESS;
    char *action = "update_job";
    int rc;
-   char finish[30];
+   char s_finish[30];
 
    // don't perform a finish time change on anything but an update
    if(item->opcode == UPDATE_JOB)
    {
-      // reset pointer if its first character is ','
-      if(finishp != NULL && *finishp->start == ',') finishp = NULL;
+      rc = OTTO_INVALID_APPLICATION;
+      retval = OTTO_FAIL;
+   }
 
-      if(finishp != NULL)
+   // get the data into a local variable
+   if(finishp != NULL) csv_getcol(s_finish, sizeof(s_finish), finishp, WITH_QUOTES);
+
+   // reset the pointer if the string version is empty
+   if(finishp != NULL && s_finish[0] == '\0') finishp = NULL;
+
+   // compatibility check with JIL
+   if(retval == OTTO_SUCCESS && jil_reserved_word(s_finish) != JIL_UNKNOWN)
+   {
+      rc = OTTO_SYNTAX_ERROR;
+      retval = OTTO_FAIL;
+   }
+
+   if(retval == OTTO_SUCCESS && finishp != NULL)
+   {
+      item->attributes |= HAS_FINISH;
+
+      if(s_finish[0] != '\n')
       {
-         item->attributes |= HAS_FINISH;
-
-         // unpack the value - convert to what it would look like in JIL
-         csv_getcol(finish, sizeof(finish), finishp, WITH_QUOTES);
-
-         if(jil_reserved_word(finish) == JIL_UNKNOWN)
+         if((rc = ottojob_copy_time(&item->finish, s_finish)) != OTTO_SUCCESS)
          {
-            if((rc = ottojob_copy_time(&item->finish, finish)) != OTTO_SUCCESS)
-            {
-               ottojob_print_finish_errors(rc, action, item->name);
-
-               retval = OTTO_FAIL;
-            }
+            retval = OTTO_FAIL;
          }
       }
+   }
+
+   if(retval != OTTO_SUCCESS)
+   {
+      ottojob_print_finish_errors(rc, action, item->name);
    }
 
    return(retval);
@@ -1425,43 +1594,58 @@ csv_getcol(char *t, size_t tlen, CSVCOL *c, int style)
 {
    char *s;
    char *e;
-   int space_to_fill = tlen - 1;  // leave room for null terminator
+   int space_to_fill = tlen - 2;  // leave room for newline and null terminator
 
    if(t != NULL && tlen > 0 && c != NULL)
    {
       s = c->start;
       e = c->end;
 
-      // remove quotes for quoted strings
-      if(c->quoted == OTTO_TRUE)
+      if(s != e)
       {
-         s++;
-         e--;
+         if((e-s) == 1 && *s == '-')
+         {
+            // do nothing; this is supposed to represent a blank line
+            // and just needs a newline
+            ;
+         }
+         else
+         {
+            // remove quotes for quoted strings
+            if(c->quoted == OTTO_TRUE)
+            {
+               s++;
+               e--;
+            }
+
+            if(style == WITH_QUOTES)
+            {
+               space_to_fill -= 2; // leave room for requested quotes
+               *t++ = '"';
+            }
+
+
+            // now inside the column data move a character at a time
+            while(s < e && space_to_fill > 0)
+            {
+               if(*s == '"' && *(s+1) == '"')
+                  s++;
+
+               *t++ = *s++;
+               space_to_fill--;
+            }
+
+            if(style == WITH_QUOTES)
+            {
+               *t++ = '"';
+            }
+         }
+
+         // add newline
+         *t++ = '\n';
       }
 
-      if(style == WITH_QUOTES)
-      {
-         space_to_fill -= 2; // leave room for requested quotes
-         *t++ = '"';
-      }
-
-
-      // now inside the column data move a character at a time
-      while(s < e && space_to_fill > 0)
-      {
-         if(*s == '"' && *(s+1) == '"')
-            s++;
-
-         *t++ = *s++;
-         space_to_fill--;
-      }
-
-      if(style == WITH_QUOTES)
-      {
-         *t++ = '"';
-      }
-
-      // null terminate
+      // add null terminate
       *t = '\0';
    }
 }

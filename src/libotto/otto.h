@@ -68,10 +68,14 @@
 #define cdeSA______     ((i64)'S'<<56 | (i64)'A'<<48 | (i64)' '<<40 | (i64)' '<<32 | ' '<<24 | ' '<<16 | ' '<<8 | ' ')
 #define cdeALL_____     ((i64)'A'<<56 | (i64)'L'<<48 | (i64)'L'<<40 | (i64)' '<<32 | ' '<<24 | ' '<<16 | ' '<<8 | ' ')
 
-#define DTECOND_BIT      (1L)
-#define DYSOFWK_BIT (1L << 1)
-#define STRTMNS_BIT (1L << 2)
-#define STRTTMS_BIT (1L << 3)
+#define DTECOND_CHECK      (1L)
+#define DYSOFWK_CHECK (1L << 1)
+#define STRTMNS_CHECK (1L << 2)
+#define STRTTMS_CHECK (1L << 3)
+#define DTECOND_EMPTY (1L << 4)
+#define DYSOFWK_EMPTY (1L << 5)
+#define STRTMNS_EMPTY (1L << 6)
+#define STRTTMS_EMPTY (1L << 7)
 
 #define HAS_TYPE                  (1L)
 #define HAS_BOX_NAME        (1L <<  1) 
