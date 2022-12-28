@@ -344,6 +344,13 @@ update_job(ottoipc_update_job_pdu_st *pdu, DBCTX *ctx)
          }
       }
 
+      if(pdu->attributes & HAS_LOOP && ctx->job[id].type == OTTO_CMD)
+      {
+         pdu->attributes ^= HAS_LOOP;
+         pdu->option = CMD_LOOP;
+         ottoipc_enqueue_simple_pdu((ottoipc_simple_pdu_st *)pdu);
+      }
+
 
       // update fields specifically appearing in the request according
       // to the pdu->attributes bitmask

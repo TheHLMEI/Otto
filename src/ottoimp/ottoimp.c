@@ -365,6 +365,9 @@ send_create_job(JOB *item)
 				case BOX_COMMAND:
 					lprintf(logp, feedback_level, "The job is a box but specifies a command (ignored).\n");
 					break;
+				case CMD_LOOP:
+					lprintf(logp, feedback_level, "The job is a command but specifies a loop (ignored).\n");
+					break;
 				case NO_SPACE_AVAILABLE:
 					lprintf(logp, feedback_level, "No space is available in the job database.\n");
 					retval = OTTO_FAIL;
@@ -466,6 +469,9 @@ send_update_job(JOB *item)
 					break;
 				case BOX_COMMAND:
 					lprintf(logp, feedback_level, "The job is a box but specifies a command (ignored).\n");
+					break;
+				case CMD_LOOP:
+					lprintf(logp, feedback_level, "The job is a command but specifies a loop (ignored).\n");
 					break;
 				case GRANDFATHER_PARADOX:
 					lprintf(logp, feedback_level, "The job would become a child job of itself.\n");

@@ -7,7 +7,7 @@
 #include <sys/types.h>
 #include <time.h>
 
-#define OTTO_VERSION_STRING "v2.0.5"
+#define OTTO_VERSION_STRING "v2.0.6"
 
 //
 // Defines
@@ -323,6 +323,7 @@ enum RESULTCODES
 	BOX_NOT_FOUND,
 	BOX_DELETED,
 	BOX_COMMAND,
+	CMD_LOOP,
 	NO_SPACE_AVAILABLE,
 	GRANDFATHER_PARADOX,
 	NEW_NAME_ALREADY_EXISTS,

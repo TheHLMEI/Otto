@@ -318,152 +318,155 @@ jil_reserved_word(char *s)
    int retval = JIL_UNKNOWN;
    int c, i;
 
-   switch(s[0])
+   if(s != NULL)
    {
-      case 'a':
-         if(strncmp(s, "auto_hold",        9) == 0) { retval = JIL_AUTOHLD; c =  9; }
-         break;
-      case 'b':
-         if(strncmp(s, "box_name",         8) == 0) { retval = JIL_BOXNAME; c =  8; }
-         break;
-      case 'c':
-         if(strncmp(s, "command",          7) == 0) { retval = JIL_COMMAND; c =  7; }
-         if(strncmp(s, "condition",        9) == 0) { retval = JIL_CONDITN; c =  9; }
-         break;
-      case 'd':
-         if(strncmp(s, "date_conditions", 15) == 0) { retval = JIL_DTECOND; c = 15; }
-         if(strncmp(s, "days_of_week",    12) == 0) { retval = JIL_DYSOFWK; c = 12; }
-         if(strncmp(s, "description",     11) == 0) { retval = JIL_DESCRIP; c = 11; }
-         if(strncmp(s, "delete_box",      10) == 0) { retval = JIL_DEL_BOX; c = 10; }
-         if(strncmp(s, "delete_job",      10) == 0) { retval = JIL_DEL_JOB; c = 10; }
-         if(strncmp(s, "delete_blob",     11) == 0) { retval = JIL_UNSUPPD; c = 11; }
-         if(strncmp(s, "delete_glob",     11) == 0) { retval = JIL_UNSUPPD; c = 11; }
-         if(strncmp(s, "delete_job_type", 15) == 0) { retval = JIL_UNSUPPD; c = 15; }
-         if(strncmp(s, "delete_machine",  14) == 0) { retval = JIL_UNSUPPD; c = 14; }
-         if(strncmp(s, "delete_monbro",   13) == 0) { retval = JIL_UNSUPPD; c = 13; }
-         if(strncmp(s, "delete_resource", 15) == 0) { retval = JIL_UNSUPPD; c = 15; }
-         if(strncmp(s, "delete_xinst",    12) == 0) { retval = JIL_UNSUPPD; c = 12; }
-         break;
-      case 'e':
-         if(strncmp(s, "environment",     11) == 0) { retval = JIL_ENVIRON; c = 11; }
-         break;
-      case 'f':
-         if(strncmp(s, "finish",           6) == 0) { retval = JIL_FINISH;  c =  6; }
-         break;
-      case 'i':
-         if(strncmp(s, "insert_job",      10) == 0) { retval = JIL_INS_JOB; c = 10; }
-         if(strncmp(s, "insert_blob",     11) == 0) { retval = JIL_UNSUPPD; c = 11; }
-         if(strncmp(s, "insert_glob",     11) == 0) { retval = JIL_UNSUPPD; c = 11; }
-         if(strncmp(s, "insert_job_type", 15) == 0) { retval = JIL_UNSUPPD; c = 15; }
-         if(strncmp(s, "insert_machine",  14) == 0) { retval = JIL_UNSUPPD; c = 14; }
-         if(strncmp(s, "insert_monbro",   13) == 0) { retval = JIL_UNSUPPD; c = 13; }
-         if(strncmp(s, "insert_resource", 15) == 0) { retval = JIL_UNSUPPD; c = 15; }
-         if(strncmp(s, "insert_xinst",    12) == 0) { retval = JIL_UNSUPPD; c = 12; }
-         break;
-      case 'j':
-         if(strncmp(s, "job_type",         8) == 0) { retval = JIL_JOBTYPE; c =  8; }
-         break;
-      case 'l':
-         if(strncmp(s, "loop",             4) == 0) { retval = JIL_LOOP;    c =  4; }
-         break;
-      case 'n':
-         if(strncmp(s, "new_name",         8) == 0) { retval = JIL_NEWNAME; c =  8; }
-         break;
-      case 'o':
-         if(strncmp(s, "override_job",    12) == 0) { retval = JIL_UNSUPPD; c = 12; }
-         break;
-      case 's':
-         if(strncmp(s, "start",            5) == 0) { retval = JIL_START;   c =  5; }
-         if(strncmp(s, "start_mins",      10) == 0) { retval = JIL_STRTMIN; c = 10; }
-         if(strncmp(s, "start_times",     11) == 0) { retval = JIL_STRTTIM; c = 11; }
-         break;
-      case 'u':
-         if(strncmp(s, "update_job",      10) == 0) { retval = JIL_UPD_JOB; c = 10; }
-         if(strncmp(s, "update_job_type", 15) == 0) { retval = JIL_UNSUPPD; c = 15; }
-         if(strncmp(s, "update_machine",  14) == 0) { retval = JIL_UNSUPPD; c = 14; }
-         if(strncmp(s, "update_monbro",   13) == 0) { retval = JIL_UNSUPPD; c = 13; }
-         if(strncmp(s, "update_resource", 15) == 0) { retval = JIL_UNSUPPD; c = 15; }
-         if(strncmp(s, "update_xinst",    12) == 0) { retval = JIL_UNSUPPD; c = 12; }
-         break;
-      default:                                        retval = JIL_UNKNOWN;
-   }
-
-   // if the result is JIL_UNKNOWN and the word has a colon adjacent to it (perhaps separater
-   // by spaces) the it is probably misspelled or intended to be a keyword Otto dopesn't
-   // recognize.  Warn for that here.
-   if(retval == JIL_UNKNOWN)
-   {
-      // consume the word
-      for(i=0; s[i] != '\0'; i++)
+      switch(s[0])
       {
-         if(isspace(s[i]) || s[i] == ':')
-         {
+         case 'a':
+            if(strncmp(s, "auto_hold",        9) == 0) { retval = JIL_AUTOHLD; c =  9; }
             break;
-         }
+         case 'b':
+            if(strncmp(s, "box_name",         8) == 0) { retval = JIL_BOXNAME; c =  8; }
+            break;
+         case 'c':
+            if(strncmp(s, "command",          7) == 0) { retval = JIL_COMMAND; c =  7; }
+            if(strncmp(s, "condition",        9) == 0) { retval = JIL_CONDITN; c =  9; }
+            break;
+         case 'd':
+            if(strncmp(s, "date_conditions", 15) == 0) { retval = JIL_DTECOND; c = 15; }
+            if(strncmp(s, "days_of_week",    12) == 0) { retval = JIL_DYSOFWK; c = 12; }
+            if(strncmp(s, "description",     11) == 0) { retval = JIL_DESCRIP; c = 11; }
+            if(strncmp(s, "delete_box",      10) == 0) { retval = JIL_DEL_BOX; c = 10; }
+            if(strncmp(s, "delete_job",      10) == 0) { retval = JIL_DEL_JOB; c = 10; }
+            if(strncmp(s, "delete_blob",     11) == 0) { retval = JIL_UNSUPPD; c = 11; }
+            if(strncmp(s, "delete_glob",     11) == 0) { retval = JIL_UNSUPPD; c = 11; }
+            if(strncmp(s, "delete_job_type", 15) == 0) { retval = JIL_UNSUPPD; c = 15; }
+            if(strncmp(s, "delete_machine",  14) == 0) { retval = JIL_UNSUPPD; c = 14; }
+            if(strncmp(s, "delete_monbro",   13) == 0) { retval = JIL_UNSUPPD; c = 13; }
+            if(strncmp(s, "delete_resource", 15) == 0) { retval = JIL_UNSUPPD; c = 15; }
+            if(strncmp(s, "delete_xinst",    12) == 0) { retval = JIL_UNSUPPD; c = 12; }
+            break;
+         case 'e':
+            if(strncmp(s, "environment",     11) == 0) { retval = JIL_ENVIRON; c = 11; }
+            break;
+         case 'f':
+            if(strncmp(s, "finish",           6) == 0) { retval = JIL_FINISH;  c =  6; }
+            break;
+         case 'i':
+            if(strncmp(s, "insert_job",      10) == 0) { retval = JIL_INS_JOB; c = 10; }
+            if(strncmp(s, "insert_blob",     11) == 0) { retval = JIL_UNSUPPD; c = 11; }
+            if(strncmp(s, "insert_glob",     11) == 0) { retval = JIL_UNSUPPD; c = 11; }
+            if(strncmp(s, "insert_job_type", 15) == 0) { retval = JIL_UNSUPPD; c = 15; }
+            if(strncmp(s, "insert_machine",  14) == 0) { retval = JIL_UNSUPPD; c = 14; }
+            if(strncmp(s, "insert_monbro",   13) == 0) { retval = JIL_UNSUPPD; c = 13; }
+            if(strncmp(s, "insert_resource", 15) == 0) { retval = JIL_UNSUPPD; c = 15; }
+            if(strncmp(s, "insert_xinst",    12) == 0) { retval = JIL_UNSUPPD; c = 12; }
+            break;
+         case 'j':
+            if(strncmp(s, "job_type",         8) == 0) { retval = JIL_JOBTYPE; c =  8; }
+            break;
+         case 'l':
+            if(strncmp(s, "loop",             4) == 0) { retval = JIL_LOOP;    c =  4; }
+            break;
+         case 'n':
+            if(strncmp(s, "new_name",         8) == 0) { retval = JIL_NEWNAME; c =  8; }
+            break;
+         case 'o':
+            if(strncmp(s, "override_job",    12) == 0) { retval = JIL_UNSUPPD; c = 12; }
+            break;
+         case 's':
+            if(strncmp(s, "start",            5) == 0) { retval = JIL_START;   c =  5; }
+            if(strncmp(s, "start_mins",      10) == 0) { retval = JIL_STRTMIN; c = 10; }
+            if(strncmp(s, "start_times",     11) == 0) { retval = JIL_STRTTIM; c = 11; }
+            break;
+         case 'u':
+            if(strncmp(s, "update_job",      10) == 0) { retval = JIL_UPD_JOB; c = 10; }
+            if(strncmp(s, "update_job_type", 15) == 0) { retval = JIL_UNSUPPD; c = 15; }
+            if(strncmp(s, "update_machine",  14) == 0) { retval = JIL_UNSUPPD; c = 14; }
+            if(strncmp(s, "update_monbro",   13) == 0) { retval = JIL_UNSUPPD; c = 13; }
+            if(strncmp(s, "update_resource", 15) == 0) { retval = JIL_UNSUPPD; c = 15; }
+            if(strncmp(s, "update_xinst",    12) == 0) { retval = JIL_UNSUPPD; c = 12; }
+            break;
+         default:                                        retval = JIL_UNKNOWN;
       }
 
-      // consume potential spaces
-      for(; s[i] != '\0'; i++)
+      // if the result is JIL_UNKNOWN and the word has a colon adjacent to it (perhaps separater
+      // by spaces) the it is probably misspelled or intended to be a keyword Otto dopesn't
+      // recognize.  Warn for that here.
+      if(retval == JIL_UNKNOWN)
       {
-         if(!isspace(s[i]))
-         {
-            break;
-         }
-      }
-
-      // if this is a potential keyword a colon should be the next character
-      if(s[i] == ':')
-      {
-         fprintf(stderr, "ERROR Unrecognized keyword found: '");
+         // consume the word
          for(i=0; s[i] != '\0'; i++)
          {
             if(isspace(s[i]) || s[i] == ':')
             {
                break;
             }
-            fprintf(stderr, "%c", s[i]);
          }
-         fprintf(stderr, ":'\n");
-         retval = JIL_BADWORD;
-      }
-   }
 
-   if(retval != JIL_UNKNOWN && retval != JIL_UNSUPPD && retval != JIL_BADWORD)
-   {
-      // autosys allows whitespace between a keyword and the following
-      // colon.  it's easier to parse if it's adjacent so fix it here
-      // look ahead for the colon, if found move it to c if necessary
-      for(i=c; s[i] != '\0'; i++)
-      {
-         if(!isspace(s[i]) && s[i] != ':')
+         // consume potential spaces
+         for(; s[i] != '\0'; i++)
          {
-            // encountered something other than whitespace or a colon
-            // so this must not be a supported JIL keyword
-            retval = JIL_UNKNOWN;
-            break;
+            if(!isspace(s[i]))
+            {
+               break;
+            }
          }
+
+         // if this is a potential keyword a colon should be the next character
          if(s[i] == ':')
          {
-            if(i != c)
+            fprintf(stderr, "ERROR Unrecognized keyword found: '");
+            for(i=0; s[i] != '\0'; i++)
             {
-               s[c] = ':';
-               s[i] = ' ';
+               if(isspace(s[i]) || s[i] == ':')
+               {
+                  break;
+               }
+               fprintf(stderr, "%c", s[i]);
             }
-            break;
+            fprintf(stderr, ":'\n");
+            retval = JIL_BADWORD;
          }
       }
-   }
 
-   if(retval != JIL_UNKNOWN && retval != JIL_UNSUPPD && retval != JIL_BADWORD)
-   {
-      // a supported JIL keyword (or a manufactured one) was found
-      // the jil parser works best with newlines at the end of each
-      // keyword use but it's okay to type JIL all on one line
-      // since JIL keywords have to be separated from other "words"
-      // (multi-word strings enclosed in double quotes count as one word)
-      // the white space preceding the found JIL keyword can be changed to
-      // a newline
-      s[-1] = '\n';
+      if(retval != JIL_UNKNOWN && retval != JIL_UNSUPPD && retval != JIL_BADWORD)
+      {
+         // autosys allows whitespace between a keyword and the following
+         // colon.  it's easier to parse if it's adjacent so fix it here
+         // look ahead for the colon, if found move it to c if necessary
+         for(i=c; s[i] != '\0'; i++)
+         {
+            if(!isspace(s[i]) && s[i] != ':')
+            {
+               // encountered something other than whitespace or a colon
+               // so this must not be a supported JIL keyword
+               retval = JIL_UNKNOWN;
+               break;
+            }
+            if(s[i] == ':')
+            {
+               if(i != c)
+               {
+                  s[c] = ':';
+                  s[i] = ' ';
+               }
+               break;
+            }
+         }
+      }
+
+      if(retval != JIL_UNKNOWN && retval != JIL_UNSUPPD && retval != JIL_BADWORD)
+      {
+         // a supported JIL keyword (or a manufactured one) was found
+         // the jil parser works best with newlines at the end of each
+         // keyword use but it's okay to type JIL all on one line
+         // since JIL keywords have to be separated from other "words"
+         // (multi-word strings enclosed in double quotes count as one word)
+         // the white space preceding the found JIL keyword can be changed to
+         // a newline
+         s[-1] = '\n';
+      }
    }
 
    return(retval);
