@@ -7,7 +7,7 @@
 #include <sys/types.h>
 #include <time.h>
 
-#define OTTO_VERSION_STRING "v2.0.6"
+#define OTTO_VERSION_STRING "v2.0.7"
 
 //
 // Defines
