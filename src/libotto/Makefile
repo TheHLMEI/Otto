@@ -36,7 +36,7 @@ SRCS = ottocfg.c                 \
 
 OBJS = $(SRCS:.c=.o)
 
-HDR  = otto.h
+HDR  = otto.h linenoise.h
 
 LIB  = libotto.a
 
@@ -52,11 +52,11 @@ rebuild: clean target
 
 install: target
 	/usr/bin/cp -f $(LIB) $(libdir)
-	/usr/bin/cp -f $(HDR) $(incdir)
+	@for header in $(HDR); do echo "/usr/bin/cp -f $$header $(incdir)" ; /usr/bin/cp -f $$header $(incdir) ; done
 
 uninstall:
 	/usr/bin/rm -f $(libdir)/$(LIB)
-	/usr/bin/rm -f $(incdir)/$(HDR)
+	@for header in $(HDR); do echo "/usr/bin/rm -f $(incdir)/$$header "; /usr/bin/rm -f $(incdir)/$$header ; done
 
 distclean: clean uninstall
 
