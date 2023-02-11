@@ -9,6 +9,7 @@
 
 
 #include "otto.h"
+#include "linenoise.h"
 
 extern OTTOLOG *logp;
 

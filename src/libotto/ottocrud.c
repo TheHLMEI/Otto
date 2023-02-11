@@ -276,6 +276,7 @@ update_job(ottoipc_update_job_pdu_st *pdu, DBCTX *ctx)
          }
       }
 
+
       // check validity of requested changes
       if(pdu->attributes & HAS_NEW_NAME)
       {
@@ -324,6 +325,15 @@ update_job(ottoipc_update_job_pdu_st *pdu, DBCTX *ctx)
          ottoipc_enqueue_simple_pdu((ottoipc_simple_pdu_st *)pdu);
       }
 
+      if(pdu->attributes & HAS_LOOP && ctx->job[id].type == OTTO_CMD)
+      {
+         pdu->attributes ^= HAS_LOOP;
+         pdu->option = CMD_LOOP;
+         ottoipc_enqueue_simple_pdu((ottoipc_simple_pdu_st *)pdu);
+      }
+
+      // put the condition validation last since validate_dependencies
+      // re-sorts the jobwork array by NAME
       if(pdu->attributes & HAS_CONDITION)
       {
          rc = validate_dependencies(ctx, pdu->name, pdu->condition);
@@ -349,6 +359,9 @@ update_job(ottoipc_update_job_pdu_st *pdu, DBCTX *ctx)
       // to the pdu->attributes bitmask
       if(retval == OTTO_SUCCESS)
       {
+         // make sure the jobwork array is sorted by ID before doing any updates
+         sort_jobwork(ctx, BY_ID);
+
          if(pdu->attributes & HAS_BOX_NAME)
          {
             // unlink the job from its current parent and siblings

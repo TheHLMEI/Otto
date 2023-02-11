@@ -262,8 +262,13 @@ ottojob_copy_description(char *output, char *description, int outlen)
          {
             if(*s == '\\' && *(s+1) == '"')
                s++;
-            *t++ = *s++;
-            l--;
+
+            // only transfer printable characters
+            if(isprint(*s))
+            {
+               *t++ = *s++;
+               l--;
+            }
          }
          else
          {

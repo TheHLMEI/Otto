@@ -75,7 +75,7 @@ void  run_box                  (int id);
 void  force_activate_box       (int id);
 void  force_activate_box_chain (int id);
 void  activate_job             (int id);
-int   run_job                  (int id);
+void  run_job                  (int id);
 void  finish_box               (int box_id, time_t finish);
 void  finish_job               (int sigNum);
 void  force_start_job          (int id);
@@ -836,7 +836,10 @@ check_dependencies()
                         run_job(id);
                         break;
                   }
-                  recheck = OTTO_TRUE;
+
+                  // only do additional checks if the daemon isn't paused
+                  if(cfg.pause == OTTO_FALSE)
+                     recheck = OTTO_TRUE;
                   break;
                case OTTO_FAIL:
                   job[id].expr_fail = OTTO_TRUE;
@@ -1179,6 +1182,10 @@ run_box(int id)
 {
    int loop_just_started = OTTO_FALSE;
 
+   // don't start any new jobs if the daemon is paused
+   if(cfg.pause == OTTO_TRUE)
+      return;
+
    // set the loop iterator to loopmin and set the state to RUNNING if necessary
    if(job[id].loopname[0] != '\0' && job[id].loopstat == LOOP_NOT_RUNNING)
    {
@@ -1202,7 +1209,7 @@ run_box(int id)
 
 
 
-int
+void
 run_job(int id)
 {
    pid_t pid;
@@ -1211,6 +1218,10 @@ run_job(int id)
    int  box, fd;
    char *s, tmpenv[ENVLEN+1];
    int rc;
+
+   // don't start any new jobs if the daemon is paused
+   if(cfg.pause == OTTO_TRUE)
+      return;
 
    if(job[id].on_noexec == OTTO_TRUE)
    {
@@ -1223,7 +1234,7 @@ run_job(int id)
       if(job[id].box != -1)
          finish_box(job[id].box, job[id].finish);
 
-      return(0);
+      return;
    }
 
    // rebuild the environment to be passed to the child job (if necessary)
@@ -1333,8 +1344,6 @@ run_job(int id)
          lprintf(logp, MAJR, "execle failed for %s.\n", job[id].name);
       }
    }
-
-   return(pid);
 }
 
 
