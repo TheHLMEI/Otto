@@ -90,7 +90,7 @@ ottojob_copy_command(char *output, char *command, int outlen)
          }
          else
          {
-            retval |= OTTO_LENGTH_EXCEEDED;
+            return(OTTO_LENGTH_EXCEEDED);
          }
       }
       *p = '\0';
@@ -267,7 +267,7 @@ ottojob_copy_description(char *output, char *description, int outlen)
          }
          else
          {
-            retval = OTTO_LENGTH_EXCEEDED;
+            return(OTTO_LENGTH_EXCEEDED);
          }
       }
 
@@ -312,7 +312,7 @@ ottojob_copy_environment(char *output, char *environment, int outlen)
          {
             if(strlen(output) + strlen(tmpenv) > (outlen-2))
             {
-               retval |= OTTO_LENGTH_EXCEEDED;
+               return(OTTO_LENGTH_EXCEEDED);
             }
             else
             {
