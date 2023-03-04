@@ -390,10 +390,12 @@ jil_reserved_word(char *s)
          default:                                        retval = JIL_UNKNOWN;
       }
 
-      // if the result is JIL_UNKNOWN and the word has a colon adjacent to it (perhaps separater
-      // by spaces) the it is probably misspelled or intended to be a keyword Otto dopesn't
+      // if the result is JIL_UNKNOWN and the word has a colon adjacent to it (perhaps separated
+      // by spaces) then it is probably misspelled or intended to be a keyword Otto doesn't
       // recognize.  Warn for that here.
-      if(retval == JIL_UNKNOWN)
+      // note time specifications have colons but if so they should be quoted so also check for a
+      // leading double quote before testing the rest of the word
+      if(retval == JIL_UNKNOWN && s[0] != '"')
       {
          // consume the word
          for(i=0; s[i] != '\0'; i++)
