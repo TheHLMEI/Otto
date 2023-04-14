@@ -312,6 +312,7 @@ add_extend_ptr(MSP_TASK *tmptask, char *s)
    {
       if(strncmp(fieldid, extenddef[COMMAND],         9) == 0) tmptask->extend[COMMAND]         = value;
       if(strncmp(fieldid, extenddef[DESCRIPTION],     9) == 0) tmptask->extend[DESCRIPTION]     = value;
+      if(strncmp(fieldid, extenddef[ENVIRONMENT],     9) == 0) tmptask->extend[ENVIRONMENT]     = value;
       if(strncmp(fieldid, extenddef[AUTOHOLD],        9) == 0) tmptask->extend[AUTOHOLD]        = value;
       if(strncmp(fieldid, extenddef[DATE_CONDITIONS], 9) == 0) tmptask->extend[DATE_CONDITIONS] = value;
       if(strncmp(fieldid, extenddef[DAYS_OF_WEEK],    9) == 0) tmptask->extend[DAYS_OF_WEEK]    = value;

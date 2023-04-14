@@ -86,7 +86,7 @@ write_insert_job_jil(JOB *item)
    }
 
    if(item->environment[0] != '\0')
-      printf("%senvironment      %s\n", indent, tval.environment);
+      printf("%senvironment:     %s\n", indent, tval.environment);
 
    if(item->autohold == OTTO_TRUE)
       printf("%sauto_hold:       %s\n", indent, tval.autohold);
