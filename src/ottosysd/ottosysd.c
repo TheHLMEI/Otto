@@ -1789,6 +1789,10 @@ move_job(int id, int direction, int count)
                job[job[id].box].tail = job[id].next;
             steps--;
          }
+         break;
+      case MOVE_JOB_DOWN:
+         steps = 1;    // limit steps to one and fall through
+      case MOVE_JOB_BOTTOM:
          while(steps > 0 && job[id].next != -1)
          {
             // save new siblings
