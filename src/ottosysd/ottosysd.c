@@ -1214,6 +1214,7 @@ run_job(int id)
 {
    pid_t pid;
    char otto_jobname[NAMLEN+15];
+   char otto_boxname[NAMLEN+15];
    char loopname[NAMLEN+15];
    int  box, fd;
    char *s, tmpenv[ENVLEN+1];
@@ -1269,6 +1270,14 @@ run_job(int id)
          // add the job name at the top of the list
          sprintf(otto_jobname, "OTTO_JOBNAME=%s", job[id].name);
          cfg.envvar[0] = otto_jobname;
+
+         // add the box name to the list
+         if(job[id].box_name[0] != '\0')
+         {
+            sprintf(otto_jobname, "OTTO_BOXNAME=%s", job[id].box_name);
+            cfg.envvar[cfg.n_envvar] = otto_boxname;
+            cfg.n_envvar++;
+         }
 
          // ascend through parent boxes and add environment variables for each parent box
          box = job[id].box;
