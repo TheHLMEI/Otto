@@ -1791,7 +1791,7 @@ move_job(int id, int direction, int count)
          }
          break;
       case MOVE_JOB_DOWN:
-         steps = 1;    // limit steps to one and fall through
+         steps = count;    // set steps to pdu value and fall through
       case MOVE_JOB_BOTTOM:
          while(steps > 0 && job[id].next != -1)
          {
