@@ -1274,7 +1274,7 @@ run_job(int id)
          // add the box name to the list
          if(job[id].box_name[0] != '\0')
          {
-            sprintf(otto_jobname, "OTTO_BOXNAME=%s", job[id].box_name);
+            sprintf(otto_boxname, "OTTO_BOXNAME=%s", job[id].box_name);
             cfg.envvar[cfg.n_envvar] = otto_boxname;
             cfg.n_envvar++;
          }
