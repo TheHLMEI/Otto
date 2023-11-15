@@ -654,21 +654,24 @@ validate_and_copy_mspdi(MSP_TASKLIST *tasklist, JOBLIST *joblist)
 
             if(parse_date_conditions == OTTO_TRUE)
             {
-               if((rc = ottojob_copy_days_of_week(&joblist->item[i].days_of_week, tasklist->item[i].extend[DAYS_OF_WEEK])) != OTTO_SUCCESS)
+               xmlcpy(tmpstr, tasklist->item[i].extend[DAYS_OF_WEEK]);
+               if((rc = ottojob_copy_days_of_week(&joblist->item[i].days_of_week, tmpstr)) != OTTO_SUCCESS)
                {
                   errcount += ottojob_print_days_of_week_errors(rc, "insert_job", namstr);
 
                   retval = OTTO_FAIL;
                }
 
-               if((rc = ottojob_copy_start_minutes(&joblist->item[i].start_minutes, tasklist->item[i].extend[START_MINUTES])) != OTTO_SUCCESS)
+               xmlcpy(tmpstr, tasklist->item[i].extend[START_MINUTES]);
+               if((rc = ottojob_copy_start_minutes(&joblist->item[i].start_minutes, tmpstr)) != OTTO_SUCCESS)
                {
                   errcount += ottojob_print_start_mins_errors(rc, "insert_job", namstr);
 
                   retval = OTTO_FAIL;
                }
 
-               if((rc = ottojob_copy_start_times(joblist->item[i].start_times, tasklist->item[i].extend[START_TIMES])) != OTTO_SUCCESS)
+               xmlcpy(tmpstr, tasklist->item[i].extend[START_TIMES]);
+               if((rc = ottojob_copy_start_times(joblist->item[i].start_times, tmpstr)) != OTTO_SUCCESS)
                {
                   errcount += ottojob_print_start_times_errors(rc, "insert_job", namstr);
 
