@@ -8,6 +8,7 @@
 #include <unistd.h>
 
 #include "otto.h"
+#include "otto_json.h"
 
 OTTOLOG *logp = NULL;
 DBCTX    ctx  = {0};
@@ -256,6 +257,8 @@ ottoexp(void)
          case OTTO_MSP:
             write_mspdi(&joblist, autoschedule);
             break;
+         case OTTO_JSON:
+            write_json(&joblist);
          default:
             break;
       }

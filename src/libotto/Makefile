@@ -9,7 +9,7 @@ SRCS = ottocfg.c                 \
        ottocond.c                \
        ottocrud.c                \
        ottodb.c                  \
-		 ottohtml.c                \
+       ottohtml.c                \
        ottoipc.c                 \
        ottojob.c                 \
        ottolog.c                 \
@@ -18,14 +18,15 @@ SRCS = ottocfg.c                 \
        otto_csv_reader.c         \
        otto_csv_writer.c         \
        otto_dtl_writer.c         \
-		 otto_htmlcsv_writer.c     \
-		 otto_htmldtl_writer.c     \
-		 otto_htmljil_writer.c     \
-		 otto_htmlmspdi_writer.c   \
-		 otto_htmlsum_writer.c     \
-		 otto_htmlversion_writer.c \
+       otto_htmlcsv_writer.c     \
+       otto_htmldtl_writer.c     \
+       otto_htmljil_writer.c     \
+       otto_htmlmspdi_writer.c   \
+       otto_htmlsum_writer.c     \
+       otto_htmlversion_writer.c \
        otto_jil_reader.c         \
        otto_jil_writer.c         \
+       otto_json.c               \
        otto_mspdi_reader.c       \
        otto_mspdi_writer.c       \
        otto_pid_writer.c         \
@@ -36,11 +37,11 @@ SRCS = ottocfg.c                 \
 
 OBJS = $(SRCS:.c=.o)
 
-HDR  = otto.h linenoise.h
+HDR  = otto.h linenoise.h otto_json.h
 
 LIB  = libotto.a
 
-CFLAGS=-g -Wall -Werror -Wno-unknown-pragmas -Wno-char-subscripts
+CFLAGS=-g -Wall -Werror -Wno-unknown-pragmas -Wno-char-subscripts -Wno-format-overflow -Wno-address -Wno-sequence-point
 
 
 target: $(LIB)

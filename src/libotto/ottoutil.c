@@ -601,6 +601,9 @@ get_file_format(char *format)
    if(strcasecmp(format, "MSP") == 0)
       retval = OTTO_MSP;
 
+   if(strcasecmp(format, "JSON") == 0)
+      retval = OTTO_JSON;
+
    return(retval);
 }
 

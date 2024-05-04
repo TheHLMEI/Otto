@@ -44,9 +44,10 @@
 #define OTTO_USE_START_TIMES   1
 #define OTTO_USE_START_MINUTES 2
 
-#define OTTO_CSV 1
-#define OTTO_JIL 2
-#define OTTO_MSP 3
+#define OTTO_CSV  1
+#define OTTO_JIL  2
+#define OTTO_MSP  3
+#define OTTO_JSON 4
 
 #define OTTO_DETAIL       1
 #define OTTO_QUERY        2
