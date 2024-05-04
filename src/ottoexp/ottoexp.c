@@ -211,9 +211,10 @@ ottoexp_usage(void)
    printf("         runtime statistics.\n");
    printf("\n");
    printf("      -f <format> - Export jobflow information in a particular format.\n");
-   printf("         CSV - export as a csv file\n");
-   printf("         JIL - export as (mostly) autosys compliant JIL\n");
-   printf("         MSP - export as MS Project Data Interchange compliant XML\n");
+   printf("         CSV  - export as a csv file\n");
+   printf("         JIL  - export as (mostly) autosys compliant JIL\n");
+   printf("         MSP  - export as MS Project Data Interchange compliant XML\n");
+   printf("         JSON - export as JSON\n");
    printf("\n");
    printf("      -h Print this help and exit.\n");
    printf("\n");

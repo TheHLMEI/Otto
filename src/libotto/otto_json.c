@@ -6,6 +6,10 @@
 #define JSON_TAB_STOP 2
 #define JSON_TAB_CHAR "                                                                                                                             "
 
+// TODOs
+// 1. Stop putting a comma afer every element.  There should be a way to tell the function this is the last or there were others before
+// 2. The entire parse_json thing for ottoimp
+
 int parse_json(DYNBUF *b, JOBLIST *joblist)
 {
     int ret = OTTO_SUCCESS;
