@@ -48,7 +48,7 @@ int write_json(JOBLIST *joblist)
         {
             job = &joblist->item[i];
 
-            if (state.box_top != NULL && strcmp(state.box_top->name, job->box_name) != 0) 
+            while (state.box_top != NULL && strcmp(state.box_top->name, job->box_name) != 0)
             {
                 json_close_box_tag(job, &state);
             }
@@ -69,7 +69,7 @@ int write_json(JOBLIST *joblist)
         }
     }
 
-    while (state.box_top != NULL) 
+    while (state.box_top != NULL)
     {
         json_close_box_tag(NULL, &state);
     }
@@ -88,7 +88,7 @@ int json_open_box_tag(JOB *job, st_JSON_WRITER_STATE_t *state)
         return OTTO_FAIL;
 
     // push the box on the stack
-    st_JSON_BOX_NODE_t *box_node = (st_JSON_BOX_NODE_t *) malloc(sizeof(st_JSON_BOX_NODE_t));
+    st_JSON_BOX_NODE_t *box_node = (st_JSON_BOX_NODE_t *)malloc(sizeof(st_JSON_BOX_NODE_t));
     strcpy(box_node->name, job->name);
     if (state->box_top == NULL)
         box_node->next = NULL;
@@ -113,7 +113,7 @@ int json_close_box_tag(JOB *job, st_JSON_WRITER_STATE_t *state)
 
     st_JSON_BOX_NODE_t *box_node = state->box_top;
     state->box_top = box_node->next;
-    free(box_node);    
+    free(box_node);
 
     ret &= json_close_array(state);
     ret &= json_close_tag(state);
@@ -172,10 +172,16 @@ int json_write_job_elements(JOB *job, st_JSON_WRITER_STATE_t *state)
         }
     }
 
-    ret &= json_write_text_element("autohold", tval.autohold, state);
+    if (job->autohold == OTTO_TRUE)
+        ret &= json_write_text_element("autohold", tval.autohold, state);
 
     if (strlen(job->environment) > 0)
         ret &= json_write_text_element("environment", tval.environment, state);
+
+    ret &= json_write_text_element("start", tval.start, state);
+    ret &= json_write_text_element("finish", tval.finish, state);
+    ret &= json_write_text_element("duration", tval.duration, state);
+    ret &= json_write_text_element("status", tval.status, state);
 
     return ret;
 }
