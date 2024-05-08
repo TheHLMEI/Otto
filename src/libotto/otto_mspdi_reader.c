@@ -741,7 +741,7 @@ validate_and_copy_mspdi(MSP_TASKLIST *tasklist, JOBLIST *joblist)
             tmpcond[0] = '\0';
             for(j=0; j<tasklist->item[i].ndep; j++)
             {
-               if(joblist->item[tasklist->item[i].depend[j]].name != NULL)
+               if(joblist->item[tasklist->item[i].depend[j]].name[0] != '\0')
                {
                   if(j>0)
                      strcat(tmpcond,  " & ");

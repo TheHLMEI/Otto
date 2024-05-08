@@ -642,7 +642,7 @@ validate_and_copy_csv_command(JOB *item, CSVCOL *commandp)
       retval = OTTO_FAIL;
    }
 
-   if(retval == OTTO_SUCCESS && s_command != NULL)
+   if(retval == OTTO_SUCCESS && s_command[0] != '\0')
    {
       item->attributes |= HAS_COMMAND;
 

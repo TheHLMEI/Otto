@@ -7,7 +7,7 @@
 #include <sys/types.h>
 #include <time.h>
 
-#define OTTO_VERSION_STRING "v2.0.10"
+#define OTTO_VERSION_STRING "v2.1.0"
 
 //
 // Defines
@@ -116,7 +116,7 @@ enum
 #define MAX_ENVVAR  1000
 
 // ottojob defines
-#define JOB_LAYOUT_VERSION     6
+#define JOB_LAYOUT_VERSION     7
 
 #define MAXLVL                99
 #define MAXLOOP              100
@@ -251,108 +251,108 @@ enum SORTS
 // ottoipc enumerations
 enum OPCODES
 {
-	NOOP,
+   NOOP,
 
-	// job definition operations
-	CREATE_JOB,
-	REPORT_JOB,
-	UPDATE_JOB,
-	DELETE_JOB,
-	DELETE_BOX,
-	CRUD_TOTAL,
+   // job definition operations
+   CREATE_JOB,
+   REPORT_JOB,
+   UPDATE_JOB,
+   DELETE_JOB,
+   DELETE_BOX,
+   CRUD_TOTAL,
 
-	// scheduler control operations
-	FORCE_START_JOB,
-	START_JOB,
-	KILL_JOB,
-	MOVE_JOB_TOP,
-	MOVE_JOB_UP,
-	MOVE_JOB_DOWN,
-	MOVE_JOB_BOTTOM,
-	RESET_JOB,
-	SEND_SIGNAL,
-	CHANGE_STATUS,
-	JOB_ON_AUTOHOLD,
-	JOB_OFF_AUTOHOLD,
-	JOB_ON_HOLD,
-	JOB_OFF_HOLD,
-	JOB_ON_NOEXEC,
-	JOB_OFF_NOEXEC,
+   // scheduler control operations
+   FORCE_START_JOB,
+   START_JOB,
+   KILL_JOB,
+   MOVE_JOB_TOP,
+   MOVE_JOB_UP,
+   MOVE_JOB_DOWN,
+   MOVE_JOB_BOTTOM,
+   RESET_JOB,
+   SEND_SIGNAL,
+   CHANGE_STATUS,
+   JOB_ON_AUTOHOLD,
+   JOB_OFF_AUTOHOLD,
+   JOB_ON_HOLD,
+   JOB_OFF_HOLD,
+   JOB_ON_NOEXEC,
+   JOB_OFF_NOEXEC,
    BREAK_LOOP,
-	SCHED_TOTAL,
+   SCHED_TOTAL,
 
-	// daemon control operations
-	PING,
-	VERIFY_DB,
-	DEBUG_ON,
-	DEBUG_OFF,
-	REFRESH,
-	PAUSE_DAEMON,
-	RESUME_DAEMON,
-	STOP_DAEMON,
-	OPCODE_TOTAL
+   // daemon control operations
+   PING,
+   VERIFY_DB,
+   DEBUG_ON,
+   DEBUG_OFF,
+   REFRESH,
+   PAUSE_DAEMON,
+   RESUME_DAEMON,
+   STOP_DAEMON,
+   OPCODE_TOTAL
 };
 
 
 enum STATUSES
 {
-	NO_STATUS=100,
-	FAILURE,
-	INACTIVE,
-	RUNNING,
-	SUCCESS,
-	TERMINATED,
-	STATUS_TOTAL
+   NO_STATUS=100,
+   FAILURE,
+   INACTIVE,
+   RUNNING,
+   SUCCESS,
+   TERMINATED,
+   STATUS_TOTAL
 };
 
 
 enum RESULTCODES
 {
-	ACK = 200,
-	NACK,
+   ACK = 200,
+   NACK,
 
-	// job definition operations
-	JOB_CREATED,
-	JOB_REPORTED,
-	JOB_UPDATED,
-	JOB_NOT_FOUND,
-	JOB_DELETED,
-	JOB_ALREADY_EXISTS,
-	JOB_DEPENDS_ON_MISSING_JOB,
-	JOB_DEPENDS_ON_ITSELF,
-	BOX_NOT_FOUND,
-	BOX_DELETED,
-	BOX_COMMAND,
-	CMD_LOOP,
-	NO_SPACE_AVAILABLE,
-	GRANDFATHER_PARADOX,
-	NEW_NAME_ALREADY_EXISTS,
-	RESULTCODE_TOTAL
+   // job definition operations
+   JOB_CREATED,
+   JOB_REPORTED,
+   JOB_UPDATED,
+   JOB_NOT_FOUND,
+   JOB_DELETED,
+   JOB_ALREADY_EXISTS,
+   JOB_DEPENDS_ON_MISSING_JOB,
+   JOB_DEPENDS_ON_ITSELF,
+   BOX_NOT_FOUND,
+   BOX_DELETED,
+   BOX_COMMAND,
+   CMD_LOOP,
+   NO_SPACE_AVAILABLE,
+   GRANDFATHER_PARADOX,
+   NEW_NAME_ALREADY_EXISTS,
+   RESULTCODE_TOTAL
 };
 
 
 enum PDUTYPE
 {
-	SIMPLE_PDU,
-	CREATE_JOB_PDU,
-	REPORT_JOB_PDU,
-	UPDATE_JOB_PDU,
-	DELETE_JOB_PDU,
-	PDUTYPE_TOTAL
+   SIMPLE_PDU,
+   CREATE_JOB_PDU,
+   REPORT_JOB_PDU,
+   UPDATE_JOB_PDU,
+   DELETE_JOB_PDU,
+   PDUTYPE_TOTAL
 };
 
 // ottocond enumerations
 enum JOBSTATS
 {
-	STAT_IN=0,
-	STAT_AC,
-	STAT_RU,
-	STAT_SU,
-	STAT_FA,
-	STAT_TE,
-	STAT_OH,
-	STAT_BR,
-	STAT_MAX
+   STAT_IN=0,
+   STAT_AC,
+   STAT_RU,
+   STAT_SU,
+   STAT_FA,
+   STAT_TE,
+   STAT_OH,
+   STAT_BR,
+   STAT_MAX
 };
 
 
@@ -388,50 +388,50 @@ enum EXTDEFS
 // ottocfg typedefs
 typedef struct _ottocfg_st
 {
-	// Otto version
-	char     *otto_version;
+   // Otto version
+   char     *otto_version;
 
-	// Otto DB layout version and number of jobs in the DB
-	int16_t   ottodb_version;
-	int16_t   ottodb_maxjobs;
+   // Otto DB layout version and number of jobs in the DB
+   int16_t   ottodb_version;
+   int16_t   ottodb_maxjobs;
 
-	// program identification variables
-	char     *progname;
+   // program identification variables
+   char     *progname;
 
-	// network values
-	char     *server_addr;
-	uint16_t  ottosysd_port;
-	uint16_t  httpd_port;
+   // network values
+   char     *server_addr;
+   uint16_t  ottosysd_port;
+   uint16_t  httpd_port;
 
-	// user identification variables
-	int       use_getpw;
-	uid_t     euid;     // effective user id
-	uid_t     ruid;     // real user id
+   // user identification variables
+   int       use_getpw;
+   uid_t     euid;     // effective user id
+   uid_t     ruid;     // real user id
    char     *userp;    // pointer to environment variable value or "unknown"
    char     *lognamep; // pointer to environment variable value or "unknown"
 
-	// standard environment
-	char     *env_ottocfg;
-	char     *env_ottolog;
-	char     *env_ottoenv;
-	char     *env_ottohtml;
+   // standard environment
+   char     *env_ottocfg;
+   char     *env_ottolog;
+   char     *env_ottoenv;
+   char     *env_ottohtml;
 
-	// general variables
+   // general variables
    int       enable_httpd;
-	int       pause;
-	int       debug;
-	int       verbose;
-	int       show_sofar;
-	int       path_overridden;
-	time_t    ottoenv_mtime;
-	char     *base_url;
+   int       pause;
+   int       debug;
+   int       verbose;
+   int       show_sofar;
+   int       path_overridden;
+   time_t    ottoenv_mtime;
+   char     *base_url;
 
-	char     *envvar[MAX_ENVVAR];   // environment to be passed to child jobs
-	char     *envvar_s[MAX_ENVVAR]; // static environment from $OTTOCFG
-	char     *envvar_d[MAX_ENVVAR]; // dynamic environment from $OTTOENV
-	int       n_envvar;
-	int       n_envvar_s;
-	int       n_envvar_d;
+   char     *envvar[MAX_ENVVAR];   // environment to be passed to child jobs
+   char     *envvar_s[MAX_ENVVAR]; // static environment from $OTTOCFG
+   char     *envvar_d[MAX_ENVVAR]; // dynamic environment from $OTTOENV
+   int       n_envvar;
+   int       n_envvar_s;
+   int       n_envvar_d;
 } ottocfg_st;
 
 // ottohtml typedefs
@@ -454,96 +454,97 @@ typedef struct
 #pragma pack(1)
 typedef struct _job
 {
-	int16_t id;                     // linkage
-	int16_t level;
-	int16_t box;
-	int16_t head;
-	int16_t tail;
-	int16_t prev;
-	int16_t next;
+   int16_t id;                     // linkage
+   int16_t level;
+   int16_t box;
+   int16_t head;
+   int16_t tail;
+   int16_t prev;
+   int16_t next;
 
-	char    name[NAMLEN+1];         // job definition
-	char    type;
-	char    box_name[NAMLEN+1];
-	char    description[DSCLEN+1];
-	char    command[CMDLEN+1];
-	char    condition[CNDLEN+1];
-	char    date_conditions;
-	char    days_of_week;
-	int64_t start_minutes;
-	int64_t start_times[24];
-	char    autohold;
+   char    name[NAMLEN+1];         // job definition
+   char    type;
+   char    box_name[NAMLEN+1];
+   char    description[DSCLEN+1];
+   char    command[CMDLEN+1];
+   char    condition[CNDLEN+1];
+   char    date_conditions;
+   char    days_of_week;
+   int64_t start_minutes;
+   int64_t start_times[24];
+   char    autohold;
    char    environment[ENVLEN+1];
-
-	char    expression[CNDLEN+1];   // current job state
-	char    expr_fail;
-	char    status;
-	char    on_autohold;
-	char    on_noexec;
    char    loopname[VARLEN+1];
    char    loopmin;
    char    loopmax;
-   char    loopnum;
    char    loopsgn;
-   char    loopstat;  
-	pid_t   pid;
-	time_t  start;
-	time_t  finish;
-	time_t  duration;
-	int     exit_status;
 
-	union                           // supplemental info
-	{
-		char opcode;
-		char printed;
-		char gpflag;
-	};
-	int16_t attributes;
+   char    expression[CNDLEN+1];   // current job state
+   char    expr_fail;
+   char    status;
+   char    on_autohold;
+   char    on_noexec;
+   char    loopnum;
+   char    loopstat;  
+   pid_t   pid;
+   time_t  start;
+   time_t  finish;
+   time_t  duration;
+   int     exit_status;
+
+   union                           // supplemental info
+   {
+      char opcode;
+      char printed;
+      char gpflag;
+   };
+   int16_t attributes;
 } JOB;
 
 typedef struct _joblist
 {
-	int   nitems;
-	JOB  *item;
+   int   nitems;
+   JOB  *item;
 } JOBLIST;
 #pragma pack()
 
 typedef struct _job_detail
 {
    // linkage
-	char    id[6];
-	char    level[6];
-	char    linkage[128];
+   char    id[6];
+   char    level[6];
+   char    linkage[128];
 
    // job definition
-	char    name[NAMLEN+1];
-	char    type[8];
-	char    box_name[NAMLEN+1];
-	char    description[(6*DSCLEN)+1];  // outsized to accommodate html escapes
-	char    command[(6*CMDLEN)+1];      // outsized to accommodate html escapes
-	char    condition[(6*CNDLEN)+1];    // outsized to accommodate html escapes
-	char    date_conditions[10];
-	char    days_of_week[30];
-	char    start_minutes[2048];
-	char    start_times[2048];
-	char    autohold[6];
-
-   // current job state
-	char    expression[(6*CNDLEN)+1];   // outsized to accommodate html escapes
-	char    expression2[(6*CNDLEN)+1];  // outsized to accommodate html escapes
-	char    expr_fail[6];
-	char    status[10];
-	char    on_autohold[6];
-	char    on_noexec[6];
-	char    pid[10];
-	char    start[20];
-	char    finish[20];
-	char    duration[20];
-	char    exit_status[10];
-	char    environment[(6*ENVLEN)+1];  // outsized to accommodate html escapes
+   char    name[NAMLEN+1];
+   char    type[8];
+   char    box_name[NAMLEN+1];
+   char    description[(6*DSCLEN)+1];  // outsized to accommodate html escapes
+   char    command[(6*CMDLEN)+1];      // outsized to accommodate html escapes
+   char    condition[(6*CNDLEN)+1];    // outsized to accommodate html escapes
+   char    date_conditions[10];
+   char    days_of_week[30];
+   char    start_minutes[2048];
+   char    start_times[2048];
+   char    autohold[6];
+   char    environment[(6*ENVLEN)+1];  // outsized to accommodate html escapes
    char    loopname[VARLEN+1];
    char    loopmin[4];
    char    loopmax[4];
+   char    loopsgn;
+
+   // current job state
+   char    expression[(6*CNDLEN)+1];   // outsized to accommodate html escapes
+   char    expression2[(6*CNDLEN)+1];  // outsized to accommodate html escapes
+   char    expr_fail[6];
+   char    status[10];
+   char    on_autohold[6];
+   char    on_noexec[6];
+   char    pid[10];
+   char    start[20];
+   char    finish[20];
+   char    duration[20];
+   char    exit_status[10];
    char    loopnum[4];
    char    loopstat[128];  
 
@@ -601,7 +602,7 @@ typedef struct _dbctx
 #pragma pack(1)
 typedef struct _ottoipc_pdu_header_st
 {
-	int   version;
+   int   version;
    int   payload_length;
    uid_t euid;
    uid_t ruid;
@@ -609,28 +610,28 @@ typedef struct _ottoipc_pdu_header_st
 
 typedef struct _ottoipc_simple_pdu_st
 {
-	COMMON_PDU_ATTRIBUTES
+   COMMON_PDU_ATTRIBUTES
 } ottoipc_simple_pdu_st;
 
 typedef struct _ottoipc_create_job_pdu_st
 {
-	COMMON_PDU_ATTRIBUTES
-	JOBDEF_PDU_ATTRIBUTES
+   COMMON_PDU_ATTRIBUTES
+   JOBDEF_PDU_ATTRIBUTES
 } ottoipc_create_job_pdu_st;
 
 typedef struct _ottoipc_report_job_pdu_st
 {
-	COMMON_PDU_ATTRIBUTES
-	JOBLNK_PDU_ATTRIBUTES
-	JOBDEF_PDU_ATTRIBUTES
-	JOBSTT_PDU_ATTRIBUTES
+   COMMON_PDU_ATTRIBUTES
+   JOBLNK_PDU_ATTRIBUTES
+   JOBDEF_PDU_ATTRIBUTES
+   JOBSTT_PDU_ATTRIBUTES
 } ottoipc_report_job_pdu_st;
 
 typedef struct _ottoipc_update_job_pdu_st
 {
-	COMMON_PDU_ATTRIBUTES
-	JOBDEF_PDU_ATTRIBUTES
-	JOBEXT_PDU_ATTRIBUTES
+   COMMON_PDU_ATTRIBUTES
+   JOBDEF_PDU_ATTRIBUTES
+   JOBEXT_PDU_ATTRIBUTES
 } ottoipc_update_job_pdu_st;
 
 typedef struct _ottoipc_simple_pdu_st ottoipc_delete_job_pdu_st;
@@ -648,32 +649,32 @@ typedef struct _recvbuf
 // ottocond typedefs
 typedef struct _ecnd_st
 {
-	char *s;
+   char *s;
 } ecnd_st;
 
 // ottocrud typedefs
 // ottolog typedefs
 typedef struct
 {
-	char *logfile;
-	FILE *logfp;
-	int   loglevel;
-	int   lsstarted;
-	char  logfile_buffer[OTTOLOG_BUFLEN];
-	char  console_buffer[OTTOLOG_BUFLEN];
-	char  last_logged_day[30];
-	int   lslevel;
+   char *logfile;
+   FILE *logfp;
+   int   loglevel;
+   int   lsstarted;
+   char  logfile_buffer[OTTOLOG_BUFLEN];
+   char  console_buffer[OTTOLOG_BUFLEN];
+   char  last_logged_day[30];
+   int   lslevel;
 } OTTOLOG;
 
 // ottoutil typedefs
 #pragma pack(1)
 typedef struct _dynbuf // stdin read buffer
 {
-	char    *buffer;
-	char    *s;
-	int     bufferlen;
-	int     eob;
-	int     line;
+   char    *buffer;
+   char    *s;
+   int     bufferlen;
+   int     eob;
+   int     line;
 } DYNBUF;
 
 // signals typedefs
