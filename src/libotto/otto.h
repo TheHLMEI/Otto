@@ -201,10 +201,10 @@ enum
 
 // format defines
 
-
-
-
-
+#define OTTO_MSPDI_FF  0 // FF (finish-to-finish)
+#define OTTO_MSPDI_FS  1 // FS (finish-to-start)
+#define OTTO_MSPDI_SF  2 // SF (start-to-finish)
+#define OTTO_MSPDI_SS  3 // SS (start-to-start)
 
 
 //
@@ -680,6 +680,27 @@ typedef struct _dynbuf // stdin read buffer
 // signals typedefs
 
 // format typedefs
+typedef struct _extdef
+{
+   char *fieldid;
+   char *fieldname;
+   char *alias;
+} EXTDEF;
+
+
+#ifdef OTTO_NEED_MSPDI_EXTDEFS
+static EXTDEF EXT[EXTDEF_TOTAL] = {
+   {"188743731",  "Text1",   "command"},
+   {"188743734",  "Text2",   "description"},
+   {"188743737",  "Text3",   "environment"},
+   {"188743740",  "Text4",   "days_of_week"},
+   {"188743743",  "Text5",   "start_mins"},
+   {"188743746",  "Text6",   "start_times"},
+   {"188743747",  "Text7",   "loop"},
+   {"188743752",  "Flag1",   "auto_hold"},
+   {"188743753",  "Flag2",   "date_conditions"}
+};
+#endif
 
 
 

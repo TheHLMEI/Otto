@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define OTTO_NEED_MSPDI_EXTDEFS
 #include "otto.h"
 
 #define MSP_WIDTHMAX 255
@@ -134,6 +135,8 @@ get_extend_def(char *s)
    int   loop=OTTO_TRUE;
    char *alias=NULL, *fieldid=NULL;
    char code[9];
+   char tmpstr[512];
+   int  d;
 
    // now associate file tags with task structure members
    while(loop == OTTO_TRUE && *s != '\0')
@@ -158,17 +161,32 @@ get_extend_def(char *s)
       s++;
    }
 
-   if(alias != NULL && fieldid != NULL)
+   if(fieldid != NULL)
    {
-      if(strncasecmp(alias, "command",          7) == 0) xmlcpy(extenddef[COMMAND],         fieldid);
-      if(strncasecmp(alias, "description",     11) == 0) xmlcpy(extenddef[DESCRIPTION],     fieldid);
-      if(strncasecmp(alias, "environment",     11) == 0) xmlcpy(extenddef[ENVIRONMENT],     fieldid);
-      if(strncasecmp(alias, "auto_hold",        8) == 0) xmlcpy(extenddef[AUTOHOLD],        fieldid);
-      if(strncasecmp(alias, "date_conditions", 15) == 0) xmlcpy(extenddef[DATE_CONDITIONS], fieldid);
-      if(strncasecmp(alias, "days_of_week",    12) == 0) xmlcpy(extenddef[DAYS_OF_WEEK],    fieldid);
-      if(strncasecmp(alias, "start_mins",      10) == 0) xmlcpy(extenddef[START_MINUTES],   fieldid);
-      if(strncasecmp(alias, "start_times",     11) == 0) xmlcpy(extenddef[START_TIMES],     fieldid);
-      if(strncasecmp(alias, "loop",             4) == 0) xmlcpy(extenddef[LOOP],            fieldid);
+      if(alias != NULL)
+      {
+         if(strncasecmp(alias, "command",          7) == 0) xmlcpy(extenddef[COMMAND],         fieldid);
+         if(strncasecmp(alias, "description",     11) == 0) xmlcpy(extenddef[DESCRIPTION],     fieldid);
+         if(strncasecmp(alias, "environment",     11) == 0) xmlcpy(extenddef[ENVIRONMENT],     fieldid);
+         if(strncasecmp(alias, "auto_hold",        8) == 0) xmlcpy(extenddef[AUTOHOLD],        fieldid);
+         if(strncasecmp(alias, "date_conditions", 15) == 0) xmlcpy(extenddef[DATE_CONDITIONS], fieldid);
+         if(strncasecmp(alias, "days_of_week",    12) == 0) xmlcpy(extenddef[DAYS_OF_WEEK],    fieldid);
+         if(strncasecmp(alias, "start_mins",      10) == 0) xmlcpy(extenddef[START_MINUTES],   fieldid);
+         if(strncasecmp(alias, "start_times",     11) == 0) xmlcpy(extenddef[START_TIMES],     fieldid);
+         if(strncasecmp(alias, "loop",             4) == 0) xmlcpy(extenddef[LOOP],            fieldid);
+      }
+      else
+      {
+         xmlcpy(tmpstr, fieldid);
+         for(d=0; d<EXTDEF_TOTAL; d++)
+         {
+            if(strcmp(tmpstr, EXT[d].fieldid) == 0)
+            {
+               xmlcpy(extenddef[d], fieldid);
+               break;
+            }
+         }
+      }
    }
 
    return(s);
@@ -745,10 +763,14 @@ validate_and_copy_mspdi(MSP_TASKLIST *tasklist, JOBLIST *joblist)
                {
                   if(j>0)
                      strcat(tmpcond,  " & ");
-                  if(tasklist->item[i].dtype[j] == 3)
-                     strcat(tmpcond,  "r(");
-                  else
-                     strcat(tmpcond,  "s(");
+                  switch(tasklist->item[i].dtype[j])
+                  {
+                     case OTTO_MSPDI_FF: strcat(tmpcond,  "f("); break;
+                     case OTTO_MSPDI_FS: strcat(tmpcond,  "s("); break;
+                     case OTTO_MSPDI_SF: strcat(tmpcond,  "d("); break;
+                     case OTTO_MSPDI_SS: strcat(tmpcond,  "t("); break;
+                     default:            strcat(tmpcond,  "s("); break;
+                  }
                   strcat(tmpcond,  joblist->item[tasklist->item[i].depend[j]].name);
                   strcat(tmpcond,  ")");
                }
