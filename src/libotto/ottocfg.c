@@ -104,7 +104,7 @@ get_envvar(char **envvar, char *envvarname, int complain, int keep_varname)
       if((t = malloc(strlen(e)+elen)) != NULL)
       {
          if(keep_varname == OTTO_TRUE)
-            sprintf(t, "%s=%s", envvarname, e);
+            otto_sprintf(t, "%s=%s", envvarname, e);
          else
             strcpy(t, e);
          *envvar = t;
@@ -655,7 +655,7 @@ rebuild_environment()
    }
 
    // only rebuild it if it's the first time through or the dynamic environment changed
-   if(cfg.n_envvar == 0 ||	environment_changed == OTTO_TRUE)
+   if(cfg.n_envvar == 0 || environment_changed == OTTO_TRUE)
    {
       // clear out current environment
       for(i=0; i<MAX_ENVVAR; i++)

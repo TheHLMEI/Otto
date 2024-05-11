@@ -412,7 +412,7 @@ open_ottodb(int type)
             if(initdb == OTTO_TRUE)
             {
                memset(root_job, 0, sizeof(JOB));
-               sprintf(root_job->name, "ottosysd %s", cfg.otto_version);
+               otto_sprintf(root_job->name, "ottosysd %s", cfg.otto_version);
                root_job->id = cfg.ottodb_version;
                root_job->box  = -1;
                root_job->head = -1;

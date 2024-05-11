@@ -134,7 +134,7 @@ init_client_ipc(char *hostname, in_port_t portnumber)
       strcpy(host, "localhost");
 
    // copy in port number
-   sprintf(port, "%u", portnumber);
+   otto_sprintf(port, "%u", portnumber);
 
    memset(&hints, 0x00, sizeof(hints));
    hints.ai_flags    = AI_NUMERICSERV;
@@ -683,7 +683,7 @@ stropcode(int i)
       case STOP_DAEMON:      retval = "STOP_DAEMON";      break;
       case OPCODE_TOTAL:     retval = "OPCODE_TOTAL";     break;
 
-      default: sprintf(msg, "Opcode %d", i); retval = msg; break;
+      default: otto_sprintf(msg, "Opcode %d", i); retval = msg; break;
    }
 
    return retval;
@@ -716,7 +716,7 @@ strresultcode(int i)
       case NO_SPACE_AVAILABLE:         retval = "NO_SPACE_AVAILABLE";         break;
       case RESULTCODE_TOTAL:           retval = "RESULTCODE_TOTAL";           break;
 
-      default: sprintf(msg, "Resultcode %d", i); retval = msg; break;
+      default: otto_sprintf(msg, "Resultcode %d", i); retval = msg; break;
    }
 
    return retval;
@@ -740,7 +740,7 @@ strstatus(int i)
       case TERMINATED:   retval = "TERMINATED";   break;
       case STATUS_TOTAL: retval = "STATUS_TOTAL"; break;
 
-      default: sprintf(msg, "Status %d", i); retval = msg; break;
+      default: otto_sprintf(msg, "Status %d", i); retval = msg; break;
    }
 
    return retval;
@@ -763,7 +763,7 @@ strpdutype(int i)
       case DELETE_JOB_PDU: retval = "DELETE_JOB_PDU"; break;
       case PDUTYPE_TOTAL:  retval = "PDUTYPE_TOTAL";  break;
 
-      default: sprintf(msg, "PDUtype %d", i); retval = msg; break;
+      default: otto_sprintf(msg, "PDUtype %d", i); retval = msg; break;
    }
 
    return retval;

@@ -123,7 +123,7 @@ write_job_cnd(JOB *item, JOBLIST *deplist)
                *x++ = *(s+1);
                *x   = *(s+2);
 
-               sprintf(atomic_condition, "%s(%s)", status, job[index].name);
+               otto_sprintf(atomic_condition, "%s(%s)", status, job[index].name);
 
                switch(job[index].status)
                {
@@ -211,7 +211,7 @@ get_next_start_time(char *next_date, char date_conditions, char days_of_week, in
             {
                if(start_times[parts->tm_hour] & (1L << m))
                {
-                  sprintf(next_date, "%02d/%02d/%04d  %02d:%02d", parts->tm_mon+1, parts->tm_mday, parts->tm_year+1900, parts->tm_hour, m);
+                  otto_sprintf(next_date, "%02d/%02d/%04d  %02d:%02d", parts->tm_mon+1, parts->tm_mday, parts->tm_year+1900, parts->tm_hour, m);
                   break;
                }
             }
@@ -224,7 +224,7 @@ get_next_start_time(char *next_date, char date_conditions, char days_of_week, in
             {
                if(start_times[parts->tm_hour] & (1L << m))
                {
-                  sprintf(next_date, "%02d/%02d/%04d  %02d:%02d", parts->tm_mon+1, parts->tm_mday, parts->tm_year+1900, h, m);
+                  otto_sprintf(next_date, "%02d/%02d/%04d  %02d:%02d", parts->tm_mon+1, parts->tm_mday, parts->tm_year+1900, h, m);
                   break;
                }
             }
@@ -249,7 +249,7 @@ get_next_start_time(char *next_date, char date_conditions, char days_of_week, in
                      {
                         if(start_times[h] & (1L << m))
                         {
-                           sprintf(next_date, "%02d/%02d/%04d  %02d:%02d", parts->tm_mon+1, parts->tm_mday, parts->tm_year+1900, h, m);
+                           otto_sprintf(next_date, "%02d/%02d/%04d  %02d:%02d", parts->tm_mon+1, parts->tm_mday, parts->tm_year+1900, h, m);
                            break;
                         }
                      }
