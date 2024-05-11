@@ -84,11 +84,12 @@
 #define HAS_CONDITION       (1L <<  4)
 #define HAS_DATE_CONDITIONS (1L <<  5)
 #define HAS_AUTO_HOLD       (1L <<  6)
-#define HAS_LOOP            (1L <<  7)
-#define HAS_ENVIRONMENT     (1L <<  8)
-#define HAS_NEW_NAME        (1L <<  9)
-#define HAS_START           (1L << 10)
-#define HAS_FINISH          (1L << 11)
+#define HAS_AUTO_NOEXEC     (1L <<  7)
+#define HAS_LOOP            (1L <<  8)
+#define HAS_ENVIRONMENT     (1L <<  9)
+#define HAS_NEW_NAME        (1L << 10)
+#define HAS_START           (1L << 11)
+#define HAS_FINISH          (1L << 12)
 
 #define LOOP_NOT_RUNNING       0
 #define LOOP_RUNNING           1
@@ -214,6 +215,7 @@ enum JIL_KEYWORDS
 {
    JIL_UNKNOWN,
    JIL_AUTOHLD,
+   JIL_AUTONOX,
    JIL_BOXNAME,
    JIL_COMMAND,
    JIL_CONDITN,
@@ -375,6 +377,7 @@ enum EXTDEFS
    LOOP,
    AUTOHOLD,
    DATE_CONDITIONS,
+   AUTONOEXEC,
    EXTDEF_TOTAL
 };
 
@@ -473,6 +476,7 @@ typedef struct _job
    int64_t start_minutes;
    int64_t start_times[24];
    char    autohold;
+   char    autonoexec;
    char    environment[ENVLEN+1];
    char    loopname[VARLEN+1];
    char    loopmin;
@@ -527,6 +531,7 @@ typedef struct _job_detail
    char    start_minutes[2048];
    char    start_times[2048];
    char    autohold[6];
+   char    autonoexec[6];
    char    environment[(6*ENVLEN)+1];  // outsized to accommodate html escapes
    char    loopname[VARLEN+1];
    char    loopmin[4];
@@ -581,6 +586,7 @@ typedef struct _dbctx
                               int64_t start_minutes;         \
                               int64_t start_times[24];       \
                               char    autohold;              \
+                              char    autonoexec;            \
                               char    environment[ENVLEN+1]; \
                               char    loopname[VARLEN+1];    \
                               char    loopmin;               \
@@ -698,7 +704,8 @@ static EXTDEF EXT[EXTDEF_TOTAL] = {
    {"188743746",  "Text6",   "start_times"},
    {"188743747",  "Text7",   "loop"},
    {"188743752",  "Flag1",   "auto_hold"},
-   {"188743753",  "Flag2",   "date_conditions"}
+   {"188743753",  "Flag2",   "date_conditions"},
+   {"188743754",  "Flag3",   "auto_noexec"}
 };
 #endif
 
@@ -774,6 +781,7 @@ int ottojob_print_condition_errors(int error_mask, char *action, char *name, int
 int ottojob_print_description_errors(int error_mask, char *action, char *name, int outlen);
 int ottojob_print_environment_errors(int error_mask, char *action, char *name, int outlen);
 int ottojob_print_auto_hold_errors(int error_mask, char *action, char *name, char *auto_hold);
+int ottojob_print_auto_noexec_errors(int error_mask, char *action, char *name, char *auto_noexec);
 int ottojob_print_date_conditions_errors(int error_mask, char *action, char *name, char *date_conditions);
 int ottojob_print_days_of_week_errors(int error_mask, char *action, char *name);
 int ottojob_print_start_mins_errors(int error_mask, char *action, char *name);
@@ -866,6 +874,7 @@ void  unescape_input(char *input);
 int   bprintf(DYNBUF *b, char *format, ...);
 char *copy_envvar_assignment(int *rc, char *t, int tlen, char *s);
 int   validate_envvar_assignment(char *s);
+int   otto_sprintf(char *buf, char *format, ...);
 
 // strptime prototypes
 char *otto_strptime(const char *buf, const char *fmt, struct tm *tm);
