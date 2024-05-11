@@ -46,6 +46,7 @@ enum CSV_KEYWORDS
    CSV_START_TIMES,
    CSV_STATUS,
    CSV_AUTOHOLD,
+   CSV_AUTONOEXEC,
    CSV_START,
    CSV_FINISH,
    CSV_DURATION,
@@ -69,6 +70,7 @@ int  validate_and_copy_csv_condition(JOB *item, CSVCOL *conditionp);
 int  validate_and_copy_csv_description(JOB *item, CSVCOL *descriptionp);
 int  validate_and_copy_csv_environment(JOB *item, CSVCOL *environmentr);
 int  validate_and_copy_csv_auto_hold(JOB *item, CSVCOL *auto_holdp);
+int  validate_and_copy_csv_auto_noexec(JOB *item, CSVCOL *auto_noexecp);
 int  validate_and_copy_csv_date_conditions(JOB *item, CSVCOL *date_conditionsp, CSVCOL *days_of_weekp, CSVCOL *start_minsp, CSVCOL *start_timesp);
 int  validate_and_copy_csv_loop(JOB *item, CSVCOL *loopp);
 int  validate_and_copy_csv_new_name(JOB *item, CSVCOL *new_namep);
@@ -191,6 +193,7 @@ add_csv_insert(JOB *item, CSVROW *row, CSVROW *hdr)
    CSVCOL *namep            = NULL;
    CSVCOL *typep            = NULL;
    CSVCOL *auto_holdp       = NULL;
+   CSVCOL *auto_noexecp     = NULL;
    CSVCOL *box_namep        = NULL;
    CSVCOL *commandp         = NULL;
    CSVCOL *conditionp       = NULL;
@@ -218,6 +221,7 @@ add_csv_insert(JOB *item, CSVROW *row, CSVROW *hdr)
          case CSV_START_MINS:      start_minsp      = &row->col[c]; break;
          case CSV_START_TIMES:     start_timesp     = &row->col[c]; break;
          case CSV_AUTOHOLD:        auto_holdp       = &row->col[c]; break;
+         case CSV_AUTONOEXEC:      auto_noexecp     = &row->col[c]; break;
          case CSV_LOOP:            loopp            = &row->col[c]; break;
          default:
                                    break;
@@ -243,6 +247,8 @@ add_csv_insert(JOB *item, CSVROW *row, CSVROW *hdr)
       retval = OTTO_FAIL;
    if(validate_and_copy_csv_auto_hold(item, auto_holdp) != OTTO_SUCCESS)
       retval = OTTO_FAIL;
+   if(validate_and_copy_csv_auto_noexec(item, auto_noexecp) != OTTO_SUCCESS)
+      retval = OTTO_FAIL;
    if(validate_and_copy_csv_date_conditions(item, date_conditionsp, days_of_weekp, start_minsp, start_timesp) != OTTO_SUCCESS)
       retval = OTTO_FAIL;
    if(validate_and_copy_csv_loop(item,loopp) != OTTO_SUCCESS)
@@ -261,6 +267,7 @@ add_csv_update(JOB *item, CSVROW *row, CSVROW *hdr)
    CSVCOL *namep            = NULL;
    CSVCOL *typep            = NULL;
    CSVCOL *auto_holdp       = NULL;
+   CSVCOL *auto_noexecp     = NULL;
    CSVCOL *box_namep        = NULL;
    CSVCOL *commandp         = NULL;
    CSVCOL *conditionp       = NULL;
@@ -291,6 +298,7 @@ add_csv_update(JOB *item, CSVROW *row, CSVROW *hdr)
          case CSV_START_MINS:      start_minsp      = &row->col[c]; break;
          case CSV_START_TIMES:     start_timesp     = &row->col[c]; break;
          case CSV_AUTOHOLD:        auto_holdp       = &row->col[c]; break;
+         case CSV_AUTONOEXEC:      auto_noexecp     = &row->col[c]; break;
          case CSV_LOOP:            loopp            = &row->col[c]; break;
          case CSV_NEW_NAME:        new_namep        = &row->col[c]; break;
          case CSV_START:           startp           = &row->col[c]; break;
@@ -318,6 +326,8 @@ add_csv_update(JOB *item, CSVROW *row, CSVROW *hdr)
    if(validate_and_copy_csv_environment(item, environmentp) != OTTO_SUCCESS)
       retval = OTTO_FAIL;
    if(validate_and_copy_csv_auto_hold(item, auto_holdp) != OTTO_SUCCESS)
+      retval = OTTO_FAIL;
+   if(validate_and_copy_csv_auto_noexec(item, auto_noexecp) != OTTO_SUCCESS)
       retval = OTTO_FAIL;
    if(validate_and_copy_csv_date_conditions(item, date_conditionsp, days_of_weekp, start_minsp, start_timesp) != OTTO_SUCCESS)
       retval = OTTO_FAIL;
@@ -896,6 +906,62 @@ validate_and_copy_csv_auto_hold(JOB *item, CSVCOL *auto_holdp)
 
 
 int
+validate_and_copy_csv_auto_noexec(JOB *item, CSVCOL *auto_noexecp)
+{
+   int retval = OTTO_SUCCESS;
+   char *action = "action";
+   int rc;
+   char s_auto_noexec[10]; // maximum number of characters in an excel cell + 1
+
+   switch(item->opcode)
+   {
+      case CREATE_JOB: action = "insert_job"; break;
+      case UPDATE_JOB: action = "update_job"; break;
+   }
+
+   // get the data into a local variable
+   if(auto_noexecp != NULL) csv_getcol(s_auto_noexec, sizeof(s_auto_noexec), auto_noexecp, WITHOUT_QUOTES);
+
+   // reset the pointer if the string version is empty
+   if(auto_noexecp != NULL && s_auto_noexec[0] == '\0') auto_noexecp = NULL;
+
+   // it's okay for this to be NULL in any case but it's never
+   // okay for it to be an empty line
+   if(auto_noexecp != NULL && s_auto_noexec[0] == '\n')
+   {
+      rc = OTTO_MISSING_REQUIRED_VALUE;
+      retval = OTTO_FAIL;
+   }
+
+   // compatibility check with JIL
+   if(retval == OTTO_SUCCESS && jil_reserved_word(s_auto_noexec) != JIL_UNKNOWN)
+   {
+      rc = OTTO_SYNTAX_ERROR;
+      retval = OTTO_FAIL;
+   }
+
+   if(retval == OTTO_SUCCESS)
+   {
+      item->attributes |= HAS_AUTO_NOEXEC;
+
+      if((rc = ottojob_copy_flag(&item->autonoexec, s_auto_noexec, FLGLEN)) != OTTO_SUCCESS)
+      {
+         retval = OTTO_FAIL;
+      }
+      item->on_noexec = item->autonoexec;
+   }
+
+   if(retval != OTTO_SUCCESS)
+   {
+      ottojob_print_auto_noexec_errors(rc, action, item->name, s_auto_noexec);
+   }
+
+   return(retval);
+}
+
+
+
+int
 validate_and_copy_csv_date_conditions(JOB *item, CSVCOL *date_conditionsp, CSVCOL *days_of_weekp, CSVCOL *start_minsp, CSVCOL *start_timesp)
 {
    int     retval                = OTTO_SUCCESS;
@@ -1313,6 +1379,7 @@ csv_gethdr(CSVROW *hdr, DYNBUF *b)
         start_mins_count      = 0,
         start_times_count     = 0,
         autohold_count        = 0,
+        autonoexec_count      = 0,
         start_count           = 0,
         finish_count          = 0,
         loop_count            = 0,
@@ -1336,6 +1403,7 @@ csv_gethdr(CSVROW *hdr, DYNBUF *b)
       if(strcasecmp(v, "start_mins")      == 0) {hdr->col[c].type = CSV_START_MINS;      start_mins_count++;      continue;}
       if(strcasecmp(v, "start_times")     == 0) {hdr->col[c].type = CSV_START_TIMES;     start_times_count++;     continue;}
       if(strcasecmp(v, "autohold")        == 0) {hdr->col[c].type = CSV_AUTOHOLD;        autohold_count++;        continue;}
+      if(strcasecmp(v, "autonoexec")      == 0) {hdr->col[c].type = CSV_AUTONOEXEC;      autonoexec_count++;      continue;}
       if(strcasecmp(v, "start")           == 0) {hdr->col[c].type = CSV_START;           start_count++;           continue;}
       if(strcasecmp(v, "finish")          == 0) {hdr->col[c].type = CSV_FINISH;          finish_count++;          continue;}
       if(strcasecmp(v, "loop")            == 0) {hdr->col[c].type = CSV_LOOP;            loop_count++;            continue;}
@@ -1357,6 +1425,7 @@ csv_gethdr(CSVROW *hdr, DYNBUF *b)
       start_mins_count      > 1 ||
       start_times_count     > 1 ||
       autohold_count        > 1 ||
+      autonoexec_count      > 1 ||
       start_count           > 1 ||
       finish_count          > 1 ||
       loop_count            > 1 ||

@@ -102,6 +102,7 @@ write_insert_job_htmldtl(DYNBUF *b, JOB *item)
    bprintf(b, "<tr><td>%s</td><td>%s</td></tr>\n",     "status",          tval.status);
    bprintf(b, "<tr><td>%s</td><td>%s</td></tr>\n",     "autohold",        tval.autohold);
    bprintf(b, "<tr><td>%s</td><td>%s</td></tr>\n",     "on_autohold",     tval.on_autohold);
+   bprintf(b, "<tr><td>%s</td><td>%s</td></tr>\n",     "autonoexec",      tval.autonoexec);
    bprintf(b, "<tr><td>%s</td><td>%s</td></tr>\n",     "on_noexec",       tval.on_noexec);
    bprintf(b, "<tr><td>%s</td><td>%s</td></tr>\n",     "loopname",        tval.loopname);
    bprintf(b, "<tr><td>%s</td><td>%s</td></tr>\n",     "loopmin",         tval.loopmin);
