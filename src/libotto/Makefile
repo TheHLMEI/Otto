@@ -40,7 +40,7 @@ HDR  = otto.h linenoise.h
 
 LIB  = libotto.a
 
-CFLAGS=-g -Wall -Werror -Wno-unknown-pragmas -Wno-char-subscripts -Wno-format-overflow
+CFLAGS=-g -Wall -Werror -Wno-unknown-pragmas -Wno-char-subscripts
 
 
 target: $(LIB)
