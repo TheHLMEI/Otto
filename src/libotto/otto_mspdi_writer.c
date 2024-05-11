@@ -218,11 +218,11 @@ buffer_mspdi_tasks(DYNBUF *b, JOBLIST *joblist, int autoschedule)
       levels[joblist->item[i].level]++;
 
       // create an outline string
-      sprintf(outline, "%d", levels[1]);
+      otto_sprintf(outline, "%d", levels[1]);
 
       for(l=2; l<=joblist->item[i].level; l++)
       {
-         sprintf(tmpstr, ".%d", levels[l]);
+         otto_sprintf(tmpstr, ".%d", levels[l]);
          strcat(outline, tmpstr);
       }
 
@@ -310,6 +310,10 @@ buffer_mspdi_task(DYNBUF *b, JOB *item, char *outline, int autoschedule)
    bprintf(b, "         <ExtendedAttribute>\n");
    bprintf(b, "            <FieldID>%s</FieldID>\n", EXT[AUTOHOLD].fieldid);
    bprintf(b, "            <Value>%c</Value>\n", item->autohold == OTTO_TRUE ? '1' : '0');
+   bprintf(b, "         </ExtendedAttribute>\n");
+
+   bprintf(b, "            <FieldID>%s</FieldID>\n", EXT[AUTONOEXEC].fieldid);
+   bprintf(b, "            <Value>%c</Value>\n", item->autonoexec == OTTO_TRUE ? '1' : '0');
    bprintf(b, "         </ExtendedAttribute>\n");
 
    if(item->date_conditions != OTTO_FALSE)
@@ -586,8 +590,8 @@ format_mspdi_timestamp(time_t t)
    static char timestamp[128];
 
    now = localtime(&t);
-   sprintf(timestamp, "%4d-%02d-%02dT%02d:%02d:%02d",
-           (now->tm_year + 1900), (now->tm_mon + 1), now->tm_mday, now->tm_hour, now->tm_min, now->tm_sec);
+   otto_sprintf(timestamp, "%4d-%02d-%02dT%02d:%02d:%02d",
+                (now->tm_year + 1900), (now->tm_mon + 1), now->tm_mday, now->tm_hour, now->tm_min, now->tm_sec);
 
    return(timestamp);
 }
@@ -626,7 +630,7 @@ format_mspdi_duration(time_t t, int autoschedule)
    seconds %= 60;
 
    // create the duration string
-   sprintf(duration, "PT%dH%dM%dS", hours, minutes, seconds);
+   otto_sprintf(duration, "PT%dH%dM%dS", hours, minutes, seconds);
 
    return(duration);
 }

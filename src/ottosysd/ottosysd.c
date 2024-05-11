@@ -768,11 +768,11 @@ handle_daemon_pdu(ottoipc_simple_pdu_st *pdu)
    switch(pdu->opcode)
    {
       case PING:
-         sprintf(pdu->name, "ottosysd %s, %s, Debug %s, DB Layout v%d",
-                 cfg.otto_version, cfg.pause ? "Paused" : "Running", cfg.debug ? "On" : "Off", cfg.ottodb_version);
+         otto_sprintf(pdu->name, "ottosysd %s, %s, Debug %s, DB Layout v%d",
+                      cfg.otto_version, cfg.pause ? "Paused" : "Running", cfg.debug ? "On" : "Off", cfg.ottodb_version);
          break;
 
-      case VERIFY_DB:     sprintf(pdu->name, "%ld", ottodb_inode);                             break;
+      case VERIFY_DB:     otto_sprintf(pdu->name, "%ld", ottodb_inode);                        break;
       case DEBUG_ON:      cfg.debug = OTTO_TRUE;                                               break;
       case DEBUG_OFF:     cfg.debug = OTTO_FALSE;                                              break;
       case REFRESH:       compile_dependencies(&ctx);                                          break;
@@ -911,7 +911,7 @@ compile_dependencies()
                         {
                            if(check_times[d][h] & (1L << dmin))
                            {
-                              sprintf(minute, " %d", dmin);
+                              otto_sprintf(minute, " %d", dmin);
                               strcat(minutes, minute);
                            }
                         }
@@ -1268,13 +1268,13 @@ run_job(int id)
          chdir(getenv("HOME"));
 
          // add the job name at the top of the list
-         sprintf(otto_jobname, "OTTO_JOBNAME=%s", job[id].name);
+         otto_sprintf(otto_jobname, "OTTO_JOBNAME=%s", job[id].name);
          cfg.envvar[0] = otto_jobname;
 
          // add the box name to the list
          if(job[id].box_name[0] != '\0')
          {
-            sprintf(otto_boxname, "OTTO_BOXNAME=%s", job[id].box_name);
+            otto_sprintf(otto_boxname, "OTTO_BOXNAME=%s", job[id].box_name);
             cfg.envvar[cfg.n_envvar] = otto_boxname;
             cfg.n_envvar++;
          }
@@ -1305,7 +1305,7 @@ run_job(int id)
             // also add environment variables for the box if it's looping
             if(job[box].loopname[0] != '\0')
             {
-               sprintf(loopname, "%s=%d", job[box].loopname, (int)(job[box].loopnum * job[box].loopsgn));
+               otto_sprintf(loopname, "%s=%d", job[box].loopname, (int)(job[box].loopnum * job[box].loopsgn));
                if((cfg.envvar[cfg.n_envvar] = strdup(loopname)) == NULL)
                {
                   lprintf(logp, MAJR, "Error mallocing envvar %d.\n", cfg.n_envvar);
@@ -1614,7 +1614,7 @@ reset_job(int id)
    if(check_reset(id) == OTTO_TRUE)
    {
       job[id].on_autohold = job[id].autohold;
-      job[id].on_noexec   = OTTO_FALSE;
+      job[id].on_noexec   = job[id].autonoexec;
       job[id].status      = STAT_IN;
       job[id].pid         = 0;
       job[id].exit_status = 0;
@@ -1637,7 +1637,7 @@ reset_job_chain(int id)
    while(id != -1)
    {
       job[id].on_autohold = job[id].autohold;
-      job[id].on_noexec   = OTTO_FALSE;
+      job[id].on_noexec   = job[id].autonoexec;
       job[id].status      = STAT_IN;
       job[id].pid         = 0;
       job[id].exit_status = 0;
