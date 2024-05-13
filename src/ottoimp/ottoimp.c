@@ -313,6 +313,7 @@ send_create_job(JOB *item)
 
    pdu.type            = item->type;
    pdu.autohold        = item->autohold;
+   pdu.autonoexec      = item->autonoexec;
    pdu.date_conditions = item->date_conditions;
    pdu.days_of_week    = item->days_of_week;
    pdu.start_minutes   = item->start_minutes;
@@ -418,6 +419,7 @@ send_update_job(JOB *item)
 
    pdu.attributes      = item->attributes;
    pdu.autohold        = item->autohold;
+   pdu.autonoexec      = item->autonoexec;
    pdu.date_conditions = item->date_conditions;
    pdu.days_of_week    = item->days_of_week;
    pdu.start_minutes   = item->start_minutes;
