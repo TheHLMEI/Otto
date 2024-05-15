@@ -194,9 +194,11 @@ ottocmd_getargs(int argc, char **argv)
          case CHANGE_STATUS:
          case FORCE_START_JOB:
          case JOB_ON_AUTOHOLD:
+         case JOB_ON_AUTONOEXEC:
          case JOB_ON_HOLD:
          case JOB_ON_NOEXEC:
          case JOB_OFF_AUTOHOLD:
+         case JOB_OFF_AUTONOEXEC:
          case JOB_OFF_HOLD:
          case JOB_OFF_NOEXEC:
          case KILL_JOB:
@@ -301,6 +303,10 @@ ottocmd_usage(void)
    printf("         off autohold.  If the starting conditions are met the job\n");
    printf("         will start.\n");
    printf("\n");
+   printf("         JOB_OFF_AUTONOEXEC - Take the job specified with the -J option\n");
+   printf("         off autonoexec.  If the starting conditions are met the job\n");
+   printf("         will run.\n");
+   printf("\n");
    printf("         JOB_OFF_HOLD - Take the job specified with the -J option off\n");
    printf("         hold.  If the starting conditions are met the job will start.\n");
    printf("\n");
@@ -309,6 +315,9 @@ ottocmd_usage(void)
    printf("\n");
    printf("         JOB_ON_AUTOHOLD - Put the job specified with the -J option\n");
    printf("         on autohold.\n");
+   printf("\n");
+   printf("         JOB_ON_AUTONOEXEC - Put the job specified with the -J option\n");
+   printf("         on autonoexec.\n");
    printf("\n");
    printf("         JOB_ON_HOLD - Put the job specified with the -J option on\n");
    printf("         hold.\n");
@@ -374,6 +383,9 @@ ottocmd_usage(void)
    printf("         to the inode of the file as determined by the sending process.\n");
    printf("\n");
    printf("      -h Print this help and exit.\n");
+   printf("\n");
+   printf("      -i iterator value\n");
+   printf("         Specifies the new loop iterator value to set for a job.\n");
    printf("\n");
    printf("      -J job_name\n");
    printf("         Identifies the job the specified event should be applied to.\n");
