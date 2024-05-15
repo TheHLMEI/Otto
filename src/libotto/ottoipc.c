@@ -634,6 +634,31 @@ log_received_pdu(void *p)
 
 
 
+void
+print_received_pdu(void *p)
+{
+   ottoipc_simple_pdu_st *pdu    = (ottoipc_simple_pdu_st *)p;
+
+   if(pdu->option < NO_STATUS)
+      printf("  ottosysd returns %s\n", strsignal(pdu->option));
+   else if(pdu->option < ACK)
+   {
+      if(pdu->option > NO_STATUS && pdu->option < STATUS_TOTAL)
+         printf("  ottosysd returns %s\n", strstatus(pdu->option));
+      else
+         printf("  ottosysd returns undefined status code\n");
+   }
+   else
+   {
+      if(pdu->option >= ACK && pdu->option < RESULTCODE_TOTAL)
+         printf("  ottosysd returns %s\n", strresultcode(pdu->option));
+      else
+         printf("  ottosysd returns undefined result code\n");
+   }
+}
+
+
+
 char *
 stropcode(int i)
 {
@@ -670,6 +695,7 @@ stropcode(int i)
       case JOB_ON_NOEXEC:    retval = "JOB_ON_NOEXEC";    break;
       case JOB_OFF_NOEXEC:   retval = "JOB_OFF_NOEXEC";   break;
       case BREAK_LOOP:       retval = "BREAK_LOOP";       break;
+      case SET_LOOP:         retval = "SET_LOOP";         break;
       case SCHED_TOTAL:      retval = "SCHED_TOTAL";      break;
 
                              // daemon control operations
@@ -708,13 +734,19 @@ strresultcode(int i)
       case JOB_UPDATED:                retval = "JOB_UPDATED";                break;
       case JOB_NOT_FOUND:              retval = "JOB_NOT_FOUND";              break;
       case JOB_DELETED:                retval = "JOB_DELETED";                break;
-      case BOX_NOT_FOUND:              retval = "BOX_NOT_FOUND";              break;
-      case BOX_DELETED:                retval = "BOX_DELETED";                break;
       case JOB_ALREADY_EXISTS:         retval = "JOB_ALREADY_EXISTS";         break;
       case JOB_DEPENDS_ON_MISSING_JOB: retval = "JOB_DEPENDS_ON_MISSING_JOB"; break;
       case JOB_DEPENDS_ON_ITSELF:      retval = "JOB_DEPENDS_ON_ITSELF";      break;
+      case BOX_NOT_FOUND:              retval = "BOX_NOT_FOUND";              break;
+      case BOX_DELETED:                retval = "BOX_DELETED";                break;
+      case BOX_COMMAND:                retval = "BOX_COMMAND";                break;
+      case CMD_LOOP:                   retval = "CMD_LOOP";                   break;
       case NO_SPACE_AVAILABLE:         retval = "NO_SPACE_AVAILABLE";         break;
-      case RESULTCODE_TOTAL:           retval = "RESULTCODE_TOTAL";           break;
+      case GRANDFATHER_PARADOX:        retval = "GRANDFATHER_PARADOX";        break;
+      case NEW_NAME_ALREADY_EXISTS:    retval = "NEW_NAME_ALREADY_EXISTS";    break;
+      case JOB_IS_NOT_A_BOX:           retval = "JOB_IS_NOT_A_BOX";           break;
+      case BOX_HAS_NO_LOOP:            retval = "BOX_HAS_NO_LOOP";            break;
+      case ITERATOR_OUT_OF_BOUNDS:     retval = "ITERATOR_OUT_OF_BOUNDS";     break;
 
       default: otto_sprintf(msg, "Resultcode %d", i); retval = msg; break;
    }

@@ -94,6 +94,7 @@ void  set_job_noexec_chain     (int id, int action);
 void  set_levels               (void);
 void  set_levels_chain         (int id, int level);
 void  break_loop               (int id);
+void  set_loop                 (int id, int iterator, uint8_t *response);
 
 
 
@@ -725,24 +726,25 @@ handle_scheduler_pdu(ottoipc_simple_pdu_st *pdu)
       pdu->option = ACK;
       switch(pdu->opcode)
       {
-         case FORCE_START_JOB:  force_start_job (id);                      check_required = OTTO_TRUE; break;
-         case START_JOB:        start_job       (id);                      check_required = OTTO_TRUE; break;
-         case KILL_JOB:         kill_job        (id, SIGKILL);             check_required = OTTO_TRUE; break;
-         case MOVE_JOB_TOP:     move_job        (id, pdu->opcode, option);                             break;
-         case MOVE_JOB_UP:      move_job        (id, pdu->opcode, option);                             break;
-         case MOVE_JOB_DOWN:    move_job        (id, pdu->opcode, option);                             break;
-         case MOVE_JOB_BOTTOM:  move_job        (id, pdu->opcode, option);                             break;
-         case RESET_JOB:        reset_job       (id);                      check_required = OTTO_TRUE; break;
-         case SEND_SIGNAL:      kill_job        (id, option);              check_required = OTTO_TRUE; break;
-         case CHANGE_STATUS:    set_job_status  (id, option);              check_required = OTTO_TRUE; break;
-         case JOB_ON_AUTOHOLD:  set_job_autohold(id, pdu->opcode);         check_required = OTTO_TRUE; break;
-         case JOB_OFF_AUTOHOLD: set_job_autohold(id, pdu->opcode);         check_required = OTTO_TRUE; break;
-         case JOB_ON_HOLD:      set_job_hold    (id, pdu->opcode);         check_required = OTTO_TRUE; break;
-         case JOB_OFF_HOLD:     set_job_hold    (id, pdu->opcode);         check_required = OTTO_TRUE; break;
-         case JOB_ON_NOEXEC:    set_job_noexec  (id, pdu->opcode);         check_required = OTTO_TRUE; break;
-         case JOB_OFF_NOEXEC:   set_job_noexec  (id, pdu->opcode);         check_required = OTTO_TRUE; break;
-         case BREAK_LOOP:       break_loop      (id);                      check_required = OTTO_TRUE; break;
-         default:               pdu->option = NOOP;                                                    break;
+         case FORCE_START_JOB:  force_start_job (id);                       check_required = OTTO_TRUE; break;
+         case START_JOB:        start_job       (id);                       check_required = OTTO_TRUE; break;
+         case KILL_JOB:         kill_job        (id, SIGKILL);              check_required = OTTO_TRUE; break;
+         case MOVE_JOB_TOP:     move_job        (id, pdu->opcode, option);                              break;
+         case MOVE_JOB_UP:      move_job        (id, pdu->opcode, option);                              break;
+         case MOVE_JOB_DOWN:    move_job        (id, pdu->opcode, option);                              break;
+         case MOVE_JOB_BOTTOM:  move_job        (id, pdu->opcode, option);                              break;
+         case RESET_JOB:        reset_job       (id);                       check_required = OTTO_TRUE; break;
+         case SEND_SIGNAL:      kill_job        (id, option);               check_required = OTTO_TRUE; break;
+         case CHANGE_STATUS:    set_job_status  (id, option);               check_required = OTTO_TRUE; break;
+         case JOB_ON_AUTOHOLD:  set_job_autohold(id, pdu->opcode);          check_required = OTTO_TRUE; break;
+         case JOB_OFF_AUTOHOLD: set_job_autohold(id, pdu->opcode);          check_required = OTTO_TRUE; break;
+         case JOB_ON_HOLD:      set_job_hold    (id, pdu->opcode);          check_required = OTTO_TRUE; break;
+         case JOB_OFF_HOLD:     set_job_hold    (id, pdu->opcode);          check_required = OTTO_TRUE; break;
+         case JOB_ON_NOEXEC:    set_job_noexec  (id, pdu->opcode);          check_required = OTTO_TRUE; break;
+         case JOB_OFF_NOEXEC:   set_job_noexec  (id, pdu->opcode);          check_required = OTTO_TRUE; break;
+         case BREAK_LOOP:       break_loop      (id);                       check_required = OTTO_TRUE; break;
+         case SET_LOOP:         set_loop        (id, option, &pdu->option); check_required = OTTO_TRUE; break;
+         default:               pdu->option = NOOP;                                                     break;
       }
    }
    else
@@ -1603,6 +1605,35 @@ break_loop(int id)
    if(job[id].type == OTTO_BOX && job[id].loopname[0] != '\0')
    {
       job[id].loopstat = LOOP_BROKEN;
+   }
+}
+
+
+
+void
+set_loop(int id, int iterator, uint8_t *response)
+{
+   if(job[id].type == OTTO_BOX)
+   {
+      if(job[id].loopname[0] != '\0')
+      {
+         if(iterator >= job[id].loopmin && iterator <= job[id].loopmax)
+         {
+            job[id].loopnum = iterator;
+         }
+         else
+         {
+            *response = ITERATOR_OUT_OF_BOUNDS;
+         }
+      }
+      else
+      {
+         *response = BOX_HAS_NO_LOOP;
+      }
+   }
+   else
+   {
+      *response = JOB_IS_NOT_A_BOX;
    }
 }
 

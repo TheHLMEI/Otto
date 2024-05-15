@@ -281,6 +281,7 @@ enum OPCODES
    JOB_ON_NOEXEC,
    JOB_OFF_NOEXEC,
    BREAK_LOOP,
+   SET_LOOP,
    SCHED_TOTAL,
 
    // daemon control operations
@@ -329,6 +330,9 @@ enum RESULTCODES
    NO_SPACE_AVAILABLE,
    GRANDFATHER_PARADOX,
    NEW_NAME_ALREADY_EXISTS,
+   JOB_IS_NOT_A_BOX,
+   BOX_HAS_NO_LOOP,
+   ITERATOR_OUT_OF_BOUNDS,
    RESULTCODE_TOTAL
 };
 
@@ -823,6 +827,7 @@ int  ottoipc_recv_all(int socket);
 int  ottoipc_recv_str(void *t, size_t tlen, RECVBUF *recvbuf);
 int  ottoipc_dequeue_pdu(void **response);
 void log_received_pdu(void *p);
+void print_received_pdu(void *p);
 
 char *stropcode(int i);
 char *strresultcode(int i);
