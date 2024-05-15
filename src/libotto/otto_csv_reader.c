@@ -948,7 +948,8 @@ validate_and_copy_csv_auto_noexec(JOB *item, CSVCOL *auto_noexecp)
       {
          retval = OTTO_FAIL;
       }
-      item->on_noexec = item->autonoexec;
+      item->on_noexec     = item->autonoexec;
+      item->on_autonoexec = item->autonoexec;
    }
 
    if(retval != OTTO_SUCCESS)

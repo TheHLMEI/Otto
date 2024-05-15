@@ -1123,6 +1123,7 @@ ottojob_log_job_layout()
    lsprintf(logp, CATI, "expr_fail       at %4d for %4d type integer  notnull\n", offsetof(JOB, expr_fail),       sizeof(j.expr_fail));
    lsprintf(logp, CATI, "status          at %4d for %4d type integer  notnull\n", offsetof(JOB, status),          sizeof(j.status));
    lsprintf(logp, CATI, "on_autohold     at %4d for %4d type integer  notnull\n", offsetof(JOB, on_autohold),     sizeof(j.on_autohold));
+   lsprintf(logp, CATI, "on_autonoexec   at %4d for %4d type integer  notnull\n", offsetof(JOB, on_autonoexec),   sizeof(j.on_autonoexec));
    lsprintf(logp, CATI, "on_noexec       at %4d for %4d type integer  notnull\n", offsetof(JOB, on_noexec),       sizeof(j.on_noexec));
    lsprintf(logp, CATI, "loopnum         at %4d for %4d type integer  notnull\n", offsetof(JOB, loopnum),         sizeof(j.loopnum));
    lsprintf(logp, CATI, "loopstat        at %4d for %4d type integer  notnull\n", offsetof(JOB, loopstat),        sizeof(j.loopstat));
@@ -1576,12 +1577,13 @@ ottojob_prepare_txt_values(JOBTVAL *tval, JOB *item, int format)
       default:      strcpy(tval->status, "--"); break;
    }
 
-   otto_sprintf(tval->autohold,    "%d",  item->autohold);
-   otto_sprintf(tval->on_autohold, "%d",  item->on_autohold);
-   otto_sprintf(tval->autonoexec,  "%d",  item->autonoexec);
-   otto_sprintf(tval->on_noexec,   "%d",  item->on_noexec);
+   otto_sprintf(tval->autohold,     "%d",  item->autohold);
+   otto_sprintf(tval->on_autohold,  "%d",  item->on_autohold);
+   otto_sprintf(tval->autonoexec,   "%d",  item->autonoexec);
+   otto_sprintf(tval->on_autonoexec,"%d",  item->on_autonoexec);
+   otto_sprintf(tval->on_noexec,    "%d",  item->on_noexec);
    if(item->type != OTTO_BOX)
-      otto_sprintf(tval->pid,      "%d",  item->pid);
+      otto_sprintf(tval->pid,       "%d",  item->pid);
    
 
    if(item->start == 0)

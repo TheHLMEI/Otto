@@ -493,6 +493,7 @@ typedef struct _job
    char    expr_fail;
    char    status;
    char    on_autohold;
+   char    on_autonoexec;
    char    on_noexec;
    char    loopnum;
    char    loopstat;  
@@ -550,6 +551,7 @@ typedef struct _job_detail
    char    expr_fail[6];
    char    status[10];
    char    on_autohold[6];
+   char    on_autonoexec[6];
    char    on_noexec[6];
    char    pid[10];
    char    start[20];
@@ -604,6 +606,7 @@ typedef struct _dbctx
 #define JOBSTT_PDU_ATTRIBUTES char    expr_fail;             \
                               char    status;                \
                               char    on_autohold;           \
+                              char    on_autonoexec;         \
                               char    on_noexec;             \
                               pid_t   pid;                   \
                               time_t  start;                 \

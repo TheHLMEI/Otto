@@ -107,6 +107,7 @@ create_job(ottoipc_create_job_pdu_st *pdu, DBCTX *ctx)
       ctx->job[id].start_minutes   = pdu->start_minutes;
       ctx->job[id].status          = STAT_IN;
       ctx->job[id].on_autohold     = pdu->autohold;
+      ctx->job[id].on_autonoexec   = pdu->autonoexec;
       ctx->job[id].on_noexec       = pdu->autonoexec;
       ctx->job[id].loopmin         = pdu->loopmin;
       ctx->job[id].loopmax         = pdu->loopmax;
@@ -218,6 +219,7 @@ report_job(ottoipc_simple_pdu_st *pdu, DBCTX *ctx)
          response.expr_fail       = joblist.item[i].expr_fail;
          response.status          = joblist.item[i].status;
          response.on_autohold     = joblist.item[i].on_autohold;
+         response.on_autonoexec   = joblist.item[i].on_autonoexec;
          response.on_noexec       = joblist.item[i].on_noexec;
          response.pid             = joblist.item[i].pid;
          response.start           = joblist.item[i].start;
@@ -451,8 +453,9 @@ update_job(ottoipc_update_job_pdu_st *pdu, DBCTX *ctx)
 
          if(pdu->attributes & HAS_AUTO_NOEXEC)
          {
-            ctx->job[id].autonoexec = pdu->autonoexec;
-            ctx->job[id].on_noexec  = pdu->autonoexec;
+            ctx->job[id].autonoexec    = pdu->autonoexec;
+            ctx->job[id].on_autonoexec = pdu->autonoexec;
+            ctx->job[id].on_noexec     = pdu->autonoexec;
          }
 
          if(pdu->attributes & HAS_LOOP)

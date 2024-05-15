@@ -74,6 +74,7 @@ write_insert_job_dtl(JOB *item)
    printf("autohold       : %s\n", tval.autohold);
    printf("on_autohold    : %s\n", tval.on_autohold);
    printf("autonoexec     : %s\n", tval.autonoexec);
+   printf("on_autonoexec  : %s\n", tval.on_autonoexec);
    printf("on_noexec      : %s\n", tval.on_noexec);
    printf("loopname       : %s\n", tval.loopname);
    printf("loopmin        : %s\n", tval.loopmin);

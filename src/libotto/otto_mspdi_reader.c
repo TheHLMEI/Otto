@@ -651,7 +651,8 @@ validate_and_copy_mspdi(MSP_TASKLIST *tasklist, JOBLIST *joblist)
 
                   retval = OTTO_FAIL;
                }
-               joblist->item[i].on_noexec = joblist->item[i].autonoexec;
+               joblist->item[i].on_autonoexec = joblist->item[i].autonoexec;
+               joblist->item[i].on_noexec     = joblist->item[i].autonoexec;
             }
          }
 

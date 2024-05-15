@@ -941,6 +941,10 @@ activate_box(int id)
       // mark box as ACTIVATED
       job[id].status = STAT_AC;
 
+      // set on_noexec if necessary
+      if(job[id].on_autonoexec == OTTO_TRUE)
+         job[id].on_noexec = job[id].on_autonoexec;
+
       // handle box looping
       if(job[id].loopname[0] != '\0')
       {
@@ -988,6 +992,10 @@ activate_box_chain(int id)
                job[id].loopnum    = job[id].loopmin -1;
                job[id].loopstat   = LOOP_NOT_RUNNING;
 
+               // set on_noexec if necessary
+               if(job[id].on_autonoexec == OTTO_TRUE)
+                  job[id].on_noexec = job[id].on_autonoexec;
+
                // activate the box's chain
                activate_box_chain(job[id].head);
             }
@@ -1003,6 +1011,10 @@ activate_box_chain(int id)
                   job[id].status   = STAT_OH;
                else
                   job[id].status   = STAT_AC;
+
+               // set on_noexec if necessary
+               if(job[id].on_autonoexec == OTTO_TRUE)
+                  job[id].on_noexec = job[id].on_autonoexec;
             }
             break;
       }
@@ -1026,6 +1038,10 @@ force_activate_box(int id)
    job[id].start      = 0;
    job[id].finish     = 0;
    job[id].duration   = 0;
+
+   // set on_noexec if necessary
+   if(job[id].on_autonoexec == OTTO_TRUE)
+      job[id].on_noexec = job[id].on_autonoexec;
 
    // and force activate the box's chain
    force_activate_box_chain(job[id].head);
@@ -1058,6 +1074,10 @@ force_activate_box_chain(int id)
             job[id].duration   = 0;
             job[id].loopstat   = LOOP_NOT_RUNNING;
 
+            // set on_noexec if necessary
+            if(job[id].on_autonoexec == OTTO_TRUE)
+               job[id].on_noexec = job[id].on_autonoexec;
+
             // and force activate the box's chain
             force_activate_box_chain(job[id].head);
             break;
@@ -1077,6 +1097,10 @@ force_activate_box_chain(int id)
             job[id].start    = 0;
             job[id].finish   = 0;
             job[id].duration = 0;
+
+            // set on_noexec if necessary
+            if(job[id].on_autonoexec == OTTO_TRUE)
+               job[id].on_noexec = job[id].on_autonoexec;
             break;
       }
 
@@ -1229,6 +1253,10 @@ run_job(int id)
    if(cfg.pause == OTTO_TRUE)
       return;
 
+   // set on_noexec if necessary
+   if(job[id].on_autonoexec == OTTO_TRUE)
+      job[id].on_noexec = job[id].on_autonoexec;
+
    if(job[id].on_noexec == OTTO_TRUE)
    {
       job[id].pid      = 0;
@@ -1374,6 +1402,10 @@ activate_job(int id)
       job[id].start    = 0;
       job[id].finish   = 0;
       job[id].duration = 0;
+
+      // set on_noexec if necessary
+      if(job[id].on_autonoexec == OTTO_TRUE)
+         job[id].on_noexec = job[id].on_autonoexec;
    }
 }
 
@@ -1497,12 +1529,12 @@ set_job_autonoexec(int id, int action)
    {
       // just set this one job on autonoexec no matter what type it is
       case JOB_ON_AUTONOEXEC:
-         job[id].autonoexec = OTTO_TRUE;
+         job[id].on_autonoexec = OTTO_TRUE;
          break;
 
       case JOB_OFF_AUTONOEXEC:
          // just set this one job off autonoexec no matter what type it is
-         job[id].autonoexec = OTTO_FALSE;
+         job[id].on_autonoexec = OTTO_FALSE;
          break;
       default:
          break;
@@ -1668,16 +1700,17 @@ reset_job(int id)
 {
    if(check_reset(id) == OTTO_TRUE)
    {
-      job[id].on_autohold = job[id].autohold;
-      job[id].on_noexec   = job[id].autonoexec;
-      job[id].status      = STAT_IN;
-      job[id].pid         = 0;
-      job[id].exit_status = 0;
-      job[id].start       = 0;
-      job[id].finish      = 0;
-      job[id].duration    = 0;
-      job[id].loopnum     = job[id].loopmin - 1;
-      job[id].loopstat    = LOOP_NOT_RUNNING;
+      job[id].on_autohold   = job[id].autohold;
+      job[id].on_autonoexec = job[id].autonoexec;
+      job[id].on_noexec     = job[id].autonoexec;
+      job[id].status        = STAT_IN;
+      job[id].pid           = 0;
+      job[id].exit_status   = 0;
+      job[id].start         = 0;
+      job[id].finish        = 0;
+      job[id].duration      = 0;
+      job[id].loopnum       = job[id].loopmin - 1;
+      job[id].loopstat      = LOOP_NOT_RUNNING;
 
       if(job[id].type == OTTO_BOX)
          reset_job_chain(job[id].head);
@@ -1691,16 +1724,17 @@ reset_job_chain(int id)
 {
    while(id != -1)
    {
-      job[id].on_autohold = job[id].autohold;
-      job[id].on_noexec   = job[id].autonoexec;
-      job[id].status      = STAT_IN;
-      job[id].pid         = 0;
-      job[id].exit_status = 0;
-      job[id].start       = 0;
-      job[id].finish      = 0;
-      job[id].duration    = 0;
-      job[id].loopnum     = job[id].loopmin - 1;
-      job[id].loopstat    = LOOP_NOT_RUNNING;
+      job[id].on_autohold   = job[id].autohold;
+      job[id].on_autonoexec = job[id].autonoexec;
+      job[id].on_noexec     = job[id].autonoexec;
+      job[id].status        = STAT_IN;
+      job[id].pid           = 0;
+      job[id].exit_status   = 0;
+      job[id].start         = 0;
+      job[id].finish        = 0;
+      job[id].duration      = 0;
+      job[id].loopnum       = job[id].loopmin - 1;
+      job[id].loopstat      = LOOP_NOT_RUNNING;
 
       if(job[id].type == OTTO_BOX)
          reset_job_chain(job[id].head);
