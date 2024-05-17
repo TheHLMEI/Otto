@@ -667,47 +667,49 @@ stropcode(int i)
 
    switch(i)
    {
-      case NOOP:             retval = "NOOP";             break;
+      case NOOP:               retval = "NOOP";               break;
 
-                             // job definition operations
-      case CREATE_JOB:       retval = "CREATE_JOB";       break;
-      case REPORT_JOB:       retval = "REPORT_JOB";       break;
-      case UPDATE_JOB:       retval = "UPDATE_JOB";       break;
-      case DELETE_JOB:       retval = "DELETE_JOB";       break;
-      case DELETE_BOX:       retval = "DELETE_BOX";       break;
-      case CRUD_TOTAL:       retval = "CRUD_TOTAL";       break;
+                               // job definition operations
+      case CREATE_JOB:         retval = "CREATE_JOB";         break;
+      case REPORT_JOB:         retval = "REPORT_JOB";         break;
+      case UPDATE_JOB:         retval = "UPDATE_JOB";         break;
+      case DELETE_JOB:         retval = "DELETE_JOB";         break;
+      case DELETE_BOX:         retval = "DELETE_BOX";         break;
+      case CRUD_TOTAL:         retval = "CRUD_TOTAL";         break;
 
-                             // scheduler control operations
-      case FORCE_START_JOB:  retval = "FORCE_START_JOB";  break;
-      case START_JOB:        retval = "START_JOB";        break;
-      case KILL_JOB:         retval = "KILL_JOB";         break;
-      case MOVE_JOB_TOP:     retval = "MOVE_JOB_TOP";     break;
-      case MOVE_JOB_UP:      retval = "MOVE_JOB_UP";      break;
-      case MOVE_JOB_DOWN:    retval = "MOVE_JOB_DOWN";    break;
-      case MOVE_JOB_BOTTOM:  retval = "MOVE_JOB_BOTTOM";  break;
-      case RESET_JOB:        retval = "RESET_JOB";        break;
-      case SEND_SIGNAL:      retval = "SEND_SIGNAL";      break;
-      case CHANGE_STATUS:    retval = "CHANGE_STATUS";    break;
-      case JOB_ON_AUTOHOLD:  retval = "JOB_ON_AUTOHOLD";  break;
-      case JOB_OFF_AUTOHOLD: retval = "JOB_OFF_AUTOHOLD"; break;
-      case JOB_ON_HOLD:      retval = "JOB_ON_HOLD";      break;
-      case JOB_OFF_HOLD:     retval = "JOB_OFF_HOLD";     break;
-      case JOB_ON_NOEXEC:    retval = "JOB_ON_NOEXEC";    break;
-      case JOB_OFF_NOEXEC:   retval = "JOB_OFF_NOEXEC";   break;
-      case BREAK_LOOP:       retval = "BREAK_LOOP";       break;
-      case SET_LOOP:         retval = "SET_LOOP";         break;
-      case SCHED_TOTAL:      retval = "SCHED_TOTAL";      break;
+                               // scheduler control operations
+      case FORCE_START_JOB:    retval = "FORCE_START_JOB";    break;
+      case START_JOB:          retval = "START_JOB";          break;
+      case KILL_JOB:           retval = "KILL_JOB";           break;
+      case MOVE_JOB_TOP:       retval = "MOVE_JOB_TOP";       break;
+      case MOVE_JOB_UP:        retval = "MOVE_JOB_UP";        break;
+      case MOVE_JOB_DOWN:      retval = "MOVE_JOB_DOWN";      break;
+      case MOVE_JOB_BOTTOM:    retval = "MOVE_JOB_BOTTOM";    break;
+      case RESET_JOB:          retval = "RESET_JOB";          break;
+      case SEND_SIGNAL:        retval = "SEND_SIGNAL";        break;
+      case CHANGE_STATUS:      retval = "CHANGE_STATUS";      break;
+      case JOB_ON_AUTOHOLD:    retval = "JOB_ON_AUTOHOLD";    break;
+      case JOB_OFF_AUTOHOLD:   retval = "JOB_OFF_AUTOHOLD";   break;
+      case JOB_ON_AUTONOEXEC:  retval = "JOB_ON_AUTONOEXEC";  break;
+      case JOB_OFF_AUTONOEXEC: retval = "JOB_OFF_AUTONOEXEC"; break;
+      case JOB_ON_HOLD:        retval = "JOB_ON_HOLD";        break;
+      case JOB_OFF_HOLD:       retval = "JOB_OFF_HOLD";       break;
+      case JOB_ON_NOEXEC:      retval = "JOB_ON_NOEXEC";      break;
+      case JOB_OFF_NOEXEC:     retval = "JOB_OFF_NOEXEC";     break;
+      case BREAK_LOOP:         retval = "BREAK_LOOP";         break;
+      case SET_LOOP:           retval = "SET_LOOP";           break;
+      case SCHED_TOTAL:        retval = "SCHED_TOTAL";        break;
 
-                             // daemon control operations
-      case PING:             retval = "PING";             break;
-      case VERIFY_DB:        retval = "VERIFY_DB";        break;
-      case DEBUG_ON:         retval = "DEBUG_ON";         break;
-      case DEBUG_OFF:        retval = "DEBUG_OFF";        break;
-      case REFRESH:          retval = "REFRESH";          break;
-      case PAUSE_DAEMON:     retval = "PAUSE_DAEMON";     break;
-      case RESUME_DAEMON:    retval = "RESUME_DAEMON";    break;
-      case STOP_DAEMON:      retval = "STOP_DAEMON";      break;
-      case OPCODE_TOTAL:     retval = "OPCODE_TOTAL";     break;
+                               // daemon control operations
+      case PING:               retval = "PING";               break;
+      case VERIFY_DB:          retval = "VERIFY_DB";          break;
+      case DEBUG_ON:           retval = "DEBUG_ON";           break;
+      case DEBUG_OFF:          retval = "DEBUG_OFF";          break;
+      case REFRESH:            retval = "REFRESH";            break;
+      case PAUSE_DAEMON:       retval = "PAUSE_DAEMON";       break;
+      case RESUME_DAEMON:      retval = "RESUME_DAEMON";      break;
+      case STOP_DAEMON:        retval = "STOP_DAEMON";        break;
+      case OPCODE_TOTAL:       retval = "OPCODE_TOTAL";       break;
 
       default: otto_sprintf(msg, "Opcode %d", i); retval = msg; break;
    }

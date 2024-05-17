@@ -123,6 +123,13 @@ create_job(ottoipc_create_job_pdu_st *pdu, DBCTX *ctx)
       ctx->job[id].prev = -1;
       ctx->job[id].next = -1;
 
+      // override autonoexec values based on parent job
+      if( ctx->job[id].box != -1 && ctx->job[ctx->job[id].box].on_autonoexec == OTTO_TRUE)
+      {
+         ctx->job[id].on_autonoexec = OTTO_TRUE;
+         ctx->job[id].on_noexec     = OTTO_TRUE;
+      }
+
       // add the job at the tail of its parent box
       if(box == -1)
       {
@@ -480,6 +487,13 @@ update_job(ottoipc_update_job_pdu_st *pdu, DBCTX *ctx)
          if(pdu->attributes & HAS_FINISH)
          {
             ctx->job[id].finish = pdu->finish;
+         }
+
+         // override autonoexec values based on parent job
+         if( ctx->job[id].box != -1 && ctx->job[ctx->job[id].box].on_autonoexec == OTTO_TRUE)
+         {
+            ctx->job[id].on_autonoexec = OTTO_TRUE;
+            ctx->job[id].on_noexec     = OTTO_TRUE;
          }
 
          save_jobwork(ctx);
