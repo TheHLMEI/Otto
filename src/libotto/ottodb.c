@@ -438,6 +438,30 @@ open_ottodb(int type)
 
    if(retval != OTTO_FAIL)
    {
+      retval = get_ottodb_inode();
+   }
+
+   return(retval);
+}
+
+
+
+int
+get_ottodb_inode()
+{
+   int   retval = OTTO_SUCCESS;
+   char *filename;
+   struct stat statbuf;
+
+   // check environment variablw
+   if((filename = getenv("OTTODB")) == NULL)
+   {
+      lprintf(logp, MAJR, "$OTTODB isn't defined.\n");
+      retval = OTTO_FAIL;
+   }
+
+   if(retval != OTTO_FAIL)
+   {
       // store the inode of the ottodb file for verification
       stat(filename, &statbuf);
       ottodb_inode = statbuf.st_ino;

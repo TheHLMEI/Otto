@@ -1591,7 +1591,7 @@ set_job_autonoexec(int id, int action)
             job[id].on_noexec = OTTO_TRUE;
 
             if(job[id].type == OTTO_BOX)
-               set_job_autonoexec_chain(action, job[id].head);
+               set_job_autonoexec_chain(job[id].head, action);
          }
          break;
 
@@ -1607,7 +1607,7 @@ set_job_autonoexec(int id, int action)
                job[id].on_noexec = OTTO_FALSE;
 
                if(job[id].type == OTTO_BOX)
-                  set_job_autonoexec_chain(action, job[id].head);
+                  set_job_autonoexec_chain(job[id].head, action);
             }
          }
          break;
@@ -1647,7 +1647,7 @@ set_job_autonoexec_chain(int id, int action)
       }
 
       if(job[id].type == OTTO_BOX)
-         set_job_autonoexec_chain(action, job[id].head);
+         set_job_autonoexec_chain(job[id].head, action);
 
       id = job[id].next;
    }
@@ -1714,7 +1714,7 @@ set_job_noexec(int id, int action)
             job[id].on_noexec = OTTO_TRUE;
 
             if(job[id].type == OTTO_BOX)
-               set_job_noexec_chain(action, job[id].head);
+               set_job_noexec_chain(job[id].head, action);
          }
          break;
 
@@ -1727,7 +1727,7 @@ set_job_noexec(int id, int action)
                job[id].on_noexec = OTTO_FALSE;
 
                if(job[id].type == OTTO_BOX)
-                  set_job_noexec_chain(action, job[id].head);
+                  set_job_noexec_chain(job[id].head, action);
             }
          }
          break;
@@ -1759,7 +1759,7 @@ set_job_noexec_chain(int id, int action)
       }
 
       if(job[id].type == OTTO_BOX)
-         set_job_noexec_chain(action, job[id].head);
+         set_job_noexec_chain(job[id].head, action);
 
       id = job[id].next;
    }

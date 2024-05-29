@@ -809,6 +809,7 @@ void ottojob_prepare_txt_values(JOBTVAL *tval, JOB *item, int format);
 
 // ottodb prototypes
 int   open_ottodb(int type);
+int   get_ottodb_inode(void);
 void  copy_jobwork(DBCTX *ctx);
 void  save_jobwork(DBCTX *ctx);
 void  sort_jobwork(DBCTX *ctx,  int sort_mode);

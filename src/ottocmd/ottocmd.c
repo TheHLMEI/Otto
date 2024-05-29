@@ -409,6 +409,7 @@ ottocmd(void)
 {
    int retval = OTTO_SUCCESS;
    ottoipc_simple_pdu_st *pdu;
+   char    inode[NAMLEN+1];
 
    ottoipc_initialize_send();
    ottoipc_enqueue_simple_pdu(&send_pdu);
@@ -428,18 +429,40 @@ ottocmd(void)
                log_received_pdu(pdu);
             }
 
-            // pings can be very verbose.  they don't need to be logged
-            // but some output to the screen is required
-            if(pdu->opcode == PING && pdu->option == ACK)
+            // output ACK responses
+            if(pdu->option == ACK)
             {
-               printf("%s\n", pdu->name);
+               // pings can be very verbose.  they don't need to be logged
+               // but some output to the screen is required
+               if(pdu->opcode == PING)
+               {
+                  printf("%s\n", pdu->name);
+               }
+
+               // verify DB is not verbose but some work needs to be done before
+               // output to the screen is done
+               if(pdu->opcode == VERIFY_DB)
+               {
+                  get_ottodb_inode();
+                  otto_sprintf(inode, "%ld", ottodb_inode);
+                  if(strcmp(inode, pdu->name) == 0)
+                  {
+                     printf("ottosysd is using the same ottodb file.\n");
+                  }
+                  else
+                  {
+                     printf("ottosysd is using a different ottodb file.\n");
+                     retval = OTTO_FAIL;
+                  }
+               }
             }
 
             // otherwise if the pdu response is NOT ACK
             // print a message to the screen
-            if(pdu->option != ACK)
+            else
             {
                print_received_pdu(pdu);
+               retval = OTTO_FAIL;
             }
          }
       }
@@ -458,7 +481,7 @@ ottocmd_copy_event(ottoipc_simple_pdu_st *pdu, char *s)
 
    for(i=CRUD_TOTAL+1; i<OPCODE_TOTAL; i++)
    {
-      if(i == SCHED_TOTAL || i == VERIFY_DB)
+      if(i == SCHED_TOTAL)
          continue;
       if(strcmp(stropcode(i), s) == 0)
       {
@@ -497,7 +520,7 @@ report_events(char *msg)
    fprintf(stderr, "\n%s.\nEvent must be one of:", msg);
    for(i=CRUD_TOTAL+1; i<OPCODE_TOTAL; i++)
    {
-      if(i == SCHED_TOTAL || i == VERIFY_DB)
+      if(i == SCHED_TOTAL)
          continue;
       if(i > CRUD_TOTAL+1)
          fprintf(stderr, ",");
