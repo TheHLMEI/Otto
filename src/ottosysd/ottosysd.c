@@ -1036,10 +1036,11 @@ force_activate_box(int id)
    job[id].status = STAT_AC;
 
    // reset all stats
-   job[id].loopstat   = LOOP_NOT_RUNNING;
-   job[id].start      = 0;
-   job[id].finish     = 0;
-   job[id].duration   = 0;
+   job[id].start    = 0;
+   job[id].finish   = 0;
+   job[id].duration = 0;
+   job[id].loopnum  = job[id].loopmin -1;
+   job[id].loopstat = LOOP_NOT_RUNNING;
 
    // set on_noexec if necessary
    if(job[id].on_autonoexec == OTTO_TRUE)
@@ -1070,11 +1071,13 @@ force_activate_box_chain(int id)
                else
                   job[id].status   = STAT_AC;
             }
+
             // but always reset values
-            job[id].start      = 0;
-            job[id].finish     = 0;
-            job[id].duration   = 0;
-            job[id].loopstat   = LOOP_NOT_RUNNING;
+            job[id].start    = 0;
+            job[id].finish   = 0;
+            job[id].duration = 0;
+            job[id].loopnum  = job[id].loopmin -1;
+            job[id].loopstat = LOOP_NOT_RUNNING;
 
             // set on_noexec if necessary
             if(job[id].on_autonoexec == OTTO_TRUE)
@@ -1094,6 +1097,7 @@ force_activate_box_chain(int id)
                else
                   job[id].status   = STAT_AC;
             }
+
             // but always reset values
             job[id].pid      = 0;
             job[id].start    = 0;
@@ -1165,6 +1169,8 @@ finish_box(int box_id, time_t finish)
                else
                {
                   job[box_id].status = STAT_SU;
+
+                  job[box_id].loopstat = LOOP_NOT_RUNNING;
 
                   job[box_id].finish = finish;
                   if(job[box_id].start != 0)
@@ -1627,10 +1633,10 @@ set_job_autonoexec_chain(int id, int action)
       switch(action)
       {
          case JOB_ON_AUTONOEXEC:
-            job[id].on_autonoexec = OTTO_FALSE;
+            job[id].on_autonoexec = OTTO_TRUE;
 
             // also set on_noexec flag
-            job[id].on_noexec = OTTO_FALSE;
+            job[id].on_noexec = OTTO_TRUE;
 
             break;
 

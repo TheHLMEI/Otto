@@ -80,6 +80,7 @@ write_insert_job_dtl(JOB *item)
    printf("loopmin        : %s\n", tval.loopmin);
    printf("loopmax        : %s\n", tval.loopmax);
    printf("loopnum        : %s\n", tval.loopnum);
+   printf("loopstat       : %s\n", tval.loopstat);
    if(item->type != OTTO_BOX)
       printf("pid            : %s\n", tval.pid);
    printf("start          : %s\n", tval.start);
