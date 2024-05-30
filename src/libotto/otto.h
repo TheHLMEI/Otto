@@ -301,7 +301,7 @@ enum OPCODES
 
 enum STATUSES
 {
-   NO_STATUS=100,
+   NO_STATUS=75,
    FAILURE,
    INACTIVE,
    RUNNING,
@@ -313,7 +313,7 @@ enum STATUSES
 
 enum RESULTCODES
 {
-   ACK = 200,
+   ACK = 100,
    NACK,
 
    // job definition operations
