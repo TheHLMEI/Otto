@@ -447,11 +447,11 @@ ottocmd(void)
                   otto_sprintf(inode, "%ld", ottodb_inode);
                   if(strcmp(inode, pdu->name) == 0)
                   {
-                     printf("ottosysd is using the same ottodb file.\n");
+                     printf("  ottosysd is using the same ottodb file\n");
                   }
                   else
                   {
-                     printf("ottosysd is using a different ottodb file.\n");
+                     printf("  ottosysd is using a different ottodb file\n");
                      retval = OTTO_FAIL;
                   }
                }

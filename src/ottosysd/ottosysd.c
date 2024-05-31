@@ -69,35 +69,35 @@ int   fork_httpd(char **argv);
 int   ottohttpd(void);
 int   handle_http(RECVBUF *recvbuf);
 /*------------------------------ job utility functions ----------------------------*/
-void  activate_box             (int id);
-void  activate_box_chain       (int id);
-void  run_box                  (int id);
-void  run_box_noexec_chain     (int id);
-void  force_activate_box       (int id);
-void  force_activate_box_chain (int id);
-void  activate_job             (int id);
-void  run_job                  (int id);
-void  finish_box               (int box_id, time_t finish);
-void  finish_job               (int sigNum);
-void  force_start_job          (int id);
-void  start_job                (int id);
-void  kill_job                 (int id, int signal);
-void  move_job                 (int id, int action, int count);
-void  reset_job                (int id);
-void  reset_job_chain          (int id);
-int   check_reset              (int id);
-int   check_reset_chain        (int id);
-void  set_job_status           (int id, int status);
-void  set_job_autohold         (int id, int action);
-void  set_job_autonoexec       (int id, int action);
-void  set_job_autonoexec_chain (int id, int action);
-void  set_job_hold             (int id, int action);
-void  set_job_noexec           (int id, int action);
-void  set_job_noexec_chain     (int id, int action);
-void  set_levels               (void);
-void  set_levels_chain         (int id, int level);
-void  break_loop               (int id);
-void  set_loop                 (int id, int iterator, uint8_t *response);
+uint8_t  activate_box             (int id);
+uint8_t  activate_box_chain       (int id);
+uint8_t  activate_job             (int id);
+uint8_t  break_loop               (int id);
+uint8_t  check_reset              (int id);
+uint8_t  check_reset_chain        (int id);
+void     finish_box               (int box_id, time_t finish);
+void     finish_job               (int sigNum);
+uint8_t  force_activate_box       (int id);
+uint8_t  force_activate_box_chain (int id);
+uint8_t  force_start_job          (int id);
+uint8_t  kill_job                 (int id, int signal);
+uint8_t  move_job                 (int id, int action, int count);
+uint8_t  reset_job                (int id);
+uint8_t  reset_job_chain          (int id);
+uint8_t  run_box                  (int id);
+uint8_t  run_box_noexec_chain     (int id);
+uint8_t  run_job                  (int id);
+uint8_t  set_job_autohold         (int id, int action);
+uint8_t  set_job_autonoexec       (int id, int action);
+uint8_t  set_job_autonoexec_chain (int id, int action);
+uint8_t  set_job_hold             (int id, int action);
+uint8_t  set_job_noexec           (int id, int action);
+uint8_t  set_job_noexec_chain     (int id, int action);
+uint8_t  set_job_status           (int id, int status);
+void     set_levels               (void);
+void     set_levels_chain         (int id, int level);
+uint8_t  set_loop                 (int id, int loop_num);
+uint8_t  start_job                (int id);
 
 
 
@@ -726,30 +726,29 @@ handle_scheduler_pdu(ottoipc_simple_pdu_st *pdu)
 
       // update pdu response in place then enqueue it to send
       option = pdu->option;
-      pdu->option = ACK;
       switch(pdu->opcode)
       {
-         case FORCE_START_JOB:    force_start_job (id);                       check_required = OTTO_TRUE; break;
-         case START_JOB:          start_job       (id);                       check_required = OTTO_TRUE; break;
-         case KILL_JOB:           kill_job        (id, SIGKILL);              check_required = OTTO_TRUE; break;
-         case MOVE_JOB_TOP:       move_job        (id, pdu->opcode, option);                              break;
-         case MOVE_JOB_UP:        move_job        (id, pdu->opcode, option);                              break;
-         case MOVE_JOB_DOWN:      move_job        (id, pdu->opcode, option);                              break;
-         case MOVE_JOB_BOTTOM:    move_job        (id, pdu->opcode, option);                              break;
-         case RESET_JOB:          reset_job       (id);                       check_required = OTTO_TRUE; break;
-         case SEND_SIGNAL:        kill_job        (id, option);               check_required = OTTO_TRUE; break;
-         case CHANGE_STATUS:      set_job_status  (id, option);               check_required = OTTO_TRUE; break;
-         case JOB_ON_AUTOHOLD:    set_job_autohold(id, pdu->opcode);          check_required = OTTO_TRUE; break;
-         case JOB_OFF_AUTOHOLD:   set_job_autohold(id, pdu->opcode);          check_required = OTTO_TRUE; break;
-         case JOB_ON_AUTONOEXEC:  set_job_autonoexec(id, pdu->opcode);        check_required = OTTO_TRUE; break;
-         case JOB_OFF_AUTONOEXEC: set_job_autonoexec(id, pdu->opcode);        check_required = OTTO_TRUE; break;
-         case JOB_ON_HOLD:        set_job_hold    (id, pdu->opcode);          check_required = OTTO_TRUE; break;
-         case JOB_OFF_HOLD:       set_job_hold    (id, pdu->opcode);          check_required = OTTO_TRUE; break;
-         case JOB_ON_NOEXEC:      set_job_noexec  (id, pdu->opcode);          check_required = OTTO_TRUE; break;
-         case JOB_OFF_NOEXEC:     set_job_noexec  (id, pdu->opcode);          check_required = OTTO_TRUE; break;
-         case BREAK_LOOP:         break_loop      (id);                       check_required = OTTO_TRUE; break;
-         case SET_LOOP:           set_loop        (id, option, &pdu->option); check_required = OTTO_TRUE; break;
-         default:                 pdu->option = NOOP;                                                     break;
+         case FORCE_START_JOB:    pdu->option = force_start_job   (id);                       check_required = OTTO_TRUE; break;
+         case START_JOB:          pdu->option = start_job         (id);                       check_required = OTTO_TRUE; break;
+         case KILL_JOB:           pdu->option = kill_job          (id, SIGKILL);              check_required = OTTO_TRUE; break;
+         case MOVE_JOB_TOP:       pdu->option = move_job          (id, pdu->opcode, option);                              break;
+         case MOVE_JOB_UP:        pdu->option = move_job          (id, pdu->opcode, option);                              break;
+         case MOVE_JOB_DOWN:      pdu->option = move_job          (id, pdu->opcode, option);                              break;
+         case MOVE_JOB_BOTTOM:    pdu->option = move_job          (id, pdu->opcode, option);                              break;
+         case RESET_JOB:          pdu->option = reset_job         (id);                       check_required = OTTO_TRUE; break;
+         case SEND_SIGNAL:        pdu->option = kill_job          (id, option);               check_required = OTTO_TRUE; break;
+         case CHANGE_STATUS:      pdu->option = set_job_status    (id, option);               check_required = OTTO_TRUE; break;
+         case JOB_ON_AUTOHOLD:    pdu->option = set_job_autohold  (id, pdu->opcode);          check_required = OTTO_TRUE; break;
+         case JOB_OFF_AUTOHOLD:   pdu->option = set_job_autohold  (id, pdu->opcode);          check_required = OTTO_TRUE; break;
+         case JOB_ON_AUTONOEXEC:  pdu->option = set_job_autonoexec(id, pdu->opcode);          check_required = OTTO_TRUE; break;
+         case JOB_OFF_AUTONOEXEC: pdu->option = set_job_autonoexec(id, pdu->opcode);          check_required = OTTO_TRUE; break;
+         case JOB_ON_HOLD:        pdu->option = set_job_hold      (id, pdu->opcode);          check_required = OTTO_TRUE; break;
+         case JOB_OFF_HOLD:       pdu->option = set_job_hold      (id, pdu->opcode);          check_required = OTTO_TRUE; break;
+         case JOB_ON_NOEXEC:      pdu->option = set_job_noexec    (id, pdu->opcode);          check_required = OTTO_TRUE; break;
+         case JOB_OFF_NOEXEC:     pdu->option = set_job_noexec    (id, pdu->opcode);          check_required = OTTO_TRUE; break;
+         case BREAK_LOOP:         pdu->option = break_loop        (id);                       check_required = OTTO_TRUE; break;
+         case SET_LOOP:           pdu->option = set_loop          (id, option);               check_required = OTTO_TRUE; break;
+         default:                 pdu->option = NOOP;                                                                     break;
       }
    }
    else
@@ -934,9 +933,11 @@ compile_dependencies()
 
 
 
-void
+uint8_t
 activate_box(int id)
 {
+   uint8_t retval = ACK;
+
    // only activate the box if it's not ON_HOLD
    if(job[id].status != STAT_OH)
    {
@@ -969,15 +970,23 @@ activate_box(int id)
       }
 
       // activate the box's chain
-      activate_box_chain(job[id].head);
+      retval = activate_box_chain(job[id].head);
    }
+   else
+   {
+      retval = JOB_IS_ON_HOLD;
+   }
+
+   return(retval);
 }
 
 
 
-void
+uint8_t
 activate_box_chain(int id)
 {
+   uint8_t retval = ACK, tmpret;
+
    while(id != -1)
    {
       switch(job[id].type)
@@ -999,7 +1008,14 @@ activate_box_chain(int id)
                   job[id].on_noexec = job[id].on_autonoexec;
 
                // activate the box's chain
-               activate_box_chain(job[id].head);
+               if((tmpret = activate_box_chain(job[id].head)) != ACK)
+               {
+                  retval = tmpret;
+               }
+            }
+            else
+            {
+               retval = CHILD_IS_ON_HOLD;
             }
             break;
          case OTTO_CMD:
@@ -1018,20 +1034,28 @@ activate_box_chain(int id)
                if(job[id].on_autonoexec == OTTO_TRUE)
                   job[id].on_noexec = job[id].on_autonoexec;
             }
+            else
+            {
+               retval = CHILD_IS_ON_HOLD;
+            }
             break;
       }
 
       id = job[id].next;
    }
+
+   return(retval);
 }
 
 
 
 // slightly different behavior from a standard activation
 // always activate the top box
-void
+uint8_t
 force_activate_box(int id)
 {
+   uint8_t retval = ACK;
+
    // mark box as ACTIVATED
    job[id].status = STAT_AC;
 
@@ -1047,16 +1071,20 @@ force_activate_box(int id)
       job[id].on_noexec = job[id].on_autonoexec;
 
    // and force activate the box's chain
-   force_activate_box_chain(job[id].head);
+   retval = force_activate_box_chain(job[id].head);
+
+   return(retval);
 }
 
 
 
 // slightly different behavior from a standard activation
 // reset all status fields to 0 but leave OH status
-void
+uint8_t
 force_activate_box_chain(int id)
 {
+   uint8_t retval = ACK;
+
    while(id != -1)
    {
       switch(job[id].type)
@@ -1084,7 +1112,7 @@ force_activate_box_chain(int id)
                job[id].on_noexec = job[id].on_autonoexec;
 
             // and force activate the box's chain
-            force_activate_box_chain(job[id].head);
+            retval = force_activate_box_chain(job[id].head);
             break;
 
          case OTTO_CMD:
@@ -1112,6 +1140,8 @@ force_activate_box_chain(int id)
 
       id = job[id].next;
    }
+
+   return(retval);
 }
 
 
@@ -1214,14 +1244,15 @@ finish_box(int box_id, time_t finish)
 
 
 
-void
+uint8_t
 run_box(int id)
 {
+   uint8_t retval = ACK;
    int loop_just_started = OTTO_FALSE;
 
    // don't start any new jobs if the daemon is paused
    if(cfg.pause == OTTO_TRUE)
-      return;
+      return(DAEMON_IS_PAUSED);
 
    // special handling for boxes on noexec
    if(job[id].on_noexec == OTTO_TRUE)
@@ -1239,7 +1270,7 @@ run_box(int id)
       lprintf(logp, INFO, "%s started (on_noexec)\n", job[id].name);
 
       // cascade noexec to child jobs
-      run_box_noexec_chain(job[id].head);
+      retval = run_box_noexec_chain(job[id].head);
    }
    else
    {
@@ -1260,16 +1291,19 @@ run_box(int id)
       job[id].status   = STAT_RU;
 
       // activate the box's chain
-      activate_box_chain(job[id].head);
+      retval = activate_box_chain(job[id].head);
    }
 
+   return(retval);
 }
 
 
 
-void
+uint8_t
 run_box_noexec_chain(int id)
 {
+   uint8_t retval = ACK;
+
    while(id != -1)
    {
       job[id].start    = time(0);
@@ -1288,7 +1322,7 @@ run_box_noexec_chain(int id)
             }
 
             // cascade noexec to child jobs
-            run_box_noexec_chain(job[id].head);
+            retval = run_box_noexec_chain(job[id].head);
             break;
 
          case OTTO_CMD:
@@ -1299,24 +1333,26 @@ run_box_noexec_chain(int id)
 
       id = job[id].next;
    }
+
+   return(retval);
 }
 
 
 
-void
+uint8_t
 run_job(int id)
 {
-   pid_t pid;
-   char otto_jobname[NAMLEN+15];
-   char otto_boxname[NAMLEN+15];
-   char loopname[NAMLEN+15];
-   int  box, fd;
-   char *s, tmpenv[ENVLEN+1];
-   int rc;
+   pid_t   pid;
+   char    otto_jobname[NAMLEN+15];
+   char    otto_boxname[NAMLEN+15];
+   char    loopname[NAMLEN+15];
+   int     box, fd;
+   char   *s, tmpenv[ENVLEN+1];
+   int     rc;
 
    // don't start any new jobs if the daemon is paused
    if(cfg.pause == OTTO_TRUE)
-      return;
+      return(DAEMON_IS_PAUSED);
 
    if(job[id].on_noexec == OTTO_TRUE)
    {
@@ -1329,7 +1365,7 @@ run_job(int id)
       if(job[id].box != -1)
          finish_box(job[id].box, job[id].finish);
 
-      return;
+      return(ACK);
    }
 
    // rebuild the environment to be passed to the child job (if necessary)
@@ -1349,12 +1385,14 @@ run_job(int id)
       job[id].status      = STAT_RU;
       setpgid(pid, 0); 
       lprintf(logp, INFO, "%s started\n", job[id].name);
+      return(ACK);
    }
    else
    {
       if(pid < 0)
       {
          lprintf(logp, MAJR, "Couldn't create a child process for %s.\n", job[id].name);
+         return(COULD_NOT_FORK);
       }
       else
       { 
@@ -1445,15 +1483,20 @@ run_job(int id)
          execle("/bin/sh", "/bin/sh", "-c", job[id].command, NULL, cfg.envvar);
 
          lprintf(logp, MAJR, "execle failed for %s.\n", job[id].name);
+         return(NACK);
       }
    }
+
+   return(ACK);
 }
 
 
 
-void
+uint8_t
 activate_job(int id)
 {
+   uint8_t retval = ACK;
+
    // only activate the job if it's not ON_HOLD and not already running
    if(job[id].status != STAT_OH &&
       job[id].status != STAT_RU)
@@ -1468,6 +1511,16 @@ activate_job(int id)
       if(job[id].on_autonoexec == OTTO_TRUE)
          job[id].on_noexec = job[id].on_autonoexec;
    }
+   else
+   {
+      switch(job[id].status)
+      {
+         case STAT_OH: retval = JOB_IS_ON_HOLD; break;
+         case STAT_RU: retval = JOB_IS_RUNNING; break;
+      }
+   }
+
+   return(retval);
 }
 
 
@@ -1525,9 +1578,11 @@ finish_job(int sigNum)
 
 
 
-void
+uint8_t
 set_job_status(int id, int status)
 {
+   uint8_t retval = ACK;
+
    switch(status)
    {
       case FAILURE:
@@ -1558,13 +1613,17 @@ set_job_status(int id, int status)
          finish_box(job[id].box, job[id].finish);
          break;
    }
+
+   return(retval);
 }
 
 
 
-void
+uint8_t
 set_job_autohold(int id, int action)
 {
+   uint8_t retval = ACK;
+
    switch(action)
    {
       // just set this one job on autohold no matter what type it is
@@ -1579,13 +1638,17 @@ set_job_autohold(int id, int action)
       default:
          break;
    }
+
+   return(retval);
 }
 
 
 
-void
+uint8_t
 set_job_autonoexec(int id, int action)
 {
+   uint8_t retval = ACK;
+
    switch(action)
    {
       case JOB_ON_AUTONOEXEC:
@@ -1597,7 +1660,15 @@ set_job_autonoexec(int id, int action)
             job[id].on_noexec = OTTO_TRUE;
 
             if(job[id].type == OTTO_BOX)
-               set_job_autonoexec_chain(job[id].head, action);
+               retval = set_job_autonoexec_chain(job[id].head, action);
+         }
+         else
+         {
+            if(job[id].on_autonoexec == OTTO_TRUE)
+               retval = JOB_ALREADY_ON_AUTONOEXEC;
+
+            if(job[id].status == STAT_RU)
+               retval = JOB_IS_RUNNING;
          }
          break;
 
@@ -1613,21 +1684,29 @@ set_job_autonoexec(int id, int action)
                job[id].on_noexec = OTTO_FALSE;
 
                if(job[id].type == OTTO_BOX)
-                  set_job_autonoexec_chain(job[id].head, action);
+                  retval = set_job_autonoexec_chain(job[id].head, action);
             }
+         }
+         else
+         {
+            retval = JOB_NOT_ON_AUTONOEXEC;
          }
          break;
 
       default:
          break;
    }
+
+   return(retval);
 }
 
 
 
-void
+uint8_t
 set_job_autonoexec_chain(int id, int action)
 {
+   uint8_t retval = ACK, tmpret;
+
    while(id != -1)
    {
       switch(action)
@@ -1653,17 +1732,22 @@ set_job_autonoexec_chain(int id, int action)
       }
 
       if(job[id].type == OTTO_BOX)
-         set_job_autonoexec_chain(job[id].head, action);
+         if((tmpret = set_job_autonoexec_chain(job[id].head, action)) != ACK)
+            retval = tmpret;
 
       id = job[id].next;
    }
+
+   return(retval);
 }
 
 
 
-void
+uint8_t
 set_job_hold(int id, int action)
 {
+   uint8_t retval = ACK;
+
    switch(action)
    {
       case JOB_ON_HOLD:
@@ -1671,6 +1755,10 @@ set_job_hold(int id, int action)
          if(job[id].status != STAT_OH && job[id].status != STAT_RU)
          {
             job[id].status = STAT_OH;
+         }
+         else
+         {
+          retval = JOB_IS_RUNNING;
          }
          break;
 
@@ -1700,18 +1788,26 @@ set_job_hold(int id, int action)
                   break;
             }
          }
+         else
+         {
+            retval = JOB_NOT_ON_HOLD;
+         }
          break;
 
       default:
          break;
    }
+
+   return(retval);
 }
 
 
 
-void
+uint8_t
 set_job_noexec(int id, int action)
 {
+   uint8_t retval = ACK;
+
    switch(action)
    {
       case JOB_ON_NOEXEC:
@@ -1720,7 +1816,15 @@ set_job_noexec(int id, int action)
             job[id].on_noexec = OTTO_TRUE;
 
             if(job[id].type == OTTO_BOX)
-               set_job_noexec_chain(job[id].head, action);
+               retval = set_job_noexec_chain(job[id].head, action);
+         }
+         else
+         {
+            if(job[id].on_noexec == OTTO_TRUE)
+               retval = JOB_ALREADY_ON_NOEXEC;
+
+            if(job[id].status == STAT_RU)
+               retval = JOB_IS_RUNNING;
          }
          break;
 
@@ -1733,21 +1837,29 @@ set_job_noexec(int id, int action)
                job[id].on_noexec = OTTO_FALSE;
 
                if(job[id].type == OTTO_BOX)
-                  set_job_noexec_chain(job[id].head, action);
+                  retval = set_job_noexec_chain(job[id].head, action);
             }
+         }
+         else
+         {
+            retval = JOB_NOT_ON_NOEXEC;
          }
          break;
 
       default:
          break;
    }
+
+   return(retval);
 }
 
 
 
-void
+uint8_t
 set_job_noexec_chain(int id, int action)
 {
+   uint8_t retval = ACK, tmpret;
+
    while(id != -1)
    {
       switch(action)
@@ -1765,28 +1877,45 @@ set_job_noexec_chain(int id, int action)
       }
 
       if(job[id].type == OTTO_BOX)
-         set_job_noexec_chain(job[id].head, action);
+         if((tmpret = set_job_noexec_chain(job[id].head, action)) != ACK)
+            retval = tmpret;
 
       id = job[id].next;
    }
+
+   return(retval);
 }
 
 
 
-void
+uint8_t
 break_loop(int id)
 {
+   uint8_t retval = ACK;
+
    if(job[id].type == OTTO_BOX && job[id].loopname[0] != '\0')
    {
       job[id].loopstat = LOOP_BROKEN;
    }
+   else
+   {
+      if(job[id].loopname[0] == '\0')
+         retval = BOX_HAS_NO_LOOP;
+
+      if(job[id].type != OTTO_BOX)
+         retval = JOB_IS_NOT_A_BOX;
+   }
+
+   return(retval);
 }
 
 
 
-void
-set_loop(int id, int iterator, uint8_t *response)
+uint8_t
+set_loop(int id, int iterator)
 {
+   uint8_t retval = ACK;
+
    if(job[id].type == OTTO_BOX)
    {
       if(job[id].loopname[0] != '\0')
@@ -1797,26 +1926,30 @@ set_loop(int id, int iterator, uint8_t *response)
          }
          else
          {
-            *response = ITERATOR_OUT_OF_BOUNDS;
+            retval = ITERATOR_OUT_OF_BOUNDS;
          }
       }
       else
       {
-         *response = BOX_HAS_NO_LOOP;
+         retval = BOX_HAS_NO_LOOP;
       }
    }
    else
    {
-      *response = JOB_IS_NOT_A_BOX;
+      retval = JOB_IS_NOT_A_BOX;
    }
+
+   return(retval);
 }
 
 
 
-void
+uint8_t
 reset_job(int id)
 {
-   if(check_reset(id) == OTTO_TRUE)
+   uint8_t retval = ACK;
+
+   if((retval = check_reset(id)) == ACK)
    {
       job[id].on_autohold   = job[id].autohold;
       job[id].on_autonoexec = job[id].autonoexec;
@@ -1838,15 +1971,19 @@ reset_job(int id)
       }
 
       if(job[id].type == OTTO_BOX)
-         reset_job_chain(job[id].head);
+         retval = reset_job_chain(job[id].head);
    }
+
+   return(retval);
 }
 
 
 
-void
+uint8_t
 reset_job_chain(int id)
 {
+   uint8_t retval = ACK, tmpret;
+
    while(id != -1)
    {
       job[id].on_autohold   = job[id].autohold;
@@ -1869,22 +2006,25 @@ reset_job_chain(int id)
       }
 
       if(job[id].type == OTTO_BOX)
-         reset_job_chain(job[id].head);
+         if((tmpret = reset_job_chain(job[id].head)) != ACK)
+            retval = tmpret;
 
       id = job[id].next;
    }
+
+   return(retval);
 }
 
 
 
-int
+uint8_t
 check_reset(int id)
 {
-   int retval = OTTO_TRUE;
+   int retval = ACK;
 
    if(job[id].status == STAT_RU)
    {
-      retval = OTTO_FALSE;
+      retval = JOB_IS_RUNNING;
    }
    else
    {
@@ -1897,21 +2037,22 @@ check_reset(int id)
 
 
 
-int
+uint8_t
 check_reset_chain(int id)
 {
-   int retval = OTTO_TRUE;
+   int retval = ACK, tmpret;
 
    while(retval == OTTO_TRUE && id != -1)
    {
       if(job[id].status == STAT_RU)
       {
-         retval = OTTO_FALSE;
+         retval = CHILD_IS_RUNNING;
       }
       else
       {
          if(job[id].type == OTTO_BOX)
-            retval = check_reset_chain(job[id].head);
+            if((tmpret = check_reset_chain(job[id].head)) != ACK)
+               retval = tmpret;
       }
 
       id = job[id].next;
@@ -1922,32 +2063,38 @@ check_reset_chain(int id)
 
 
 
-void
+uint8_t
 force_start_job(int id)
 {
+   uint8_t retval = ACK;
+
    // don't start any new jobs if the daemon is paused
    if(cfg.pause == OTTO_TRUE)
-      return;
+      return(DAEMON_IS_PAUSED);
 
    switch(job[id].type)
    {
       case OTTO_BOX:
-         run_box(id);
+         retval = run_box(id);
          break;
       case OTTO_CMD:
-         run_job(id);
+         retval = run_job(id);
          break;
    }
+
+   return(retval);
 }
 
 
 
-void
+uint8_t
 start_job(int id)
 {
+   uint8_t retval = ACK;
+
    // don't start any new jobs if the daemon is paused
    if(cfg.pause == OTTO_TRUE)
-      return;
+      return(DAEMON_IS_PAUSED);
 
    if(job[id].status != STAT_OH &&
       job[id].status != STAT_RU)
@@ -1958,25 +2105,40 @@ start_job(int id)
          case OTTO_CMD: activate_job(id); break;
       }
    }
+   else
+   {
+      switch(job[id].status)
+      {
+         case STAT_OH: retval = JOB_IS_ON_HOLD; break;
+         case STAT_RU: retval = JOB_IS_RUNNING; break;
+      }
+   }
+
+   return(retval);
 }
 
 
 
-void
+uint8_t
 kill_job(int id, int signal)
 {
+   uint8_t retval = ACK;
+
    if(job[id].pid > 0)
    {
       // send signal to pid
       kill((-1*job[id].pid), signal);
    }
+
+   return(retval);
 }
 
 
 
-void
+uint8_t
 move_job(int id, int direction, int count)
 {
+   int8_t retval = ACK;
    int steps  = cfg.ottodb_maxjobs; // assume the job will move the entire length of the DB
    int new_prev, new_next;
 
@@ -2039,6 +2201,8 @@ move_job(int id, int direction, int count)
          }
          break;
    }
+
+   return(retval);
 }
 
 

@@ -730,25 +730,36 @@ strresultcode(int i)
       case ACK:                        retval = "ACK";                        break;
       case NACK:                       retval = "NACK";                       break;
 
-                                       // job definition operations
+      case BOX_COMMAND:                retval = "BOX_COMMAND";                break;
+      case BOX_DELETED:                retval = "BOX_DELETED";                break;
+      case BOX_HAS_NO_LOOP:            retval = "BOX_HAS_NO_LOOP";            break;
+      case BOX_NOT_FOUND:              retval = "BOX_NOT_FOUND";              break;
+      case CHILD_IS_ON_HOLD:           retval = "CHILD_IS_ON_HOLD";           break;
+      case CHILD_IS_RUNNING:           retval = "CHILD_IS_RUNNING";           break;
+      case CMD_LOOP:                   retval = "CMD_LOOP";                   break;
+      case COULD_NOT_FORK:             retval = "COULD_NOT_FORK";             break;
+      case DAEMON_IS_PAUSED:           retval = "DAEMON_IS_PAUSED";           break;
+      case GRANDFATHER_PARADOX:        retval = "GRANDFATHER_PARADOX";        break;
+      case ITERATOR_OUT_OF_BOUNDS:     retval = "ITERATOR_OUT_OF_BOUNDS";     break;
+      case JOB_ALREADY_EXISTS:         retval = "JOB_ALREADY_EXISTS";         break;
+      case JOB_ALREADY_ON_AUTONOEXEC:  retval = "JOB_ALREADY_ON_AUTONOEXEC";  break;
+      case JOB_ALREADY_ON_NOEXEC:      retval = "JOB_ALREADY_ON_NOEXEC";      break;
       case JOB_CREATED:                retval = "JOB_CREATED";                break;
+      case JOB_DELETED:                retval = "JOB_DELETED";                break;
+      case JOB_DEPENDS_ON_ITSELF:      retval = "JOB_DEPENDS_ON_ITSELF";      break;
+      case JOB_DEPENDS_ON_MISSING_JOB: retval = "JOB_DEPENDS_ON_MISSING_JOB"; break;
+      case JOB_IS_NOT_A_BOX:           retval = "JOB_IS_NOT_A_BOX";           break;
+      case JOB_IS_ON_HOLD:             retval = "JOB_IS_ON_HOLD";             break;
+      case JOB_IS_RUNNING:             retval = "JOB_IS_RUNNING";             break;
+      case JOB_NOT_FOUND:              retval = "JOB_NOT_FOUND";              break;
+      case JOB_NOT_ON_AUTONOEXEC:      retval = "JOB_NOT_ON_AUTONOEXEC";      break;
+      case JOB_NOT_ON_HOLD:            retval = "JOB_NOT_ON_HOLD";            break;
+      case JOB_NOT_ON_NOEXEC:          retval = "JOB_NOT_ON_NOEXEC";          break;
       case JOB_REPORTED:               retval = "JOB_REPORTED";               break;
       case JOB_UPDATED:                retval = "JOB_UPDATED";                break;
-      case JOB_NOT_FOUND:              retval = "JOB_NOT_FOUND";              break;
-      case JOB_DELETED:                retval = "JOB_DELETED";                break;
-      case JOB_ALREADY_EXISTS:         retval = "JOB_ALREADY_EXISTS";         break;
-      case JOB_DEPENDS_ON_MISSING_JOB: retval = "JOB_DEPENDS_ON_MISSING_JOB"; break;
-      case JOB_DEPENDS_ON_ITSELF:      retval = "JOB_DEPENDS_ON_ITSELF";      break;
-      case BOX_NOT_FOUND:              retval = "BOX_NOT_FOUND";              break;
-      case BOX_DELETED:                retval = "BOX_DELETED";                break;
-      case BOX_COMMAND:                retval = "BOX_COMMAND";                break;
-      case CMD_LOOP:                   retval = "CMD_LOOP";                   break;
-      case NO_SPACE_AVAILABLE:         retval = "NO_SPACE_AVAILABLE";         break;
-      case GRANDFATHER_PARADOX:        retval = "GRANDFATHER_PARADOX";        break;
       case NEW_NAME_ALREADY_EXISTS:    retval = "NEW_NAME_ALREADY_EXISTS";    break;
-      case JOB_IS_NOT_A_BOX:           retval = "JOB_IS_NOT_A_BOX";           break;
-      case BOX_HAS_NO_LOOP:            retval = "BOX_HAS_NO_LOOP";            break;
-      case ITERATOR_OUT_OF_BOUNDS:     retval = "ITERATOR_OUT_OF_BOUNDS";     break;
+      case NO_SPACE_AVAILABLE:         retval = "NO_SPACE_AVAILABLE";         break;
+
 
       default: otto_sprintf(msg, "Resultcode %d", i); retval = msg; break;
    }
