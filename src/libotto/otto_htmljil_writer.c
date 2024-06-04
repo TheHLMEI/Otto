@@ -106,6 +106,9 @@ write_insert_job_htmljil(DYNBUF *b, JOB *item)
    if(item->autohold == OTTO_TRUE)
       bprintf(b, "<tr><td>%s%s</td><td>%s</td></tr>\n", indent, "auto_hold:",         tval.autohold);
 
+   if(item->autonoexec == OTTO_TRUE)
+      bprintf(b, "<tr><td>%s%s</td><td>%s</td></tr>\n", indent, "auto_noexec:",       tval.autonoexec);
+
    if(item->date_conditions != OTTO_FALSE)
    {
       bprintf(b, "<tr><td>%s%s</td><td>%s</td></tr>\n", indent, "date_conditions:",   tval.date_conditions);

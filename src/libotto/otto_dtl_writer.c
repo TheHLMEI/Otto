@@ -73,11 +73,14 @@ write_insert_job_dtl(JOB *item)
    printf("status         : %s\n", tval.status);
    printf("autohold       : %s\n", tval.autohold);
    printf("on_autohold    : %s\n", tval.on_autohold);
+   printf("autonoexec     : %s\n", tval.autonoexec);
+   printf("on_autonoexec  : %s\n", tval.on_autonoexec);
    printf("on_noexec      : %s\n", tval.on_noexec);
    printf("loopname       : %s\n", tval.loopname);
    printf("loopmin        : %s\n", tval.loopmin);
    printf("loopmax        : %s\n", tval.loopmax);
    printf("loopnum        : %s\n", tval.loopnum);
+   printf("loopstat       : %s\n", tval.loopstat);
    if(item->type != OTTO_BOX)
       printf("pid            : %s\n", tval.pid);
    printf("start          : %s\n", tval.start);

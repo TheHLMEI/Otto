@@ -327,8 +327,8 @@ read_stdin(DYNBUF *b, char *client)
 
       if(isatty(STDIN_FILENO))
       {
-         sprintf(prompt, "%s> ", client);
-         sprintf(histfname, "$HOME/.%s_history", client);
+         otto_sprintf(prompt, "%s> ", client);
+         otto_sprintf(histfname, "$HOME/.%s_history", client);
          histfile = expand_path(histfname);
 
          linenoiseHistoryLoad(histfile); // Load the history
@@ -815,6 +815,24 @@ validate_envvar_assignment(char *instring)
 
    return(rc);
 }
+
+
+int
+otto_sprintf(char *buf, char *format, ...)
+{
+   va_list ap;
+   int     retval;
+
+   if(buf != NULL)
+   {
+      va_start(ap, format);
+      retval = vsprintf(buf, format, ap);
+      va_end(ap);
+   }
+
+   return(retval);
+}
+
 
 
 

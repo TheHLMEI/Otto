@@ -101,11 +101,14 @@ create_job(ottoipc_create_job_pdu_st *pdu, DBCTX *ctx)
       memset(ctx->job[id].expression,  0,                CNDLEN+1);
       ctx->job[id].type            = tolower(pdu->type);
       ctx->job[id].autohold        = pdu->autohold;
+      ctx->job[id].autonoexec      = pdu->autonoexec;
       ctx->job[id].date_conditions = pdu->date_conditions;
       ctx->job[id].days_of_week    = pdu->days_of_week;
       ctx->job[id].start_minutes   = pdu->start_minutes;
       ctx->job[id].status          = STAT_IN;
       ctx->job[id].on_autohold     = pdu->autohold;
+      ctx->job[id].on_autonoexec   = pdu->autonoexec;
+      ctx->job[id].on_noexec       = pdu->autonoexec;
       ctx->job[id].loopmin         = pdu->loopmin;
       ctx->job[id].loopmax         = pdu->loopmax;
       ctx->job[id].loopsgn         = pdu->loopsgn;
@@ -119,6 +122,13 @@ create_job(ottoipc_create_job_pdu_st *pdu, DBCTX *ctx)
       ctx->job[id].tail = -1;
       ctx->job[id].prev = -1;
       ctx->job[id].next = -1;
+
+      // override autonoexec values based on parent job
+      if( ctx->job[id].box != -1 && ctx->job[ctx->job[id].box].on_autonoexec == OTTO_TRUE)
+      {
+         ctx->job[id].on_autonoexec = OTTO_TRUE;
+         ctx->job[id].on_noexec     = OTTO_TRUE;
+      }
 
       // add the job at the tail of its parent box
       if(box == -1)
@@ -212,9 +222,11 @@ report_job(ottoipc_simple_pdu_st *pdu, DBCTX *ctx)
          for(h=0; h<24; h++)
             response.start_times[h] = joblist.item[i].start_times[h];
          response.autohold        = joblist.item[i].autohold;
+         response.autonoexec      = joblist.item[i].autonoexec;
          response.expr_fail       = joblist.item[i].expr_fail;
          response.status          = joblist.item[i].status;
          response.on_autohold     = joblist.item[i].on_autohold;
+         response.on_autonoexec   = joblist.item[i].on_autonoexec;
          response.on_noexec       = joblist.item[i].on_noexec;
          response.pid             = joblist.item[i].pid;
          response.start           = joblist.item[i].start;
@@ -446,6 +458,13 @@ update_job(ottoipc_update_job_pdu_st *pdu, DBCTX *ctx)
             ctx->job[id].on_autohold = pdu->autohold;
          }
 
+         if(pdu->attributes & HAS_AUTO_NOEXEC)
+         {
+            ctx->job[id].autonoexec    = pdu->autonoexec;
+            ctx->job[id].on_autonoexec = pdu->autonoexec;
+            ctx->job[id].on_noexec     = pdu->autonoexec;
+         }
+
          if(pdu->attributes & HAS_LOOP)
          {
             memcpy(ctx->job[id].loopname, pdu->loopname, sizeof(ctx->job[id].loopname));
@@ -468,6 +487,13 @@ update_job(ottoipc_update_job_pdu_st *pdu, DBCTX *ctx)
          if(pdu->attributes & HAS_FINISH)
          {
             ctx->job[id].finish = pdu->finish;
+         }
+
+         // override autonoexec values based on parent job
+         if( ctx->job[id].box != -1 && ctx->job[ctx->job[id].box].on_autonoexec == OTTO_TRUE)
+         {
+            ctx->job[id].on_autonoexec = OTTO_TRUE;
+            ctx->job[id].on_noexec     = OTTO_TRUE;
          }
 
          save_jobwork(ctx);

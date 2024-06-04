@@ -53,7 +53,7 @@ write_insert_job_jil(JOB *item)
 
    ottojob_prepare_txt_values(&tval, item, AS_ASCII);
 
-   sprintf(indent, "%*.*s", item->level, item->level, " ");
+   otto_sprintf(indent, "%*.*s", item->level, item->level, " ");
 
    printf("%s/* ----------------- %s ----------------- */\n", indent, tval.name);
    printf("\n");
@@ -90,6 +90,9 @@ write_insert_job_jil(JOB *item)
 
    if(item->autohold == OTTO_TRUE)
       printf("%sauto_hold:       %s\n", indent, tval.autohold);
+
+   if(item->autonoexec == OTTO_TRUE)
+      printf("%sauto_noexec:     %s\n", indent, tval.autonoexec);
 
    if(item->date_conditions != OTTO_FALSE)
    {

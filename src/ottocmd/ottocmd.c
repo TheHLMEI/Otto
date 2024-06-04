@@ -23,6 +23,7 @@ int   ottocmd_copy_jobname(ottoipc_simple_pdu_st *pdu, char *s);
 int   ottocmd_copy_signum(ottoipc_simple_pdu_st *pdu, char *s);
 int   ottocmd_copy_status(ottoipc_simple_pdu_st *pdu, char *s);
 int   ottocmd_copy_count(ottoipc_simple_pdu_st *pdu, char *s);
+int   ottocmd_copy_iterator(ottoipc_simple_pdu_st *pdu, char *s);
 
 void report_events(char *msg);
 void report_statuses(char *msg);
@@ -36,7 +37,7 @@ main(int argc, char *argv[])
    int loglevel = INFO;
    int report_initialization = OTTO_TRUE;
 
-   // quick scan args to fileter PING events
+   // quick scan args to filter PING events
    for(i=1; i<argc; i++)
    {
       if(strcmp(argv[i], "-E") == 0 && i+1 < argc && strcmp(argv[i+1], "PING") == 0)
@@ -128,8 +129,9 @@ ottocmd_getargs(int argc, char **argv)
 {
    int retval = OTTO_SUCCESS;
    int i_opt;
-   int event_reported = OTTO_FALSE;
+   int event_reported  = OTTO_FALSE;
    int status_reported = OTTO_FALSE;
+   int iterator_found  = OTTO_FALSE;
 
    // initialize values
    memset(&send_pdu, 0, sizeof(ottoipc_simple_pdu_st));
@@ -138,7 +140,7 @@ ottocmd_getargs(int argc, char **argv)
    opterr = 0;
 
    // Get all parameters.
-   while((i_opt = getopt(argc, argv, ":c:C:e:E:hHj:J:k:K:s:S:")) != -1 && retval != OTTO_FAIL)
+   while((i_opt = getopt(argc, argv, ":c:C:e:E:hHi:I:j:J:k:K:s:S:")) != -1 && retval != OTTO_FAIL)
    {
       switch(tolower(i_opt))
       {
@@ -151,6 +153,10 @@ ottocmd_getargs(int argc, char **argv)
             break;
          case 'h':
             ottocmd_usage();
+            break;
+         case 'i':
+            if((retval = ottocmd_copy_iterator(&send_pdu, optarg)) == OTTO_SUCCESS)
+               iterator_found = OTTO_TRUE;
             break;
          case 'j':
             retval = ottocmd_copy_jobname(&send_pdu, optarg);
@@ -188,9 +194,11 @@ ottocmd_getargs(int argc, char **argv)
          case CHANGE_STATUS:
          case FORCE_START_JOB:
          case JOB_ON_AUTOHOLD:
+         case JOB_ON_AUTONOEXEC:
          case JOB_ON_HOLD:
          case JOB_ON_NOEXEC:
          case JOB_OFF_AUTOHOLD:
+         case JOB_OFF_AUTONOEXEC:
          case JOB_OFF_HOLD:
          case JOB_OFF_NOEXEC:
          case KILL_JOB:
@@ -200,6 +208,7 @@ ottocmd_getargs(int argc, char **argv)
          case MOVE_JOB_UP:
          case RESET_JOB:
          case SEND_SIGNAL:
+         case SET_LOOP:
          case START_JOB:
             if(send_pdu.name[0] == '\0')
             {
@@ -212,7 +221,7 @@ ottocmd_getargs(int argc, char **argv)
       }
    }
 
-   if(retval == OTTO_SUCCESS      &&
+   if(retval          == OTTO_SUCCESS  &&
       send_pdu.opcode == CHANGE_STATUS &&
       send_pdu.option == NO_STATUS)
    {
@@ -222,11 +231,20 @@ ottocmd_getargs(int argc, char **argv)
       retval = OTTO_FAIL;
    }
 
-   if(retval == OTTO_SUCCESS &&
-      send_pdu.opcode == SEND_SIGNAL &&
+   if(retval          == OTTO_SUCCESS &&
+      send_pdu.opcode == SEND_SIGNAL  &&
       send_pdu.option == 0)
    {
       fprintf(stderr, "\nSEND_SIGNAL event requires a signal (-k).\n");
+
+      retval = OTTO_FAIL;
+   }
+
+   if(retval          == OTTO_SUCCESS &&
+      send_pdu.opcode == SET_LOOP     &&
+      iterator_found  == OTTO_FALSE)
+   {
+      fprintf(stderr, "\nSET_LOOP event requires an iterator value(-i).\n");
 
       retval = OTTO_FAIL;
    }
@@ -285,6 +303,10 @@ ottocmd_usage(void)
    printf("         off autohold.  If the starting conditions are met the job\n");
    printf("         will start.\n");
    printf("\n");
+   printf("         JOB_OFF_AUTONOEXEC - Take the job specified with the -J option\n");
+   printf("         off autonoexec.  If the starting conditions are met the job\n");
+   printf("         will run.\n");
+   printf("\n");
    printf("         JOB_OFF_HOLD - Take the job specified with the -J option off\n");
    printf("         hold.  If the starting conditions are met the job will start.\n");
    printf("\n");
@@ -293,6 +315,9 @@ ottocmd_usage(void)
    printf("\n");
    printf("         JOB_ON_AUTOHOLD - Put the job specified with the -J option\n");
    printf("         on autohold.\n");
+   printf("\n");
+   printf("         JOB_ON_AUTONOEXEC - Put the job specified with the -J option\n");
+   printf("         on autonoexec.\n");
    printf("\n");
    printf("         JOB_ON_HOLD - Put the job specified with the -J option on\n");
    printf("         hold.\n");
@@ -327,6 +352,9 @@ ottocmd_usage(void)
    printf("\n");
    printf("         SEND_SIGNAL - Send a UNIX signal to a running job.\n");
    printf("\n");
+   printf("         SET_LOOP - Set the loop iterator of the job specified with the -J option\n");
+   printf("         to the number specified with the -i option.\n");
+   printf("\n");
    printf("         START_JOB - Activate the job specified in job_name,  The job\n");
    printf("         will run when its starting  conditions  are satisfied.\n");
    printf("\n");
@@ -356,6 +384,9 @@ ottocmd_usage(void)
    printf("\n");
    printf("      -h Print this help and exit.\n");
    printf("\n");
+   printf("      -i iterator value\n");
+   printf("         Specifies the new loop iterator value to set for a job.\n");
+   printf("\n");
    printf("      -J job_name\n");
    printf("         Identifies the job the specified event should be applied to.\n");
    printf("\n");
@@ -378,6 +409,7 @@ ottocmd(void)
 {
    int retval = OTTO_SUCCESS;
    ottoipc_simple_pdu_st *pdu;
+   char    inode[NAMLEN+1];
 
    ottoipc_initialize_send();
    ottoipc_enqueue_simple_pdu(&send_pdu);
@@ -397,11 +429,40 @@ ottocmd(void)
                log_received_pdu(pdu);
             }
 
-            // pings can be very verbose.  they don't need to be logged
-            // but some output to the screen is required
-            if(pdu->opcode == PING && pdu->option == ACK)
+            // output ACK responses
+            if(pdu->option == ACK)
             {
-               printf("%s\n", pdu->name);
+               // pings can be very verbose.  they don't need to be logged
+               // but some output to the screen is required
+               if(pdu->opcode == PING)
+               {
+                  printf("%s\n", pdu->name);
+               }
+
+               // verify DB is not verbose but some work needs to be done before
+               // output to the screen is done
+               if(pdu->opcode == VERIFY_DB)
+               {
+                  get_ottodb_inode();
+                  otto_sprintf(inode, "%ld", ottodb_inode);
+                  if(strcmp(inode, pdu->name) == 0)
+                  {
+                     printf("  ottosysd is using the same ottodb file\n");
+                  }
+                  else
+                  {
+                     printf("  ottosysd is using a different ottodb file\n");
+                     retval = OTTO_FAIL;
+                  }
+               }
+            }
+
+            // otherwise if the pdu response is NOT ACK
+            // print a message to the screen
+            else
+            {
+               print_received_pdu(pdu);
+               retval = OTTO_FAIL;
             }
          }
       }
@@ -420,7 +481,7 @@ ottocmd_copy_event(ottoipc_simple_pdu_st *pdu, char *s)
 
    for(i=CRUD_TOTAL+1; i<OPCODE_TOTAL; i++)
    {
-      if(i == SCHED_TOTAL || i == VERIFY_DB)
+      if(i == SCHED_TOTAL)
          continue;
       if(strcmp(stropcode(i), s) == 0)
       {
@@ -459,7 +520,7 @@ report_events(char *msg)
    fprintf(stderr, "\n%s.\nEvent must be one of:", msg);
    for(i=CRUD_TOTAL+1; i<OPCODE_TOTAL; i++)
    {
-      if(i == SCHED_TOTAL || i == VERIFY_DB)
+      if(i == SCHED_TOTAL)
          continue;
       if(i > CRUD_TOTAL+1)
          fprintf(stderr, ",");
@@ -566,6 +627,30 @@ ottocmd_copy_count(ottoipc_simple_pdu_st *pdu, char *s)
    if(i < 1 || i > 255)
    {
       fprintf(stderr, "Invalid count.  Count must be 1 to 255 \n");
+      pdu->option = 0;
+
+      retval = OTTO_FAIL;
+   }
+   else
+   {
+      pdu->option = i;
+   }
+
+   return(retval);
+}
+
+
+
+int
+ottocmd_copy_iterator(ottoipc_simple_pdu_st *pdu, char *s)
+{
+   int retval = OTTO_SUCCESS;
+   int i;
+
+   i = atoi(s);
+   if(i < 0 || i > 99)
+   {
+      fprintf(stderr, "Invalid iterator value.  Iterator must be 0 to 99 \n");
       pdu->option = 0;
 
       retval = OTTO_FAIL;

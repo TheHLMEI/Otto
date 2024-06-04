@@ -3,27 +3,8 @@
 #include <string.h>
 #include <time.h>
 
+#define OTTO_NEED_MSPDI_EXTDEFS
 #include "otto.h"
-
-typedef struct _extdef
-{
-   char *fieldid;
-   char *fieldname;
-   char *alias;
-} EXTDEF;
-
-
-EXTDEF EXT[EXTDEF_TOTAL] = {
-   {"188743731",  "Text1",   "command"},
-   {"188743734",  "Text2",   "description"},
-   {"188743737",  "Text3",   "environment"},
-   {"188743740",  "Text4",   "days_of_week"},
-   {"188743743",  "Text5",   "start_mins"},
-   {"188743746",  "Text6",   "start_times"},
-   {"188743747",  "Text7",   "loop"},
-   {"188743752",  "Flag1",   "auto_hold"},
-   {"188743753",  "Flag2",   "date_conditions"}
-};
 
 
 void buffer_mspdi_preamble(DYNBUF *b, JOBLIST *joblist, int *autoschedule);
@@ -112,12 +93,13 @@ buffer_mspdi_preamble(DYNBUF *b, JOBLIST *joblist, int *autoschedule)
    {
       if(joblist->item[i].start != 0)
       {
-         if(start == -1)
-         {
-            start = i;
-         }
+         start = i;
+         break;
       }
-      else if(joblist->item[i].start < joblist->item[start].start)
+   }
+   for(; i<joblist->nitems; i++)
+   {
+      if(joblist->item[i].start != 0 && joblist->item[i].start < joblist->item[start].start)
       {
          start = i;
       }
@@ -236,11 +218,11 @@ buffer_mspdi_tasks(DYNBUF *b, JOBLIST *joblist, int autoschedule)
       levels[joblist->item[i].level]++;
 
       // create an outline string
-      sprintf(outline, "%d", levels[1]);
+      otto_sprintf(outline, "%d", levels[1]);
 
       for(l=2; l<=joblist->item[i].level; l++)
       {
-         sprintf(tmpstr, ".%d", levels[l]);
+         otto_sprintf(tmpstr, ".%d", levels[l]);
          strcat(outline, tmpstr);
       }
 
@@ -330,6 +312,10 @@ buffer_mspdi_task(DYNBUF *b, JOB *item, char *outline, int autoschedule)
    bprintf(b, "            <Value>%c</Value>\n", item->autohold == OTTO_TRUE ? '1' : '0');
    bprintf(b, "         </ExtendedAttribute>\n");
 
+   bprintf(b, "            <FieldID>%s</FieldID>\n", EXT[AUTONOEXEC].fieldid);
+   bprintf(b, "            <Value>%c</Value>\n", item->autonoexec == OTTO_TRUE ? '1' : '0');
+   bprintf(b, "         </ExtendedAttribute>\n");
+
    if(item->date_conditions != OTTO_FALSE)
    {
       bprintf(b, "         <ExtendedAttribute>\n");
@@ -387,6 +373,7 @@ buffer_mspdi_predecessors(DYNBUF *b, char *name, char *expression)
    char *s = expression;
    int16_t index;
    char *i;
+   char predecessor_type;
 
    while(*s != '\0')
    {
@@ -395,27 +382,16 @@ buffer_mspdi_predecessors(DYNBUF *b, char *name, char *expression)
          default:
             break;
 
-         case 'd':
-         case 'f':
          case 'n':
-         case 't':
+         case 'r':
             fprintf(stderr, "WARNING for job: %s < Condition '%c' is inconsistent with MS Project predecessor concept >.\n",
                     name, *s);
             break;
-         case 'r':
-            s++;
-            i = (char *)&index;
-            *i++ = *s++;
-            *i   = *s;
-            if(index >= 0)
-            {
-               bprintf(b, "         <PredecessorLink>\n");
-               bprintf(b, "            <PredecessorUID>%d</PredecessorUID>\n", index);
-               bprintf(b, "            <Type>3</Type>\n");
-               bprintf(b, "         </PredecessorLink>\n");
-            }
-            break;
+         case 'd':
+         case 'f':
          case 's':
+         case 't':
+            predecessor_type = *s;
             s++;
             i = (char *)&index;
             *i++ = *s++;
@@ -424,7 +400,13 @@ buffer_mspdi_predecessors(DYNBUF *b, char *name, char *expression)
             {
                bprintf(b, "         <PredecessorLink>\n");
                bprintf(b, "            <PredecessorUID>%d</PredecessorUID>\n", index);
-               bprintf(b, "            <Type>1</Type>\n");
+               switch(predecessor_type)
+               {
+                  case 'd': bprintf(b, "            <Type>%d</Type>\n", OTTO_MSPDI_SF); break;
+                  case 'f': bprintf(b, "            <Type>%d</Type>\n", OTTO_MSPDI_FF); break;
+                  case 's': bprintf(b, "            <Type>%d</Type>\n", OTTO_MSPDI_FS); break;
+                  case 't': bprintf(b, "            <Type>%d</Type>\n", OTTO_MSPDI_SS); break;
+               }
                bprintf(b, "         </PredecessorLink>\n");
             }
             break;
@@ -608,8 +590,8 @@ format_mspdi_timestamp(time_t t)
    static char timestamp[128];
 
    now = localtime(&t);
-   sprintf(timestamp, "%4d-%02d-%02dT%02d:%02d:%02d",
-           (now->tm_year + 1900), (now->tm_mon + 1), now->tm_mday, now->tm_hour, now->tm_min, now->tm_sec);
+   otto_sprintf(timestamp, "%4d-%02d-%02dT%02d:%02d:%02d",
+                (now->tm_year + 1900), (now->tm_mon + 1), now->tm_mday, now->tm_hour, now->tm_min, now->tm_sec);
 
    return(timestamp);
 }
@@ -648,7 +630,7 @@ format_mspdi_duration(time_t t, int autoschedule)
    seconds %= 60;
 
    // create the duration string
-   sprintf(duration, "PT%dH%dM%dS", hours, minutes, seconds);
+   otto_sprintf(duration, "PT%dH%dM%dS", hours, minutes, seconds);
 
    return(duration);
 }

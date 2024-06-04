@@ -1112,18 +1112,20 @@ ottojob_log_job_layout()
    lsprintf(logp, CATI, "start_minutes   at %4d for %4d type char    notnull\n", offsetof(JOB, start_minutes),   sizeof(j.start_minutes));
    lsprintf(logp, CATI, "start_times     at %4d for %4d type char    notnull\n", offsetof(JOB, start_times),     sizeof(j.start_times));
    lsprintf(logp, CATI, "autohold        at %4d for %4d type integer notnull\n", offsetof(JOB, autohold),        sizeof(j.autohold));
+   lsprintf(logp, CATI, "autonoexec      at %4d for %4d type integer notnull\n", offsetof(JOB, autonoexec),      sizeof(j.autonoexec));
    lsprintf(logp, CATI, "environment     at %4d for %4d type char    notnull\n", offsetof(JOB, environment),     sizeof(j.environment));
+   lsprintf(logp, CATI, "loopname        at %4d for %4d type char    notnull\n", offsetof(JOB, loopname),        sizeof(j.loopname));
+   lsprintf(logp, CATI, "loopmin         at %4d for %4d type integer notnull\n", offsetof(JOB, loopmin),         sizeof(j.loopmin));
+   lsprintf(logp, CATI, "loopmax         at %4d for %4d type integer notnull\n", offsetof(JOB, loopmax),         sizeof(j.loopmax));
+   lsprintf(logp, CATI, "loopsgn         at %4d for %4d type integer notnull\n", offsetof(JOB, loopsgn),         sizeof(j.loopsgn));
 
    lsprintf(logp, CATI, "expression      at %4d for %4d type char    notnull\n", offsetof(JOB, expression),      sizeof(j.expression));
    lsprintf(logp, CATI, "expr_fail       at %4d for %4d type integer notnull\n", offsetof(JOB, expr_fail),       sizeof(j.expr_fail));
    lsprintf(logp, CATI, "status          at %4d for %4d type integer notnull\n", offsetof(JOB, status),          sizeof(j.status));
    lsprintf(logp, CATI, "on_autohold     at %4d for %4d type integer notnull\n", offsetof(JOB, on_autohold),     sizeof(j.on_autohold));
+   lsprintf(logp, CATI, "on_autonoexec   at %4d for %4d type integer notnull\n", offsetof(JOB, on_autonoexec),   sizeof(j.on_autonoexec));
    lsprintf(logp, CATI, "on_noexec       at %4d for %4d type integer notnull\n", offsetof(JOB, on_noexec),       sizeof(j.on_noexec));
-   lsprintf(logp, CATI, "loopname        at %4d for %4d type char    notnull\n", offsetof(JOB, loopname),        sizeof(j.loopname));
-   lsprintf(logp, CATI, "loopmin         at %4d for %4d type integer notnull\n", offsetof(JOB, loopmin),         sizeof(j.loopmin));
-   lsprintf(logp, CATI, "loopmax         at %4d for %4d type integer notnull\n", offsetof(JOB, loopmax),         sizeof(j.loopmax));
    lsprintf(logp, CATI, "loopnum         at %4d for %4d type integer notnull\n", offsetof(JOB, loopnum),         sizeof(j.loopnum));
-   lsprintf(logp, CATI, "loopsgn         at %4d for %4d type integer notnull\n", offsetof(JOB, loopsgn),         sizeof(j.loopsgn));
    lsprintf(logp, CATI, "loopstat        at %4d for %4d type integer notnull\n", offsetof(JOB, loopstat),        sizeof(j.loopstat));
    lsprintf(logp, CATI, "pid             at %4d for %4d type integer notnull\n", offsetof(JOB, pid),             sizeof(j.pid));
    lsprintf(logp, CATI, "start           at %4d for %4d type integer notnull\n", offsetof(JOB, start),           sizeof(j.start));
@@ -1332,12 +1334,12 @@ ottojob_prepare_txt_values(JOBTVAL *tval, JOB *item, int format)
 
    now = time(0);
 
-   sprintf(tval->id,              "%d", item->id);
-   sprintf(tval->level,           "%d", item->level);
-   sprintf(tval->linkage,         "box %d, head %d, tail %d, prev %d, next %d", item->box, item->head, item->tail, item->prev, item->next);
-   sprintf(tval->name,            "%s", item->name);
-   sprintf(tval->type,            "%c", item->type);
-   sprintf(tval->box_name,        "%s", item->box_name);
+   otto_sprintf(tval->id,              "%d", item->id);
+   otto_sprintf(tval->level,           "%d", item->level);
+   otto_sprintf(tval->linkage,         "box %d, head %d, tail %d, prev %d, next %d", item->box, item->head, item->tail, item->prev, item->next);
+   otto_sprintf(tval->name,            "%s", item->name);
+   otto_sprintf(tval->type,            "%c", item->type);
+   otto_sprintf(tval->box_name,        "%s", item->box_name);
    
    s = item->description;
    t = tval->description;
@@ -1381,9 +1383,9 @@ ottojob_prepare_txt_values(JOBTVAL *tval, JOB *item, int format)
 
 
 
-   sprintf(tval->command,         "%s", item->command);
-   sprintf(tval->condition,       "%s", item->condition);
-   sprintf(tval->date_conditions, "%s", item->date_conditions == 0 ? "0" : "1");
+   otto_sprintf(tval->command,         "%s", item->command);
+   otto_sprintf(tval->condition,       "%s", item->condition);
+   otto_sprintf(tval->date_conditions, "%s", item->date_conditions == 0 ? "0" : "1");
    if(item->days_of_week == OTTO_ALL)
    {
       strcpy(tval->days_of_week, "all");
@@ -1422,7 +1424,7 @@ ottojob_prepare_txt_values(JOBTVAL *tval, JOB *item, int format)
             {
                if(one_printed == OTTO_TRUE)
                   strcat(tval->start_minutes, ",");
-               sprintf(&tval->start_minutes[strlen(tval->start_minutes)], "%d", i);
+               otto_sprintf(&tval->start_minutes[strlen(tval->start_minutes)], "%d", i);
                one_printed = OTTO_TRUE;
             }
          }
@@ -1438,7 +1440,7 @@ ottojob_prepare_txt_values(JOBTVAL *tval, JOB *item, int format)
                {
                   if(one_printed == OTTO_TRUE)
                      strcat(tval->start_times, ",");
-                  sprintf(&tval->start_times[strlen(tval->start_times)], "%d:%02d", i, j);
+                  otto_sprintf(&tval->start_times[strlen(tval->start_times)], "%d:%02d", i, j);
                   one_printed = OTTO_TRUE;
                }
             }
@@ -1478,7 +1480,7 @@ ottojob_prepare_txt_values(JOBTVAL *tval, JOB *item, int format)
                if(index < 0)
                   strcpy(t, "----");
                else
-                  sprintf(t, "%04d", index);
+                  otto_sprintf(t, "%04d", index);
                t += 4 ;
                *t = '\0';
                break;
@@ -1511,9 +1513,9 @@ ottojob_prepare_txt_values(JOBTVAL *tval, JOB *item, int format)
                c.s = s;
                value = evaluate_stat(&c);
                if(value != OTTO_FAIL)
-                  sprintf(t, " (%d) ", value);
+                  otto_sprintf(t, " (%d) ", value);
                else
-                  sprintf(t, " (-) ");
+                  otto_sprintf(t, " (-) ");
                s += 2;
                t += 5 ;
                *t = '\0';
@@ -1524,7 +1526,7 @@ ottojob_prepare_txt_values(JOBTVAL *tval, JOB *item, int format)
       }
 
 
-      sprintf(tval->expr_fail, "%d", item->expr_fail);
+      otto_sprintf(tval->expr_fail, "%d", item->expr_fail);
    }
 
    if(item->on_noexec == OTTO_FALSE)
@@ -1575,11 +1577,13 @@ ottojob_prepare_txt_values(JOBTVAL *tval, JOB *item, int format)
       default:      strcpy(tval->status, "--"); break;
    }
 
-   sprintf(tval->autohold,    "%d",  item->autohold);
-   sprintf(tval->on_autohold, "%d",  item->on_autohold);
-   sprintf(tval->on_noexec,   "%d",  item->on_noexec);
+   otto_sprintf(tval->autohold,     "%d",  item->autohold);
+   otto_sprintf(tval->on_autohold,  "%d",  item->on_autohold);
+   otto_sprintf(tval->autonoexec,   "%d",  item->autonoexec);
+   otto_sprintf(tval->on_autonoexec,"%d",  item->on_autonoexec);
+   otto_sprintf(tval->on_noexec,    "%d",  item->on_noexec);
    if(item->type != OTTO_BOX)
-      sprintf(tval->pid,      "%d",  item->pid);
+      otto_sprintf(tval->pid,       "%d",  item->pid);
    
 
    if(item->start == 0)
@@ -1611,7 +1615,7 @@ ottojob_prepare_txt_values(JOBTVAL *tval, JOB *item, int format)
          if(item->start != 0 && cfg.show_sofar == OTTO_TRUE)
          {
             duration = now - item->start;
-            sprintf(tval->duration, "%02ld:%02ld:%02ld", duration / 3600, duration / 60 % 60, duration % 60);
+            otto_sprintf(tval->duration, "%02ld:%02ld:%02ld", duration / 3600, duration / 60 % 60, duration % 60);
          }
          else
          {
@@ -1627,7 +1631,7 @@ ottojob_prepare_txt_values(JOBTVAL *tval, JOB *item, int format)
       duration = item->finish - item->start;
       if(duration >= 0)
       {
-         sprintf(tval->duration, "%02ld:%02ld:%02ld", duration / 3600, duration / 60 % 60, duration % 60);
+         otto_sprintf(tval->duration, "%02ld:%02ld:%02ld", duration / 3600, duration / 60 % 60, duration % 60);
       }
       else
       {
@@ -1635,12 +1639,12 @@ ottojob_prepare_txt_values(JOBTVAL *tval, JOB *item, int format)
       }
    }
 
-   sprintf(tval->exit_status, "%d",  item->exit_status);
+   otto_sprintf(tval->exit_status, "%d",  item->exit_status);
 
-   sprintf(tval->loopname, "%s", item->loopname);
-   sprintf(tval->loopnum, "%d", (int)(item->loopnum * item->loopsgn));
-   sprintf(tval->loopmin, "%d", (int)(item->loopmin * item->loopsgn));
-   sprintf(tval->loopmax, "%d", (int)(item->loopmax * item->loopsgn));
+   otto_sprintf(tval->loopname, "%s", item->loopname);
+   otto_sprintf(tval->loopnum, "%d", (int)(item->loopnum * item->loopsgn));
+   otto_sprintf(tval->loopmin, "%d", (int)(item->loopmin * item->loopsgn));
+   otto_sprintf(tval->loopmax, "%d", (int)(item->loopmax * item->loopsgn));
    if(item->type == 'b')
    {
       if(item->loopname[0] != '\0')
@@ -1908,6 +1912,22 @@ ottojob_print_auto_hold_errors(int error_mask, char *action, char *name, char *a
    if(error_mask & OTTO_INVALID_VALUE)
    {
       fprintf(stderr, "ERROR for %s: %s < invalid value \"%c\" for keyword: \"auto_hold\" >.\n", action, name, auto_hold[0]);
+      retval++;
+   }
+
+   return(retval);
+}
+
+
+
+int
+ottojob_print_auto_noexec_errors(int error_mask, char *action, char *name, char *auto_noexec)
+{
+   int retval = 0;
+
+   if(error_mask & OTTO_INVALID_VALUE)
+   {
+      fprintf(stderr, "ERROR for %s: %s < invalid value \"%c\" for keyword: \"auto_noexec\" >.\n", action, name, auto_noexec[0]);
       retval++;
    }
 

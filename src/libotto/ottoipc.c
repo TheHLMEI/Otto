@@ -134,7 +134,7 @@ init_client_ipc(char *hostname, in_port_t portnumber)
       strcpy(host, "localhost");
 
    // copy in port number
-   sprintf(port, "%u", portnumber);
+   otto_sprintf(port, "%u", portnumber);
 
    memset(&hints, 0x00, sizeof(hints));
    hints.ai_flags    = AI_NUMERICSERV;
@@ -634,6 +634,31 @@ log_received_pdu(void *p)
 
 
 
+void
+print_received_pdu(void *p)
+{
+   ottoipc_simple_pdu_st *pdu    = (ottoipc_simple_pdu_st *)p;
+
+   if(pdu->option < NO_STATUS)
+      printf("  ottosysd returns %s\n", strsignal(pdu->option));
+   else if(pdu->option < ACK)
+   {
+      if(pdu->option > NO_STATUS && pdu->option < STATUS_TOTAL)
+         printf("  ottosysd returns %s\n", strstatus(pdu->option));
+      else
+         printf("  ottosysd returns undefined status code\n");
+   }
+   else
+   {
+      if(pdu->option >= ACK && pdu->option < RESULTCODE_TOTAL)
+         printf("  ottosysd returns %s\n", strresultcode(pdu->option));
+      else
+         printf("  ottosysd returns undefined result code\n");
+   }
+}
+
+
+
 char *
 stropcode(int i)
 {
@@ -642,48 +667,51 @@ stropcode(int i)
 
    switch(i)
    {
-      case NOOP:             retval = "NOOP";             break;
+      case NOOP:               retval = "NOOP";               break;
 
-                             // job definition operations
-      case CREATE_JOB:       retval = "CREATE_JOB";       break;
-      case REPORT_JOB:       retval = "REPORT_JOB";       break;
-      case UPDATE_JOB:       retval = "UPDATE_JOB";       break;
-      case DELETE_JOB:       retval = "DELETE_JOB";       break;
-      case DELETE_BOX:       retval = "DELETE_BOX";       break;
-      case CRUD_TOTAL:       retval = "CRUD_TOTAL";       break;
+                               // job definition operations
+      case CREATE_JOB:         retval = "CREATE_JOB";         break;
+      case REPORT_JOB:         retval = "REPORT_JOB";         break;
+      case UPDATE_JOB:         retval = "UPDATE_JOB";         break;
+      case DELETE_JOB:         retval = "DELETE_JOB";         break;
+      case DELETE_BOX:         retval = "DELETE_BOX";         break;
+      case CRUD_TOTAL:         retval = "CRUD_TOTAL";         break;
 
-                             // scheduler control operations
-      case FORCE_START_JOB:  retval = "FORCE_START_JOB";  break;
-      case START_JOB:        retval = "START_JOB";        break;
-      case KILL_JOB:         retval = "KILL_JOB";         break;
-      case MOVE_JOB_TOP:     retval = "MOVE_JOB_TOP";     break;
-      case MOVE_JOB_UP:      retval = "MOVE_JOB_UP";      break;
-      case MOVE_JOB_DOWN:    retval = "MOVE_JOB_DOWN";    break;
-      case MOVE_JOB_BOTTOM:  retval = "MOVE_JOB_BOTTOM";  break;
-      case RESET_JOB:        retval = "RESET_JOB";        break;
-      case SEND_SIGNAL:      retval = "SEND_SIGNAL";      break;
-      case CHANGE_STATUS:    retval = "CHANGE_STATUS";    break;
-      case JOB_ON_AUTOHOLD:  retval = "JOB_ON_AUTOHOLD";  break;
-      case JOB_OFF_AUTOHOLD: retval = "JOB_OFF_AUTOHOLD"; break;
-      case JOB_ON_HOLD:      retval = "JOB_ON_HOLD";      break;
-      case JOB_OFF_HOLD:     retval = "JOB_OFF_HOLD";     break;
-      case JOB_ON_NOEXEC:    retval = "JOB_ON_NOEXEC";    break;
-      case JOB_OFF_NOEXEC:   retval = "JOB_OFF_NOEXEC";   break;
-      case BREAK_LOOP:       retval = "BREAK_LOOP";       break;
-      case SCHED_TOTAL:      retval = "SCHED_TOTAL";      break;
+                               // scheduler control operations
+      case FORCE_START_JOB:    retval = "FORCE_START_JOB";    break;
+      case START_JOB:          retval = "START_JOB";          break;
+      case KILL_JOB:           retval = "KILL_JOB";           break;
+      case MOVE_JOB_TOP:       retval = "MOVE_JOB_TOP";       break;
+      case MOVE_JOB_UP:        retval = "MOVE_JOB_UP";        break;
+      case MOVE_JOB_DOWN:      retval = "MOVE_JOB_DOWN";      break;
+      case MOVE_JOB_BOTTOM:    retval = "MOVE_JOB_BOTTOM";    break;
+      case RESET_JOB:          retval = "RESET_JOB";          break;
+      case SEND_SIGNAL:        retval = "SEND_SIGNAL";        break;
+      case CHANGE_STATUS:      retval = "CHANGE_STATUS";      break;
+      case JOB_ON_AUTOHOLD:    retval = "JOB_ON_AUTOHOLD";    break;
+      case JOB_OFF_AUTOHOLD:   retval = "JOB_OFF_AUTOHOLD";   break;
+      case JOB_ON_AUTONOEXEC:  retval = "JOB_ON_AUTONOEXEC";  break;
+      case JOB_OFF_AUTONOEXEC: retval = "JOB_OFF_AUTONOEXEC"; break;
+      case JOB_ON_HOLD:        retval = "JOB_ON_HOLD";        break;
+      case JOB_OFF_HOLD:       retval = "JOB_OFF_HOLD";       break;
+      case JOB_ON_NOEXEC:      retval = "JOB_ON_NOEXEC";      break;
+      case JOB_OFF_NOEXEC:     retval = "JOB_OFF_NOEXEC";     break;
+      case BREAK_LOOP:         retval = "BREAK_LOOP";         break;
+      case SET_LOOP:           retval = "SET_LOOP";           break;
+      case SCHED_TOTAL:        retval = "SCHED_TOTAL";        break;
 
-                             // daemon control operations
-      case PING:             retval = "PING";             break;
-      case VERIFY_DB:        retval = "VERIFY_DB";        break;
-      case DEBUG_ON:         retval = "DEBUG_ON";         break;
-      case DEBUG_OFF:        retval = "DEBUG_OFF";        break;
-      case REFRESH:          retval = "REFRESH";          break;
-      case PAUSE_DAEMON:     retval = "PAUSE_DAEMON";     break;
-      case RESUME_DAEMON:    retval = "RESUME_DAEMON";    break;
-      case STOP_DAEMON:      retval = "STOP_DAEMON";      break;
-      case OPCODE_TOTAL:     retval = "OPCODE_TOTAL";     break;
+                               // daemon control operations
+      case PING:               retval = "PING";               break;
+      case VERIFY_DB:          retval = "VERIFY_DB";          break;
+      case DEBUG_ON:           retval = "DEBUG_ON";           break;
+      case DEBUG_OFF:          retval = "DEBUG_OFF";          break;
+      case REFRESH:            retval = "REFRESH";            break;
+      case PAUSE_DAEMON:       retval = "PAUSE_DAEMON";       break;
+      case RESUME_DAEMON:      retval = "RESUME_DAEMON";      break;
+      case STOP_DAEMON:        retval = "STOP_DAEMON";        break;
+      case OPCODE_TOTAL:       retval = "OPCODE_TOTAL";       break;
 
-      default: sprintf(msg, "Opcode %d", i); retval = msg; break;
+      default: otto_sprintf(msg, "Opcode %d", i); retval = msg; break;
    }
 
    return retval;
@@ -702,21 +730,38 @@ strresultcode(int i)
       case ACK:                        retval = "ACK";                        break;
       case NACK:                       retval = "NACK";                       break;
 
-                                       // job definition operations
+      case BOX_COMMAND:                retval = "BOX_COMMAND";                break;
+      case BOX_DELETED:                retval = "BOX_DELETED";                break;
+      case BOX_HAS_NO_LOOP:            retval = "BOX_HAS_NO_LOOP";            break;
+      case BOX_NOT_FOUND:              retval = "BOX_NOT_FOUND";              break;
+      case CHILD_IS_ON_HOLD:           retval = "CHILD_IS_ON_HOLD";           break;
+      case CHILD_IS_RUNNING:           retval = "CHILD_IS_RUNNING";           break;
+      case CMD_LOOP:                   retval = "CMD_LOOP";                   break;
+      case COULD_NOT_FORK:             retval = "COULD_NOT_FORK";             break;
+      case DAEMON_IS_PAUSED:           retval = "DAEMON_IS_PAUSED";           break;
+      case GRANDFATHER_PARADOX:        retval = "GRANDFATHER_PARADOX";        break;
+      case ITERATOR_OUT_OF_BOUNDS:     retval = "ITERATOR_OUT_OF_BOUNDS";     break;
+      case JOB_ALREADY_EXISTS:         retval = "JOB_ALREADY_EXISTS";         break;
+      case JOB_ALREADY_ON_AUTONOEXEC:  retval = "JOB_ALREADY_ON_AUTONOEXEC";  break;
+      case JOB_ALREADY_ON_NOEXEC:      retval = "JOB_ALREADY_ON_NOEXEC";      break;
       case JOB_CREATED:                retval = "JOB_CREATED";                break;
+      case JOB_DELETED:                retval = "JOB_DELETED";                break;
+      case JOB_DEPENDS_ON_ITSELF:      retval = "JOB_DEPENDS_ON_ITSELF";      break;
+      case JOB_DEPENDS_ON_MISSING_JOB: retval = "JOB_DEPENDS_ON_MISSING_JOB"; break;
+      case JOB_IS_NOT_A_BOX:           retval = "JOB_IS_NOT_A_BOX";           break;
+      case JOB_IS_ON_HOLD:             retval = "JOB_IS_ON_HOLD";             break;
+      case JOB_IS_RUNNING:             retval = "JOB_IS_RUNNING";             break;
+      case JOB_NOT_FOUND:              retval = "JOB_NOT_FOUND";              break;
+      case JOB_NOT_ON_AUTONOEXEC:      retval = "JOB_NOT_ON_AUTONOEXEC";      break;
+      case JOB_NOT_ON_HOLD:            retval = "JOB_NOT_ON_HOLD";            break;
+      case JOB_NOT_ON_NOEXEC:          retval = "JOB_NOT_ON_NOEXEC";          break;
       case JOB_REPORTED:               retval = "JOB_REPORTED";               break;
       case JOB_UPDATED:                retval = "JOB_UPDATED";                break;
-      case JOB_NOT_FOUND:              retval = "JOB_NOT_FOUND";              break;
-      case JOB_DELETED:                retval = "JOB_DELETED";                break;
-      case BOX_NOT_FOUND:              retval = "BOX_NOT_FOUND";              break;
-      case BOX_DELETED:                retval = "BOX_DELETED";                break;
-      case JOB_ALREADY_EXISTS:         retval = "JOB_ALREADY_EXISTS";         break;
-      case JOB_DEPENDS_ON_MISSING_JOB: retval = "JOB_DEPENDS_ON_MISSING_JOB"; break;
-      case JOB_DEPENDS_ON_ITSELF:      retval = "JOB_DEPENDS_ON_ITSELF";      break;
+      case NEW_NAME_ALREADY_EXISTS:    retval = "NEW_NAME_ALREADY_EXISTS";    break;
       case NO_SPACE_AVAILABLE:         retval = "NO_SPACE_AVAILABLE";         break;
-      case RESULTCODE_TOTAL:           retval = "RESULTCODE_TOTAL";           break;
 
-      default: sprintf(msg, "Resultcode %d", i); retval = msg; break;
+
+      default: otto_sprintf(msg, "Resultcode %d", i); retval = msg; break;
    }
 
    return retval;
@@ -740,7 +785,7 @@ strstatus(int i)
       case TERMINATED:   retval = "TERMINATED";   break;
       case STATUS_TOTAL: retval = "STATUS_TOTAL"; break;
 
-      default: sprintf(msg, "Status %d", i); retval = msg; break;
+      default: otto_sprintf(msg, "Status %d", i); retval = msg; break;
    }
 
    return retval;
@@ -763,7 +808,7 @@ strpdutype(int i)
       case DELETE_JOB_PDU: retval = "DELETE_JOB_PDU"; break;
       case PDUTYPE_TOTAL:  retval = "PDUTYPE_TOTAL";  break;
 
-      default: sprintf(msg, "PDUtype %d", i); retval = msg; break;
+      default: otto_sprintf(msg, "PDUtype %d", i); retval = msg; break;
    }
 
    return retval;
