@@ -48,7 +48,7 @@ Base Otto package - server, command line utilities...
 
         Example:  
         #
-        # username of privileged user allowed to start and stop the deamon fromt he command line
+        # username of privileged user allowed to start and stop the deamon from the command line
         #
         user           otto
 
@@ -213,5 +213,5 @@ Base Otto package - server, command line utilities...
 ## What?  No JOB_ON_ICE?
 
 I never liked it.  I got into the bad habit of using it early in my experience with autosys
-but in writing this clone I learned about JOB_ON_NOEXEC which I feel is a much better
-method of not running jobs.
+but in writing this utility I decided JOB_ON_NOEXEC is a much better (safer) method of not
+running jobs.
