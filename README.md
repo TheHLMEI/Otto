@@ -16,8 +16,10 @@ Base Otto package - server, command line utilities...
         export OTTOLOG=$HOME/.otto/log
         export OTTODB=$HOME/.otto/otto.db
 
+   See etc/setup.sh.
 
-3. Pick a port for the ottosysd daemon to listen on.  Low port numbers are typically preassigned to well-known services so pick a higher number.  You can use the netstat command to show ports in use by other programs:
+
+4. Pick a port for the ottosysd daemon to listen on.  Low port numbers are typically preassigned to well-known services so pick a higher number.  You can use the netstat command to show ports in use by other programs:
 
         Example:  
         $ netstat -an -f inet  
@@ -31,7 +33,7 @@ Base Otto package - server, command line utilities...
     In the above example the fifth number (or the number after the asterisk) in the Local Address column is a port currently in use (21, 12345, 53520, 53861) suggesting you should choose a port not shown.
 
 
-4. Save the port number in your $OTTOCFG file in a single line of the format "server_port \[port number\]".  
+5. Save the port number in your $OTTOCFG file in a single line of the format "ottosysd_port \[port number\]".  
 
         Example:  
         $ cat $OTTOCFG  
@@ -42,7 +44,7 @@ Base Otto package - server, command line utilities...
         14:04:58 MAJR: bind failed.
 
 
-5. Save values for additional optional parameters in your $OTTOCFG file.
+6. Save values for additional optional parameters in your $OTTOCFG file.
 
         Example:  
         #
@@ -98,7 +100,7 @@ Base Otto package - server, command line utilities...
         envvar         OTTOBIN=/usr/local/conv/opt/otto/pkg/Otto/bin
         
 
-6. Make sure ottosysd, ottocmd, ottoexp, ottoimp, ottorep, ottotr, ottostart, ottostop, and ottoping are in your $PATH and are executable.
+7. Compile and install the programs (make install in src).  Make sure ottosysd, ottocmd, ottoexp, ottoimp, ottorep, ottotr, ottostart, ottostop, and ottoping are in your $PATH and are executable.
 
         Example:  
         $ ls -logh
@@ -142,18 +144,17 @@ Base Otto package - server, command line utilities...
                                        MOVE_JOB_UP, RESET_JOB, SET_LOOP, DEBUG_OFF, DEBUG_ON, PAUSE_DAEMON,
                                        PING, REFRESH, RESUME_DAEMON, VERIFY_DB
     
-                                       CHANGE_STATUS supports FAILURE, INACTIVE, RUNNING,  
-                                       SUCCESS, and TERMINATED statuses  
+                                       CHANGE_STATUS supports FAILURE, INACTIVE, RUNNING, SUCCESS, TERMINATED
         some conditions                Supports DONE, FAILURE, NOTRUNNING, SUCCESS, and TEMINATED job statuses  
                                        and logical and (&) and or (|) with condition grouping  
 
 
     What it doesn't support:  
 
-        permissions                    otto is meant to be a local "personal" job scheduler  
+        permissions                    Otto is meant to be a local "personal" job scheduler  
         file watchers                  These can be implemented as job scripts and run like normal commands  
         calendars                      These can be implemented as a job script or cron job  
-        multiple machines              otto is meant to be a local "personal" job scheduler not an  
+        multiple machines              Otto is meant to be a local "personal" job scheduler not an  
                                        enterprise wide solution  
         some conditions                Does not support lookback, exit status, global variables  
 
@@ -199,7 +200,7 @@ Base Otto package - server, command line utilities...
    using the delete_job command but this action retains the box's contents, promoting them to
    the level of the box that contained them.
 
-6. Otto provides multple non-autosys supported keywords and events listed above.
+6. Otto provides multiple non-autosys supported keywords and events listed above.
 
 7. ottorep -p presents the PID of the job for use by monitoring programs.
 
@@ -208,7 +209,8 @@ Base Otto package - server, command line utilities...
     b. the preceding box/job is in the SAME parent box as the dependent job/box.  
 
 
-What?  No JOB_ON_ICE?
+
+## What?  No JOB_ON_ICE?
 
 I never liked it.  I got into the bad habit of using it early in my experience with autosys
 but in writing this clone I learned about JOB_ON_NOEXEC which I feel is a much better
