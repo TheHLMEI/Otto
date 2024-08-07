@@ -35,27 +35,67 @@ Base Otto package - server, command line utilities...
 
         Example:  
         $ cat $OTTOCFG  
-        server_port 12345  
+        ottosysd_port 12345  
 
     If you pick a port already in use ottosysd will complain.  A line will be written to the log file such as:
 
         14:04:58 MAJR: bind failed.
 
 
-5. Save values for additional optional parameters in your $OTTOCFG file.  These parameters are:
-
-        archivelog - When set to 'true' the existing log files in $OTTOLOG will be renamed adding a '.bkp'  
-                     extension whenever the ottosysd program is started.  Default: false  
-        max_job    - When set this defines the number of jobs your instance of otto will support.  This number  
-                     directly impacts the size of the $OTTODB file and processing time.  Default: 1000  
-        path       - When set this defines the default path inherited by jobs run via otto.  Default: path of user running ottosysd  
-        verbose    - When set to 'true' some autosys-like feedback is enabled.  Default: false  
+5. Save values for additional optional parameters in your $OTTOCFG file.
 
         Example:  
-        $ cat $OTTOCFG  
-        server_port 12345  
-        max_job       500  
-        archivelog   true  
+        #
+        # username of privileged user allowed to start and stop the deamon fromt he command line
+        #
+        user           otto
+
+        #
+        # up to max signed short (32767)
+        #
+        ottodb_maxjobs 1500
+
+        #
+        # daemon listening port
+        #
+        ottosysd_port  12345
+
+        #
+        # archive logs on restart
+        #
+        archivelog     true
+
+        #
+        # verbose response on job operations
+        #
+        verbose        true
+
+        #
+        # show the time a process has been running "so far" in the Runtime column on the summary report
+        #
+        show_sofar     true
+
+        #
+        # Produce additional debug output in the log
+        #
+        debug          true
+
+        #
+        # identify users issuing commands using getpw calls instead of using $LOGNAME/$USER
+        #
+        use_getpw      false
+
+        #
+        # httpd is best used behind a proxy like caddy or nginx
+        #
+        enable_httpd   true
+        httpd_port     12346
+        base_url       /otto
+
+        #
+        # variables to insert into the environment of child jobs
+        #
+        envvar         OTTOBIN=/usr/local/conv/opt/otto/pkg/Otto/bin
         
 
 6. Make sure ottosysd, ottocmd, ottoexp, ottoimp, ottorep, ottotr, ottostart, ottostop, and ottoping are in your $PATH and are executable.
@@ -82,15 +122,25 @@ Base Otto package - server, command line utilities...
     What it supports:  
     
         eventor program equivalent     Daemon runs in shell session or in background (nohupped)  
-        jil command equivalent         Reads autosys JIL.  Supported JIL keywords are:  
-                                       delete_box, delete_job, insert_job, auto_hold, box_name,  
-                                       command, condition, description, job_type  
+        jil command equivalent         Reads a subset of autosys JIL plus Otto-specific extensions.
+                                       Common keywords between Otto and autosys JIL:
+                                       auto_hold, box_name, command, condition,
+                                       date_conditions, days_of_week, delete_box, delete_job, description,
+                                       insert_job, job_type, start_mins, start_times, update_job
+
+                                       Otto specific keywords:
+                                       auto_noexec, environment, finish, loop, new_name, start
         autorep command equivalent     Reports in (mostly) autosys formats  
-        sendevent command equivalent   Supports CHANGE_STATUS, JOB_ON_HOLD, JOB_OFF_HOLD,  
-                                       JOB_ON_NOEXEC, JOB_OFF_NOEXEC, KILLJOB, SEND_SIGNAL,  
-                                       STARTJOB, and STOP_DEMON events  
-                                       Adds non-autosys compliant JOB_ON_AUTOHOLD, JOB_OFF_AUTOHOLD  
-                                       events.  
+        sendevent command equivalent   Common events between Otto and autosys:
+                                       CHANGE_STATUS, FORCE_STARTJOB, JOB_OFF_HOLD, JOB_OFF_NOEXEC,
+                                       JOB_ON_HOLD, JOB_ON_NOEXEC, KILLJOB, SEND_SIGNAL, STARTJOB,
+                                       STOP_DEMON
+
+                                       Otto specific events:
+                                       BREAK_LOOP, JOB_OFF_AUTOHOLD, JOB_OFF_AUTONOEXEC, JOB_ON_AUTOHOLD,
+                                       JOB_ON_AUTONOEXEC, MOVE_JOB_BOTTOM, MOVE_JOB_DOWN, MOVE_JOB_TOP,
+                                       MOVE_JOB_UP, RESET_JOB, SET_LOOP, DEBUG_OFF, DEBUG_ON, PAUSE_DAEMON,
+                                       PING, REFRESH, RESUME_DAEMON, VERIFY_DB
     
                                        CHANGE_STATUS supports FAILURE, INACTIVE, RUNNING,  
                                        SUCCESS, and TERMINATED statuses  
@@ -106,7 +156,6 @@ Base Otto package - server, command line utilities...
         multiple machines              otto is meant to be a local "personal" job scheduler not an  
                                        enterprise wide solution  
         some conditions                Does not support lookback, exit status, global variables  
-
 
 
 ## Notable differences from autosys
@@ -128,7 +177,7 @@ Base Otto package - server, command line utilities...
 
 3. ottorep -d presents details in an otto specific format
 
-4. ottorep -q doesn't show unsupported machine, owner, permission, or alarm_if_fail attributes
+4. ottoexp -F JIL (instead of ottorep -q) doesn't show unsupported machine, owner, permission, or alarm_if_fail attributes
 
         Example:  
         /* ----------------- CNV_OTTO_BOX ----------------- */  
@@ -150,10 +199,17 @@ Base Otto package - server, command line utilities...
    using the delete_job command but this action retains the box's contents, promoting them to
    the level of the box that contained them.
 
-6. Otto provides 2 non-autosys supported events JOB_ON_AUTOHOLD, JOB_OFF_AUTOHOLD.
+6. Otto provides multple non-autosys supported keywords and events listed above.
 
 7. ottorep -p presents the PID of the job for use by monitoring programs.
 
 8. Unlike autosys, Otto does NOT automatically run a job or box when its conditions are satisfied UNLESS:   
     a. you STARTJOB the dependent job/box first, OR   
     b. the preceding box/job is in the SAME parent box as the dependent job/box.  
+
+
+What?  No JOB_ON_ICE?
+
+I never liked it.  I got into the bad habit of using it early in my experience with autosys
+but in writing this clone I learned about JOB_ON_NOEXEC which I feel is a much better
+method of not running jobs.
