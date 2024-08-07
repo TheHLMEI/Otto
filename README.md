@@ -97,7 +97,7 @@ Base Otto package - server, command line utilities...
         #
         # variables to insert into the environment of child jobs
         #
-        envvar         OTTOBIN=/usr/local/conv/opt/otto/pkg/Otto/bin
+        envvar         OTTOBIN=/home/otto/Otto/bin
         
 
 7. Compile and install the programs (make install in src).  Make sure ottosysd, ottocmd, ottoexp, ottoimp, ottorep, ottotr, ottostart, ottostop, and ottoping are in your $PATH and are executable.
