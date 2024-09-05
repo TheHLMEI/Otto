@@ -1,0 +1,106 @@
+plugins {
+    id "cpp-library"
+    id ("com.netflix.nebula.rpm") version "11.9.1"
+}
+
+group = 'com.gwt.conversion'
+version = '6.0.0'
+
+ext {
+    rpmLibraries = fileTree(dir: 'bin', include: "**/*.so")
+    rpmIncludes = fileTree(dir: ".", include: "otto.h")
+    sources = fileTree(dir: ".", includes: [ 
+        "ottocfg.c",
+        "ottocond.c",
+        "ottocrud.c",
+        "ottodb.c",
+        "ottohtml.c",
+        "ottoipc.c",
+        "ottojob.c",
+        "ottolog.c",
+        "ottoutil.c",
+        "otto_cnd_writer.c",
+        "otto_csv_reader.c",
+        "otto_csv_writer.c",
+        "otto_dtl_writer.c",
+        "otto_htmlcsv_writer.c",
+        "otto_htmldtl_writer.c",
+        "otto_htmljil_writer.c",
+        "otto_htmlmspdi_writer.c",
+        "otto_htmlsum_writer.c",
+        "otto_htmlversion_writer.c",
+        "otto_jil_reader.c",
+        "otto_jil_writer.c",
+        "otto_mspdi_reader.c",
+        "otto_mspdi_writer.c",
+        "otto_pid_writer.c",
+        "otto_sum_writer.c",
+        "signals.c",
+        "strptime.c",
+        "linenoise.c"])
+    publicIncludes = fileTree(dir: ".", include: "otto.h")
+}
+
+library {
+    // Set the target operating system and architecture for this library
+    targetMachines.add(machines.linux.x86_64)
+    linkage = [Linkage.SHARED]
+    
+    source.from sources
+    publicHeaders.from publicIncludes
+
+    binaries.configureEach {
+        def compileTask = compileTask.get()
+        compileTask.source.from sources
+        compileTask.includes {
+            "."
+        }        
+        if (toolChain instanceof VisualCpp) {
+            compileTask.compilerArgs = ["/TC"]
+        } else if (toolChain instanceof GccCompatibleToolChain) {
+            compileTask.compilerArgs = ["-DLINUX_OS", "-x", "c"]
+        }
+    }
+
+}
+
+task rpm(type: Rpm) {
+    dependsOn('build')
+    os LINUX
+    into "/opt/otto"
+    arch 'x86_64'
+    packageName project.name
+
+    user "otto"
+    group "otto"
+    permissionGroup "otto"
+
+    if (this.hasProperty("rpmLibraries")) {
+        from (rpmLibraries) {
+            into "lib/"
+            fileMode 0664
+        }
+    }
+
+    if (this.hasProperty("rpmEtc")) {
+        from (rpmEtc) {
+            into "etc/"
+            fileMode 0664
+        }
+    }
+
+    if (this.hasProperty("rpmIncludes")) {
+        from (rpmIncludes) {
+            into "include/"
+            fileMode 0664
+        }
+    }
+
+    if (this.hasProperty("rpmBinaries")) {
+        from (rpmBinaries) {
+            into "bin/"
+            fileMode 0775
+        }
+    }
+
+}
