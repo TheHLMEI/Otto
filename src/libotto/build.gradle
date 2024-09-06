@@ -41,6 +41,8 @@ ext {
 }
 
 library {
+    baseName = "otto"
+
     // Set the target operating system and architecture for this library
     targetMachines.add(machines.linux.x86_64)
     linkage = [Linkage.SHARED]

@@ -2,15 +2,29 @@ plugins {
     id ("com.netflix.nebula.rpm") version "11.9.1"
 }
 
-group = 'com.gwt.conversion'
-version = '6.0.0'
+group = 'org.thehlei'
+version = '1.0.0'
 
-ext {
-    rpmBinaries = fileTree(dir: 'bin', include: "*")
-    rpmModules = fileTree(dir: '.', include: "gencode.module")
+task rpm(type: Rpm) {
+    dependsOn('build')
+    os LINUX
+    into "/opt/otto"
+    arch 'x86_64'
+    packageName project.name
+
+    user "otto"
+    group "otto"
+    permissionGroup "otto"
+
+    from (fileTree(dir: "src/libotto", include: "otto.h")) {
+        into "include/"
+        fileMode 0664
+    }
+
+    from (fileTree(dir: "src/libotto/build/lib/main/release", include: "*.so")) {
+        into "lib/"
+        fileMode 0664
+    }
+
 }
 
-apply from: "${System.getenv('CONV_ETC')}/build/gradle/build.gradle.rpm"
-
-tasks.withType(Rpm).configureEach {
-}
