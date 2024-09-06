@@ -1,0 +1,9 @@
+rootProject.name = 'otto'
+
+include ":src:libotto"
+include ":src:ottocmd"
+include ":src:ottoexp"
+include ":src:ottoimp"
+include ":src:ottorep"
+include ":src:ottosysd"
+include ":src:ottotr"

@@ -1,0 +1,16 @@
+plugins {
+    id ("com.netflix.nebula.rpm") version "11.9.1"
+}
+
+group = 'com.gwt.conversion'
+version = '6.0.0'
+
+ext {
+    rpmBinaries = fileTree(dir: 'bin', include: "*")
+    rpmModules = fileTree(dir: '.', include: "gencode.module")
+}
+
+apply from: "${System.getenv('CONV_ETC')}/build/gradle/build.gradle.rpm"
+
+tasks.withType(Rpm).configureEach {
+}

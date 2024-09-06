@@ -1,0 +1,75 @@
+plugins {
+    id "cpp-application"
+    id ("com.netflix.nebula.rpm") version "11.9.1"
+}
+
+group = 'org.thehlei'
+version = '1.0.0'
+
+ext {
+    sources = fileTree(dir: ".", includes: [ "*.c" ])
+}
+
+dependencies { 
+    implementation project(":src:libotto")
+}
+
+application {
+    // Set the target operating system and architecture for this library
+    targetMachines.add(machines.linux.x86_64)
+    
+    source.from sources
+
+    binaries.configureEach {
+        def compileTask = compileTask.get()
+        compileTask.source.from sources
+        compileTask.includes.from "../libotto"
+        if (toolChain instanceof VisualCpp) {
+            compileTask.compilerArgs = ["/TC"]
+        } else if (toolChain instanceof GccCompatibleToolChain) {
+            compileTask.compilerArgs = ["-x", "c"]
+        }
+    }
+
+}
+
+task rpm(type: Rpm) {
+    dependsOn('build')
+    os LINUX
+    into "/opt/otto"
+    arch 'x86_64'
+    packageName project.name
+
+    user "otto"
+    group "otto"
+    permissionGroup "otto"
+
+    if (this.hasProperty("rpmLibraries")) {
+        from (rpmLibraries) {
+            into "lib/"
+            fileMode 0664
+        }
+    }
+
+    if (this.hasProperty("rpmEtc")) {
+        from (rpmEtc) {
+            into "etc/"
+            fileMode 0664
+        }
+    }
+
+    if (this.hasProperty("rpmIncludes")) {
+        from (rpmIncludes) {
+            into "include/"
+            fileMode 0664
+        }
+    }
+
+    if (this.hasProperty("rpmBinaries")) {
+        from (rpmBinaries) {
+            into "bin/"
+            fileMode 0775
+        }
+    }
+
+}

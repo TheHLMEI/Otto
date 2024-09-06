@@ -1,10 +1,9 @@
 plugins {
     id "cpp-library"
-    id ("com.netflix.nebula.rpm") version "11.9.1"
 }
 
-group = 'com.gwt.conversion'
-version = '6.0.0'
+group = 'org.thehlei'
+version = '1.0.0'
 
 ext {
     rpmLibraries = fileTree(dir: 'bin', include: "**/*.so")
@@ -59,47 +58,6 @@ library {
             compileTask.compilerArgs = ["/TC"]
         } else if (toolChain instanceof GccCompatibleToolChain) {
             compileTask.compilerArgs = ["-DLINUX_OS", "-x", "c"]
-        }
-    }
-
-}
-
-task rpm(type: Rpm) {
-    dependsOn('build')
-    os LINUX
-    into "/opt/otto"
-    arch 'x86_64'
-    packageName project.name
-
-    user "otto"
-    group "otto"
-    permissionGroup "otto"
-
-    if (this.hasProperty("rpmLibraries")) {
-        from (rpmLibraries) {
-            into "lib/"
-            fileMode 0664
-        }
-    }
-
-    if (this.hasProperty("rpmEtc")) {
-        from (rpmEtc) {
-            into "etc/"
-            fileMode 0664
-        }
-    }
-
-    if (this.hasProperty("rpmIncludes")) {
-        from (rpmIncludes) {
-            into "include/"
-            fileMode 0664
-        }
-    }
-
-    if (this.hasProperty("rpmBinaries")) {
-        from (rpmBinaries) {
-            into "bin/"
-            fileMode 0775
         }
     }
 
