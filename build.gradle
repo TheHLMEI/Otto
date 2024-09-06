@@ -11,10 +11,20 @@ task rpm(type: Rpm) {
     into "/opt/otto"
     arch 'x86_64'
     packageName project.name
+    release '1'
 
     user "otto"
     group "otto"
     permissionGroup "otto"
+
+    preInstall file('setup/pre-install.sh')
+    postInstall file('setup/post-install.sh')
+
+    directory('/opt/otto', 0664)
+    directory('/opt/otto/lib', 0664)
+    directory('/opt/otto/include', 0664)
+    directory('/opt/otto/bin', 0775)
+    directory('/opt/otto/etc', 0664)
 
     from (fileTree(dir: "src/libotto", include: "otto.h")) {
         into "include/"
@@ -24,6 +34,21 @@ task rpm(type: Rpm) {
     from (fileTree(dir: "src/libotto/build/lib/main/release", include: "*.so")) {
         into "lib/"
         fileMode 0664
+    }
+
+    from (fileTree(dir: "etc", excludes: [ "systemd", "profile.d" ])) {
+        into "etc/"
+        fileMode 0664
+    }
+
+    from (fileTree(dir: "etc/profile.d", include: "otto.sh")) {
+        addParentDirs false
+        into "/etc/profile.d/"
+    }
+
+    from (fileTree(dir: "etc/systemd/system", include: "otto.service")) {
+        addParentDirs false
+        into "/etc/systemd/system/"
     }
 
     from (fileTree(dir: "src/ottocmd/build/exe/main/release", include: "ottocmd")) {
@@ -47,6 +72,11 @@ task rpm(type: Rpm) {
     }
 
     from (fileTree(dir: "src/ottosysd/build/exe/main/release", include: "ottosysd")) {
+        into "bin/"
+        fileMode 0775
+    }
+
+    from (fileTree(dir: "bin", include: "*")) {
         into "bin/"
         fileMode 0775
     }

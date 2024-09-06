@@ -1,0 +1,12 @@
+[Unit]
+Description=Otto - system ottomation
+
+[Service]
+EnvironmentFile=-/opt/otto/etc/otto.environment
+ExecStart=/opt/otto/bin/ottostart
+ExecStop=/opt/otto/bin/ottostop
+User=otto
+Group=otto
+Type=forking
+
+[Install]

@@ -1,0 +1,10 @@
+OTTO_HOME=/opt/otto
+OTTO_ETC=/opt/otto/etc
+OTTO_VAR=/opt/otto/var
+OTTOBIN=/opt/otto/bin
+OTTODIR=/opt/otto/var
+OTTOCFG=/opt/otto/etc/otto.conf
+OTTOLOG=/opt/otto/var/log
+OTTODB=/opt/otto/var/otto.db
+OTTOENV=/opt/otto/etc/otto.env
+OTTOHTML=/opt/otto/srv/html
