@@ -26,5 +26,30 @@ task rpm(type: Rpm) {
         fileMode 0664
     }
 
+    from (fileTree(dir: "src/ottocmd/build/exe/main/release", include: "ottocmd")) {
+        into "bin/"
+        fileMode 0775
+    }
+
+    from (fileTree(dir: "src/ottoexp/build/exe/main/release", include: "ottoexp")) {
+        into "bin/"
+        fileMode 0775
+    }
+
+    from (fileTree(dir: "src/ottoimp/build/exe/main/release", include: "ottoimp")) {
+        into "bin/"
+        fileMode 0775
+    }
+
+    from (fileTree(dir: "src/ottorep/build/exe/main/release", include: "ottorep")) {
+        into "bin/"
+        fileMode 0775
+    }
+
+    from (fileTree(dir: "src/ottosysd/build/exe/main/release", include: "ottosysd")) {
+        into "bin/"
+        fileMode 0775
+    }
+
 }
 
