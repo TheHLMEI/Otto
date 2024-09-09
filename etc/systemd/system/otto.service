@@ -10,3 +10,4 @@ Group=otto
 Type=forking
 
 [Install]
+WantedBy=multi-user.target
