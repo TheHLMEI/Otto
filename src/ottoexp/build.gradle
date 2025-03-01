@@ -1,6 +1,5 @@
 plugins {
     id 'c'
-    id ("com.netflix.nebula.rpm") version "11.9.1"
 }
 
 model {

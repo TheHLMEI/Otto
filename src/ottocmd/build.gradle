@@ -1,16 +1,15 @@
 plugins {
     id 'c'
-    id ("com.netflix.nebula.rpm") version "11.9.1"
 }
 
 model {
     toolChains {
         gcc(Gcc) {
             eachPlatform {
-                cppCompiler.executable = "gcc"
+                cCompiler.executable = "gcc"
                 linker.executable = "gcc"
                 assembler.executable = "gcc"
-                cppCompiler.withArguments { args -> args.clear() && args.addAll(
+                cCompiler.withArguments { args -> args.remove("-m64") && args.addAll(
                         "-g", 
                         "-Wall", 
                         "-Werror", 

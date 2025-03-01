@@ -3,10 +3,15 @@ plugins {
 }
 
 group = 'org.thehlei'
-version = '1.0.0'
+version = '1.0.1'
 
 task rpm(type: Rpm) {
-    dependsOn('build')
+    dependsOn(':src:libotto:build')
+    dependsOn(':src:ottocmd:build')
+    dependsOn(':src:ottoexp:build')
+    dependsOn(':src:ottoimp:build')
+    dependsOn(':src:ottorep:build')
+    dependsOn(':src:ottosysd:build')
 
     os LINUX
     into "/opt/otto"
@@ -32,7 +37,7 @@ task rpm(type: Rpm) {
         fileMode 0664
     }
 
-    from (fileTree(dir: "src/libotto/build/lib/main/release", include: "*.so")) {
+    from (fileTree(dir: "src/libotto/build/libs/libotto/shared/release", include: "**/*.so")) {
         into "lib/"
         fileMode 0664
     }
@@ -52,27 +57,27 @@ task rpm(type: Rpm) {
         into "/etc/systemd/system/"
     }
 
-    from (fileTree(dir: "src/ottocmd/build/exe/main/release", include: "ottocmd")) {
+    from (fileTree(dir: "src/ottocmd/build/exe/ottocmd/release", include: "ottocmd")) {
         into "bin/"
         fileMode 0775
     }
 
-    from (fileTree(dir: "src/ottoexp/build/exe/main/release", include: "ottoexp")) {
+    from (fileTree(dir: "src/ottoexp/build/exe/ottoexp/release", include: "ottoexp")) {
         into "bin/"
         fileMode 0775
     }
 
-    from (fileTree(dir: "src/ottoimp/build/exe/main/release", include: "ottoimp")) {
+    from (fileTree(dir: "src/ottoimp/build/exe/ottoimp/release", include: "ottoimp")) {
         into "bin/"
         fileMode 0775
     }
 
-    from (fileTree(dir: "src/ottorep/build/exe/main/release", include: "ottorep")) {
+    from (fileTree(dir: "src/ottorep/build/exe/ottorep/release", include: "ottorep")) {
         into "bin/"
         fileMode 0775
     }
 
-    from (fileTree(dir: "src/ottosysd/build/exe/main/release", include: "ottosysd")) {
+    from (fileTree(dir: "src/ottosysd/build/exe/ottosysd/release", include: "ottosysd")) {
         into "bin/"
         fileMode 0775
     }
