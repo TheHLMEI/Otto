@@ -1,75 +1,54 @@
 plugins {
-    id "cpp-application"
+    id 'c'
     id ("com.netflix.nebula.rpm") version "11.9.1"
 }
 
-group = 'org.thehlei'
-version = '1.0.0'
-
-ext {
-    sources = fileTree(dir: ".", includes: [ "*.c" ])
-}
-
-dependencies { 
-    implementation project(":src:libotto")
-}
-
-application {
-    // Set the target operating system and architecture for this library
-    targetMachines.add(machines.linux.x86_64)
-    
-    source.from sources
-
-    binaries.configureEach {
-        def compileTask = compileTask.get()
-        compileTask.source.from sources
-        compileTask.includes.from "../libotto"
-        if (toolChain instanceof VisualCpp) {
-            compileTask.compilerArgs = ["/TC"]
-        } else if (toolChain instanceof GccCompatibleToolChain) {
-            compileTask.compilerArgs = ["-x", "c"]
+model {
+    toolChains {
+        gcc(Gcc) {
+            eachPlatform {
+                cppCompiler.executable = "gcc"
+                linker.executable = "gcc"
+                assembler.executable = "gcc"
+                cppCompiler.withArguments { args -> args.clear() && args.addAll(
+                        "-g", 
+                        "-Wall", 
+                        "-Werror", 
+                        "-Wno-unknown-pragmas",
+                        "-Wno-char-subscripts",
+                        "-DLINUX_OS"
+                    ) 
+                }
+            }
         }
     }
 
-}
+    buildTypes {
+        release
+        debug
+    }
 
-task rpm(type: Rpm) {
-    dependsOn('build')
-    os LINUX
-    into "/opt/otto"
-    arch 'x86_64'
-    packageName project.name
+    components {
+        ottosysd(NativeExecutableSpec) {
+            sources {
+                c {
+                    lib project: ':src:libotto', library: "libotto", linkage: 'static'
+                    source {
+                        srcDirs "."
+                        include "*.c"
+                    }
+                    exportedHeaders {
+                        srcDirs "."
+                    }
+                }
+            }
 
-    user "otto"
-    group "otto"
-    permissionGroup "otto"
-
-    if (this.hasProperty("rpmLibraries")) {
-        from (rpmLibraries) {
-            into "lib/"
-            fileMode 0664
         }
     }
 
-    if (this.hasProperty("rpmEtc")) {
-        from (rpmEtc) {
-            into "etc/"
-            fileMode 0664
-        }
+    binaries {
+        all {
+            cCompiler.args "-g"
+        }        
     }
-
-    if (this.hasProperty("rpmIncludes")) {
-        from (rpmIncludes) {
-            into "include/"
-            fileMode 0664
-        }
-    }
-
-    if (this.hasProperty("rpmBinaries")) {
-        from (rpmBinaries) {
-            into "bin/"
-            fileMode 0775
-        }
-    }
-
 }
