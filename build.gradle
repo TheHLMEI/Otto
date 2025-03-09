@@ -3,7 +3,7 @@ plugins {
 }
 
 group = 'org.thehlei'
-version = '1.0.3'
+version = '1.0.2'
 
 task rpm(type: Rpm) {
     dependsOn(':src:libotto:build')
