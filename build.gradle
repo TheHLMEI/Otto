@@ -3,7 +3,7 @@ plugins {
 }
 
 group = 'org.thehlei'
-version = '1.0.1'
+version = '1.0.3'
 
 task rpm(type: Rpm) {
     dependsOn(':src:libotto:build')
@@ -49,11 +49,13 @@ task rpm(type: Rpm) {
 
     from (fileTree(dir: "etc/profile.d", include: "otto.sh")) {
         addParentDirs false
+        fileType CONFIG | NOREPLACE
         into "/etc/profile.d/"
     }
 
     from (fileTree(dir: "etc/systemd/system", include: "otto.service")) {
         addParentDirs false
+        fileType CONFIG | NOREPLACE
         into "/etc/systemd/system/"
     }
 
