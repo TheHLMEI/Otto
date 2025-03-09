@@ -2,31 +2,9 @@ plugins {
     id 'c'
 }
 
+apply from: "../c.build.gradle"
+
 model {
-    toolChains {
-        gcc(Gcc) {
-            eachPlatform {
-                cCompiler.executable = "gcc"
-                linker.executable = "gcc"
-                assembler.executable = "gcc"
-                cCompiler.withArguments { args -> args.remove("-m64") && args.addAll(
-                        "-g", 
-                        "-Wall", 
-                        "-Werror", 
-                        "-Wno-unknown-pragmas",
-                        "-Wno-char-subscripts",
-                        "-DLINUX_OS"
-                    ) 
-                }
-            }
-        }
-    }
-
-    buildTypes {
-        release
-        debug
-    }
-
     components {
         ottocmd(NativeExecutableSpec) {
             sources {
@@ -41,13 +19,6 @@ model {
                     }
                 }
             }
-
         }
-    }
-
-    binaries {
-        all {
-            cCompiler.args "-g"
-        }        
     }
 }

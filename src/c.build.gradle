@@ -1,0 +1,36 @@
+repositories {
+    mavenCentral()
+    mavenLocal()    
+}
+
+model {
+    toolChains {
+        gcc(Gcc) {
+            eachPlatform {
+                cppCompiler.executable = "gcc"
+                linker.executable = "gcc"
+                assembler.executable = "gcc"
+                cppCompiler.withArguments { args -> args.clear() && args.addAll(
+                        "-g", 
+                        "-Wall", 
+                        "-Werror", 
+                        "-Wno-unknown-pragmas",
+                        "-Wno-char-subscripts",
+                        "-DLINUX_OS"
+                    ) 
+                }
+            }
+        }
+    }
+
+    buildTypes {
+        release
+        debug
+    }
+
+    binaries {
+        all {
+            cCompiler.args "-g"
+        }        
+    }
+}
