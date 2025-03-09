@@ -1,0 +1,53 @@
+plugins {
+    id 'c'
+}
+
+model {
+    toolChains {
+        gcc(Gcc) {
+            eachPlatform {
+                cppCompiler.executable = "gcc"
+                linker.executable = "gcc"
+                assembler.executable = "gcc"
+                cppCompiler.withArguments { args -> args.clear() && args.addAll(
+                        "-g", 
+                        "-Wall", 
+                        "-Werror", 
+                        "-Wno-unknown-pragmas",
+                        "-Wno-char-subscripts",
+                        "-DLINUX_OS"
+                    ) 
+                }
+            }
+        }
+    }
+
+    buildTypes {
+        release
+        debug
+    }
+
+    components {
+        ottotr(NativeExecutableSpec) {
+            sources {
+                c {
+                    lib project: ':src:libotto', library: "libotto", linkage: 'static'
+                    source {
+                        srcDirs "."
+                        include "*.c"
+                    }
+                    exportedHeaders {
+                        srcDirs "."
+                    }
+                }
+            }
+
+        }
+    }
+
+    binaries {
+        all {
+            cCompiler.args "-g"
+        }        
+    }
+}

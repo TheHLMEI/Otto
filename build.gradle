@@ -12,6 +12,7 @@ task rpm(type: Rpm) {
     dependsOn(':src:ottoimp:build')
     dependsOn(':src:ottorep:build')
     dependsOn(':src:ottosysd:build')
+    dependsOn(':src:ottotr:build')
 
     os LINUX
     into "/opt/otto"
@@ -44,6 +45,7 @@ task rpm(type: Rpm) {
 
     from (fileTree(dir: "etc", excludes: [ "systemd", "profile.d" ])) {
         into "etc/"
+        fileType CONFIG | NOREPLACE
         fileMode 0664
     }
 
@@ -80,6 +82,11 @@ task rpm(type: Rpm) {
     }
 
     from (fileTree(dir: "src/ottosysd/build/exe/ottosysd/release", include: "ottosysd")) {
+        into "bin/"
+        fileMode 0775
+    }
+
+    from (fileTree(dir: "src/ottotr/build/exe/ottotr/release", include: "ottotr")) {
         into "bin/"
         fileMode 0775
     }
