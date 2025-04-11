@@ -187,16 +187,16 @@ ottohtml_send_error(int fd, char *cause, char *errnum, char *shortmsg, char *lon
 {
    char content[1024];
 
-   sprintf(content, "<html>\n"
-                    "<head>\n"
-                    "   <link rel=\"icon\" href=\"favicon.ico\" type=\"image/x-icon\">\n"
-                    "   <link rel=\"stylesheet\" href=\"otto.css\" type=\"text/css\">\n"
-                    "   <title>Otto HTTP Error</title>\n"
-                    "</head>\n"
-                    "<body>\n"
-                    "%s: %s\n"
-                    "<p>%s: %s\n"
-                    "</body></html>\n", errnum, shortmsg, longmsg, cause);
+   otto_sprintf(content, "<html>\n"
+                         "<head>\n"
+                         "   <link rel=\"icon\" href=\"favicon.ico\" type=\"image/x-icon\">\n"
+                         "   <link rel=\"stylesheet\" href=\"otto.css\" type=\"text/css\">\n"
+                         "   <title>Otto HTTP Error</title>\n"
+                         "</head>\n"
+                         "<body>\n"
+                         "%s: %s\n"
+                         "<p>%s: %s\n"
+                         "</body></html>\n", errnum, shortmsg, longmsg, cause);
 
    ottohtml_send(fd, errnum, shortmsg, "text/html", content, strlen(content));
 }
@@ -212,11 +212,11 @@ ottohtml_send(int fd, char *msgnum, char *status, char *content_type, char *cont
    char buffer[32];
    char header[1024];
 
-   sprintf(header, "HTTP/1.1 %s %s\n"
-                   "Server: Otto HTTPD\n"
-                   "Content-type: %s\n"
-                   "Content-length: %d\n"
-                   "\n", msgnum, status, content_type, contentlen);
+   otto_sprintf(header, "HTTP/1.1 %s %s\n"
+                        "Server: Otto HTTPD\n"
+                        "Content-type: %s\n"
+                        "Content-length: %d\n"
+                        "\n", msgnum, status, content_type, contentlen);
 
    if (recv(fd, buffer, sizeof(buffer), MSG_PEEK | MSG_DONTWAIT) != 0) 
    {
@@ -235,12 +235,12 @@ ottohtml_send_attachment(int fd, char *filename, char *content, int contentlen)
    char buffer[32];
    char header[1024];
 
-   sprintf(header, "HTTP/1.1 200 OK\n"
-                   "Server: Otto HTTPD\n"
-                   "Content-type: Otto/Export\n"
-                   "Content-length: %d\n"
-                   "Content-Disposition: attachment; filename=\"%s\"\n"
-                   "\n", contentlen, filename);
+   otto_sprintf(header, "HTTP/1.1 200 OK\n"
+                        "Server: Otto HTTPD\n"
+                        "Content-type: Otto/Export\n"
+                        "Content-length: %d\n"
+                        "Content-Disposition: attachment; filename=\"%s\"\n"
+                        "\n", contentlen, filename);
 
    if (recv(fd, buffer, sizeof(buffer), MSG_PEEK | MSG_DONTWAIT) != 0) 
    {

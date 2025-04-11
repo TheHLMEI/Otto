@@ -67,7 +67,7 @@ if [ "$resp" = "connect() failed: Connection refused" ] ; then
       ;;
    esac
 
-   ulimit -c unlimited
+   # ulimit -c unlimited
    nohup $OTTOBIN/ottosysd 2>ottoerr.log > ottoout.log &
    sleep .25
    cat ottoerr.log

@@ -19,6 +19,7 @@ int  validate_and_copy_jil_condition(JOB *item, char *conditionp);
 int  validate_and_copy_jil_description(JOB *item, char *descriptionp);
 int  validate_and_copy_jil_environment(JOB *item, char *environmentp);
 int  validate_and_copy_jil_auto_hold(JOB *item, char *auto_holdp);
+int  validate_and_copy_jil_auto_noexec(JOB *item, char *auto_noexecp);
 int  validate_and_copy_jil_date_conditions(JOB *item, char *date_conditionsp, char *days_of_weekp, char *start_minsp, char *start_timesp);
 int  validate_and_copy_jil_loop(JOB *item, char *loopp);
 int  validate_and_copy_jil_new_name(JOB *item, char *new_namep);
@@ -123,6 +124,7 @@ add_insert_job(JOB *item, DYNBUF *b)
    char    *namep                = NULL;
    char    *typep                = NULL;
    char    *auto_holdp           = NULL;
+   char    *auto_noexecp         = NULL;
    char    *box_namep            = NULL;
    char    *commandp             = NULL;
    char    *conditionp           = NULL;
@@ -148,6 +150,7 @@ add_insert_job(JOB *item, DYNBUF *b)
          case JIL_DESCRIP: advance_jilword(b); descriptionp     = b->s; break;
          case JIL_ENVIRON: advance_jilword(b); environmentp     = b->s; break;
          case JIL_AUTOHLD: advance_jilword(b); auto_holdp       = b->s; break;
+         case JIL_AUTONOX: advance_jilword(b); auto_noexecp     = b->s; break;
          case JIL_DTECOND: advance_jilword(b); date_conditionsp = b->s; break;
          case JIL_DYSOFWK: advance_jilword(b); days_of_weekp    = b->s; break;
          case JIL_STRTMIN: advance_jilword(b); start_minsp      = b->s; break;
@@ -184,6 +187,8 @@ add_insert_job(JOB *item, DYNBUF *b)
       retval = OTTO_FAIL;
    if(validate_and_copy_jil_auto_hold(item, auto_holdp) != OTTO_SUCCESS)
       retval = OTTO_FAIL;
+   if(validate_and_copy_jil_auto_noexec(item, auto_noexecp) != OTTO_SUCCESS)
+      retval = OTTO_FAIL;
    if(validate_and_copy_jil_date_conditions(item, date_conditionsp, days_of_weekp, start_minsp, start_timesp) != OTTO_SUCCESS)
       retval = OTTO_FAIL;
    if(validate_and_copy_jil_loop(item, loopp) != OTTO_SUCCESS)
@@ -204,6 +209,7 @@ add_update_job(JOB *item, DYNBUF *b)
    char    *namep                = NULL;
    char    *typep                = NULL;
    char    *auto_holdp           = NULL;
+   char    *auto_noexecp         = NULL;
    char    *box_namep            = NULL;
    char    *commandp             = NULL;
    char    *conditionp           = NULL;
@@ -232,6 +238,7 @@ add_update_job(JOB *item, DYNBUF *b)
          case JIL_DESCRIP: advance_jilword(b); descriptionp     = b->s; break;
          case JIL_ENVIRON: advance_jilword(b); environmentp     = b->s; break;
          case JIL_AUTOHLD: advance_jilword(b); auto_holdp       = b->s; break;
+         case JIL_AUTONOX: advance_jilword(b); auto_noexecp     = b->s; break;
          case JIL_DTECOND: advance_jilword(b); date_conditionsp = b->s; break;
          case JIL_DYSOFWK: advance_jilword(b); days_of_weekp    = b->s; break;
          case JIL_STRTMIN: advance_jilword(b); start_minsp      = b->s; break;
@@ -270,6 +277,8 @@ add_update_job(JOB *item, DYNBUF *b)
    if(validate_and_copy_jil_environment(item, environmentp) != OTTO_SUCCESS)
       retval = OTTO_FAIL;
    if(validate_and_copy_jil_auto_hold(item, auto_holdp) != OTTO_SUCCESS)
+      retval = OTTO_FAIL;
+   if(validate_and_copy_jil_auto_noexec(item, auto_noexecp) != OTTO_SUCCESS)
       retval = OTTO_FAIL;
    if(validate_and_copy_jil_date_conditions(item, date_conditionsp, days_of_weekp, start_minsp, start_timesp) != OTTO_SUCCESS)
       retval = OTTO_FAIL;
@@ -324,6 +333,7 @@ jil_reserved_word(char *s)
       {
          case 'a':
             if(strncmp(s, "auto_hold",        9) == 0) { retval = JIL_AUTOHLD; c =  9; }
+            if(strncmp(s, "auto_noexec",     11) == 0) { retval = JIL_AUTONOX; c = 11; }
             break;
          case 'b':
             if(strncmp(s, "box_name",         8) == 0) { retval = JIL_BOXNAME; c =  8; }
@@ -929,6 +939,54 @@ validate_and_copy_jil_auto_hold(JOB *item, char *auto_holdp)
    if(retval != OTTO_SUCCESS)
    {
       ottojob_print_auto_hold_errors(rc, action, item->name, auto_holdp);
+   }
+
+   return(retval);
+}
+
+
+
+int
+validate_and_copy_jil_auto_noexec(JOB *item, char *auto_noexecp)
+{
+   int retval = OTTO_SUCCESS;
+   char *action = "action";
+   int rc;
+
+   switch(item->opcode)
+   {
+      case CREATE_JOB: action = "insert_job"; break;
+      case UPDATE_JOB: action = "update_job"; break;
+   }
+
+   // it's okay for this to be NULL in any case but it's never
+   // okay for it to be an empty line
+   if(auto_noexecp != NULL && *auto_noexecp == '\n')
+   {
+      rc = OTTO_MISSING_REQUIRED_VALUE;
+      retval = OTTO_FAIL;
+   }
+
+   if(retval == OTTO_SUCCESS && jil_reserved_word(auto_noexecp) != JIL_UNKNOWN)
+   {
+      rc = OTTO_SYNTAX_ERROR;
+      retval = OTTO_FAIL;
+   }
+
+   if(retval == OTTO_SUCCESS)
+   {
+      item->attributes |= HAS_AUTO_NOEXEC;
+
+      if((rc = ottojob_copy_flag(&item->autonoexec, auto_noexecp, FLGLEN)) != OTTO_SUCCESS)
+      {
+         retval = OTTO_FAIL;
+      }
+      item->on_noexec = item->autonoexec;
+   }
+
+   if(retval != OTTO_SUCCESS)
+   {
+      ottojob_print_auto_noexec_errors(rc, action, item->name, auto_noexecp);
    }
 
    return(retval);
