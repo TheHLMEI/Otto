@@ -1,0 +1,100 @@
+plugins {
+    id ("com.netflix.nebula.rpm") version "11.9.1"
+}
+
+group = 'org.thehlei'
+version = '1.0.3'
+
+task rpm(type: Rpm) {
+    dependsOn(':src:libotto:build')
+    dependsOn(':src:ottocmd:build')
+    dependsOn(':src:ottoexp:build')
+    dependsOn(':src:ottoimp:build')
+    dependsOn(':src:ottorep:build')
+    dependsOn(':src:ottosysd:build')
+    dependsOn(':src:ottotr:build')
+
+    os LINUX
+    into "/opt/otto"
+    arch 'x86_64'
+    packageName project.name
+    release '1'
+
+    user "otto"
+    group "otto"
+    permissionGroup "otto"
+
+    preInstall file('setup/pre-install.sh')
+    postInstall file('setup/post-install.sh')
+
+    directory('/opt/otto', 0664)
+    directory('/opt/otto/lib', 0664)
+    directory('/opt/otto/include', 0664)
+    directory('/opt/otto/bin', 0775)
+    directory('/opt/otto/etc', 0664)
+
+    from (fileTree(dir: "src/libotto", include: "otto.h")) {
+        into "include/"
+        fileMode 0664
+    }
+
+    from (fileTree(dir: "src/libotto/build/libs/libotto/shared/release", include: "**/*.so")) {
+        into "lib/"
+        fileMode 0664
+    }
+
+    from (fileTree(dir: "etc", excludes: [ "systemd", "profile.d" ])) {
+        into "etc/"
+        fileType CONFIG | NOREPLACE
+        fileMode 0664
+    }
+
+    from (fileTree(dir: "etc/profile.d", include: "otto.sh")) {
+        addParentDirs false
+        fileType CONFIG | NOREPLACE
+        into "/etc/profile.d/"
+    }
+
+    from (fileTree(dir: "etc/systemd/system", include: "otto.service")) {
+        addParentDirs false
+        fileType CONFIG | NOREPLACE
+        into "/etc/systemd/system/"
+    }
+
+    from (fileTree(dir: "src/ottocmd/build/exe/ottocmd/release", include: "ottocmd")) {
+        into "bin/"
+        fileMode 0775
+    }
+
+    from (fileTree(dir: "src/ottoexp/build/exe/ottoexp/release", include: "ottoexp")) {
+        into "bin/"
+        fileMode 0775
+    }
+
+    from (fileTree(dir: "src/ottoimp/build/exe/ottoimp/release", include: "ottoimp")) {
+        into "bin/"
+        fileMode 0775
+    }
+
+    from (fileTree(dir: "src/ottorep/build/exe/ottorep/release", include: "ottorep")) {
+        into "bin/"
+        fileMode 0775
+    }
+
+    from (fileTree(dir: "src/ottosysd/build/exe/ottosysd/release", include: "ottosysd")) {
+        into "bin/"
+        fileMode 0775
+    }
+
+    from (fileTree(dir: "src/ottotr/build/exe/ottotr/release", include: "ottotr")) {
+        into "bin/"
+        fileMode 0775
+    }
+
+    from (fileTree(dir: "bin", include: "*")) {
+        into "bin/"
+        fileMode 0775
+    }
+
+}
+

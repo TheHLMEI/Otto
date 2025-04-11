@@ -40,4 +40,7 @@ bak/
 *.exe
 *.out
 
-
+# build folder
+build/
+.gradle
+!gradlew

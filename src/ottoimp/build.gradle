@@ -1,0 +1,24 @@
+plugins {
+    id 'c'
+}
+
+apply from: "../c.build.gradle"
+
+model {
+    components {
+        ottoimp(NativeExecutableSpec) {
+            sources {
+                c {
+                    lib project: ':src:libotto', library: "libotto", linkage: 'static'
+                    source {
+                        srcDirs "."
+                        include "*.c"
+                    }
+                    exportedHeaders {
+                        srcDirs "."
+                    }
+                }
+            }
+        }
+    }
+}
