@@ -1,0 +1,400 @@
+openapi: 3.0.3
+info:
+  title: Otto Job Scheduler API
+  description: |
+    REST API for Otto Job Scheduler system providing job information in various formats.
+    
+    The Otto system manages job scheduling and execution with hierarchical job structures,
+    dependencies, and status tracking.
+  version: 1.0.4
+  contact:
+    name: Otto Development Team
+    url: https://github.com/TheHLMEI/Otto
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:8080/otto
+    description: Local development server
+  - url: https://otto.example.com/otto
+    description: Production server
+
+paths:
+  /json:
+    get:
+      summary: Get job information in JSON format
+      description: |
+        Returns job information in JSON format with optional filtering by job name and status.
+        
+        The response includes detailed job information with schema_version 2 format:
+        - Numeric timestamps (epoch seconds)
+        - Numeric durations and status codes
+        - Boolean flags as 0/1
+        - Proper JSON escaping for text fields
+        
+        Status filters allow selective display of jobs by their current state.
+      operationId: getJobsJson
+      tags:
+        - Jobs
+      parameters:
+        - name: jobname
+          in: query
+          description: |
+            Filter jobs by name pattern. Supports wildcards:
+            - `%` matches any sequence of characters
+            - `_` matches any single character
+            - Leave empty to return all jobs
+          required: false
+          schema:
+            type: string
+          example: "batch_job_%"
+          
+        - name: radiofmt
+          in: query
+          description: Enable radio button format compatibility (legacy parameter)
+          required: false
+          schema:
+            type: string
+            enum: [on, off]
+            default: off
+          example: "on"
+          
+        - name: IN
+          in: query
+          description: Include jobs with INACTIVE status
+          required: false
+          schema:
+            type: integer
+            enum: [0, 1]
+            default: 1
+          example: 1
+          
+        - name: AC
+          in: query
+          description: Include jobs with ACTIVE status
+          required: false
+          schema:
+            type: integer
+            enum: [0, 1]
+            default: 1
+          example: 1
+          
+        - name: OH
+          in: query
+          description: Include jobs with ON HOLD status
+          required: false
+          schema:
+            type: integer
+            enum: [0, 1]
+            default: 1
+          example: 1
+          
+        - name: RU
+          in: query
+          description: Include jobs with RUNNING status
+          required: false
+          schema:
+            type: integer
+            enum: [0, 1]
+            default: 1
+          example: 1
+          
+        - name: SU
+          in: query
+          description: Include jobs with SUCCESS status
+          required: false
+          schema:
+            type: integer
+            enum: [0, 1]
+            default: 1
+          example: 1
+          
+        - name: FA
+          in: query
+          description: Include jobs with FAILURE status
+          required: false
+          schema:
+            type: integer
+            enum: [0, 1]
+            default: 1
+          example: 1
+          
+        - name: TE
+          in: query
+          description: Include jobs with TERMINATED status
+          required: false
+          schema:
+            type: integer
+            enum: [0, 1]
+            default: 1
+          example: 1
+
+      responses:
+        '200':
+          description: Job information retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobResponse'
+              examples:
+                single_job:
+                  summary: Single command job
+                  value:
+                    schema_version: 2
+                    jobs:
+                      - name: "daily_backup"
+                        type: "cmd"
+                        description: "Daily database backup job"
+                        command: "/scripts/backup.sh"
+                        start: 1704067200
+                        finish: 1704067560
+                        duration: 360
+                        status: "SUCCESS"
+                        status_code: 4
+                        on_autohold: 0
+                        on_autonoexec: 0
+                        on_noexec: 0
+                        date_conditions_enabled: 1
+                        start_times: [0,0,0,0,0,0,1800,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+                        
+                box_with_jobs:
+                  summary: Job box containing multiple jobs
+                  value:
+                    schema_version: 2
+                    jobs:
+                      - name: "batch_processing"
+                        type: "box"
+                        description: "Batch processing workflow"
+                        date_conditions_enabled: 0
+                        start: 1704067200
+                        finish: 1704070800
+                        duration: 3600
+                        status: "SUCCESS"
+                        status_code: 4
+                        on_autohold: 0
+                        on_autonoexec: 0
+                        on_noexec: 0
+                        jobs:
+                          - name: "extract_data"
+                            type: "cmd"
+                            description: "Extract data from source"
+                            command: "/etl/extract.sh"
+                            box_name: "batch_processing"
+                            start: 1704067200
+                            finish: 1704067800
+                            duration: 600
+                            status: "SUCCESS"
+                            status_code: 4
+                            on_autohold: 0
+                            on_autonoexec: 0
+                            on_noexec: 0
+                            date_conditions_enabled: 0
+                          - name: "transform_data"
+                            type: "cmd"
+                            description: "Transform extracted data"
+                            command: "/etl/transform.sh"
+                            box_name: "batch_processing"
+                            condition: "s(extract_data)"
+                            start: 1704067800
+                            finish: 1704069600
+                            duration: 1800
+                            status: "SUCCESS"
+                            status_code: 4
+                            on_autohold: 0
+                            on_autonoexec: 0
+                            on_noexec: 0
+                            date_conditions_enabled: 0
+                            
+        '500':
+          description: Internal server error
+          content:
+            text/html:
+              schema:
+                type: string
+              example: "Internal Server Error"
+
+components:
+  schemas:
+    JobResponse:
+      type: object
+      required:
+        - schema_version
+        - jobs
+      properties:
+        schema_version:
+          type: integer
+          description: API schema version for compatibility
+          example: 2
+        jobs:
+          type: array
+          description: Array of job objects
+          items:
+            $ref: '#/components/schemas/Job'
+            
+    Job:
+      type: object
+      required:
+        - name
+        - type
+        - description
+        - start
+        - finish
+        - duration
+        - status
+        - status_code
+        - on_autohold
+        - on_autonoexec
+        - on_noexec
+        - date_conditions_enabled
+      properties:
+        name:
+          type: string
+          description: Unique job name identifier
+          maxLength: 64
+          example: "daily_backup"
+          
+        type:
+          type: string
+          description: Job type
+          enum: [cmd, box]
+          example: "cmd"
+          
+        description:
+          type: string
+          description: Human-readable job description
+          maxLength: 256
+          example: "Daily database backup job"
+          
+        box_name:
+          type: string
+          description: Parent box name (for jobs inside boxes)
+          maxLength: 64
+          example: "batch_processing"
+          
+        command:
+          type: string
+          description: Command to execute (for cmd type jobs)
+          maxLength: 1024
+          example: "/scripts/backup.sh"
+          
+        condition:
+          type: string
+          description: Job dependency condition expression
+          maxLength: 256
+          example: "s(previous_job)"
+          
+        environment:
+          type: string
+          description: Environment variables for job execution
+          maxLength: 512
+          example: "PATH=/usr/local/bin:$PATH"
+          
+        # Temporal fields (numeric)
+        start:
+          type: integer
+          format: int64
+          description: Job start time (Unix epoch seconds, 0 if not started)
+          example: 1704067200
+          
+        finish:
+          type: integer
+          format: int64
+          description: Job finish time (Unix epoch seconds, 0 if not finished)
+          example: 1704067560
+          
+        duration:
+          type: integer
+          format: int64
+          description: Job duration in seconds (0 if not completed)
+          example: 360
+          
+        # Status fields
+        status:
+          type: string
+          description: Human-readable job status
+          enum: [INACTIVE, ACTIVE, ON_HOLD, RUNNING, SUCCESS, FAILURE, TERMINATED]
+          example: "SUCCESS"
+          
+        status_code:
+          type: integer
+          description: Numeric status code for programmatic use
+          minimum: 0
+          maximum: 10
+          example: 4
+          
+        # Boolean flags (0/1)
+        on_autohold:
+          type: integer
+          description: Whether job is currently on automatic hold
+          enum: [0, 1]
+          example: 0
+          
+        on_autonoexec:
+          type: integer
+          description: Whether job has automatic no-execute flag set
+          enum: [0, 1]
+          example: 0
+          
+        on_noexec:
+          type: integer
+          description: Whether job has no-execute flag set
+          enum: [0, 1]
+          example: 0
+          
+        autohold:
+          type: integer
+          description: Whether job has autohold attribute (only present if true)
+          enum: [1]
+          example: 1
+          
+        # Date conditions
+        date_conditions_enabled:
+          type: integer
+          description: Whether job has date/time conditions configured
+          enum: [0, 1]
+          example: 1
+          
+        date_conditions:
+          type: string
+          description: Type of date conditions (when enabled)
+          enum: [start_minutes, start_times]
+          example: "start_times"
+          
+        days_of_week:
+          type: string
+          description: Days of week when job can run (when date conditions enabled)
+          example: "mo,tu,we,th,fr"
+          
+        start_minutes_mask:
+          type: integer
+          format: int64
+          description: Bitmask for allowed start minutes (when using start_minutes)
+          example: 1152921504606846976
+          
+        start_times:
+          type: array
+          description: Array of 24 hourly start times in seconds from midnight (when using start_times)
+          items:
+            type: integer
+            format: int64
+            minimum: 0
+            maximum: 86400
+          minItems: 24
+          maxItems: 24
+          example: [0,0,0,0,0,0,1800,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+          
+        # Nested jobs (for box type)
+        jobs:
+          type: array
+          description: Child jobs (only for box type jobs)
+          items:
+            $ref: '#/components/schemas/Job'
+
+tags:
+  - name: Jobs
+    description: Job management and information retrieval
+
+externalDocs:
+  description: Otto Job Scheduler Documentation
+  url: https://github.com/TheHLMEI/Otto/blob/main/README.md
