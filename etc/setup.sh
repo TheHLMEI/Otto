@@ -1,8 +1,8 @@
 #
 # Common Locations
 #
-export OTTOSRC=/path-to-Otto-sources
-export OTTOBIN=/path-to-Otto-sources
+export OTTOSRC=/var/otto/src/
+export OTTOBIN=/var/otto/bin
 export PATH=$PATH:$OTTOBIN
 
 export OTTODIR=/path-to-otto-data-files

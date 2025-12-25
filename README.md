@@ -1,3 +1,44 @@
+## JSON Export (schema_version = 2)
+
+The `/otto/json` endpoint returns application/json with the following structure:
+
+- schema_version: 2
+- jobs: array of job objects
+
+Job object fields (selected):
+- name: string
+- type: string
+- description: string
+- box_name: string (when present)
+- condition: string (when present)
+- date_conditions: string ("start_minutes" or "start_times") when present
+- date_conditions_enabled: number (0/1) — numeric boolean
+- days_of_week: string when date conditions are enabled
+- start_minutes_mask: number — raw 64-bit mask (when using minutes)
+- start_times: array<number> — 24 numeric entries (when using times)
+- autohold: number (0/1) — numeric boolean when defined
+- environment: string (when present)
+- start: number — epoch seconds
+- finish: number — epoch seconds
+- duration: number — seconds
+- status: string — human readable status
+- status_code: number — internal status enum value
+- on_autohold: number (0/1)
+- on_autonoexec: number (0/1)
+- on_noexec: number (0/1)
+
+Notes:
+- Strings are JSON-escaped per RFC 8259.
+- Trailing commas are removed; output parses cleanly with `jq`.
+- Future `parse_json` will consume numeric timestamps/durations directly.
+
+Quick validation:
+
+```bash
+make -C src
+bin/ottostart
+bin/ottojsoncheck
+```
 # Otto
 
 Base Otto package - server, command line utilities...

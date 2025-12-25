@@ -101,6 +101,10 @@ static char *json_escape(const char *value)
     return out;
 }
 
+// Forward declarations for local helpers used below
+static int json_write_bool_element(DYNBUF *b, const char *name, int truthy, st_JSON_WRITER_STATE_t *state);
+static int json_write_array_long_item(DYNBUF *b, int64_t value, st_JSON_WRITER_STATE_t *state);
+
 /**
  *
  */
@@ -195,16 +199,28 @@ int json_write_job_elements(DYNBUF *b, JOB *job, st_JSON_WRITER_STATE_t *state)
     {
         ret &= json_write_text_element(b, "date_conditions", tval.date_conditions, state);
         ret &= json_write_text_element(b, "days_of_week", tval.days_of_week, state);
+        ret &= json_write_bool_element(b, "date_conditions_enabled", 1, state);
 
         switch (job->date_conditions)
         {
         case OTTO_USE_START_MINUTES:
-            ret &= json_write_text_element(b, "start_minutes", tval.start_minutes, state);
+            // Provide raw mask as numeric alongside textual representation
+            ret &= json_write_long_element(b, "start_minutes_mask", (int64_t)job->start_minutes, state);
             break;
         case OTTO_USE_START_TIMES:
-            ret &= json_write_text_element(b, "start_times", tval.start_times, state);
+            // Emit numeric array for start_times
+            ret &= json_open_array(b, "start_times", state);
+            for (int h = 0; h < 24; h++)
+            {
+                ret &= json_write_array_long_item(b, (int64_t)job->start_times[h], state);
+            }
+            ret &= json_close_array(b, state);
             break;
         }
+    }
+    else
+    {
+        ret &= json_write_bool_element(b, "date_conditions_enabled", 0, state);
     }
 
     if (job->autohold == OTTO_TRUE)
@@ -218,6 +234,10 @@ int json_write_job_elements(DYNBUF *b, JOB *job, st_JSON_WRITER_STATE_t *state)
     ret &= json_write_long_element(b, "finish", (int64_t)job->finish, state);
     ret &= json_write_long_element(b, "duration", (int64_t)job->duration, state);
     ret &= json_write_text_element(b, "status", tval.status, state);
+    ret &= json_write_long_element(b, "status_code", (int64_t)job->status, state);
+    ret &= json_write_bool_element(b, "on_autohold", job->on_autohold == OTTO_TRUE, state);
+    ret &= json_write_bool_element(b, "on_autonoexec", job->on_autonoexec == OTTO_TRUE, state);
+    ret &= json_write_bool_element(b, "on_noexec", job->on_noexec == OTTO_TRUE, state);
 
     return ret;
 }
@@ -296,6 +316,22 @@ int json_write_long_element(DYNBUF *b, const char *name, int64_t value, st_JSON_
     int ret = OTTO_SUCCESS;
     // Emit numeric value (unquoted)
     bprintf(b, "%.*s\"%s\": %" PRId64 ",\n", state->indent_level * JSON_TAB_STOP, JSON_TAB_CHAR, name, value);
+    return ret;
+}
+
+// Write a numeric boolean (0/1)
+static int json_write_bool_element(DYNBUF *b, const char *name, int truthy, st_JSON_WRITER_STATE_t *state)
+{
+    int ret = OTTO_SUCCESS;
+    bprintf(b, "%.*s\"%s\": %d,\n", state->indent_level * JSON_TAB_STOP, JSON_TAB_CHAR, name, truthy ? 1 : 0);
+    return ret;
+}
+
+// Write a numeric array item inside an opened array
+static int json_write_array_long_item(DYNBUF *b, int64_t value, st_JSON_WRITER_STATE_t *state)
+{
+    int ret = OTTO_SUCCESS;
+    bprintf(b, "%.*s%" PRId64 ",\n", state->indent_level * JSON_TAB_STOP, JSON_TAB_CHAR, value);
     return ret;
 }
 
