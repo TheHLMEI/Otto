@@ -53,7 +53,8 @@
 #define OTTO_SUMMARY 3
 #define OTTO_EXPORT_MSP 4
 #define OTTO_EXPORT_CSV 5
-#define OTTO_VERSION 6
+#define OTTO_EXPORT_JSON 6
+#define OTTO_VERSION 7
 
 #define i64 int64_t
 #define cde8int(a) ((i64)a[0] << 56 | (i64)a[1] << 48 | (i64)a[2] << 40 | (i64)a[3] << 32 | a[4] << 24 | a[5] << 16 | a[6] << 8 | a[7])
@@ -916,6 +917,7 @@ int write_htmldtl(int fd, JOBLIST *joblist, ottohtml_query *q);
 int write_htmljil(int fd, JOBLIST *joblist, ottohtml_query *q);
 int write_htmlmspdi(int fd, JOBLIST *joblist, ottohtml_query *q);
 int write_htmlcsv(int fd, JOBLIST *joblist, ottohtml_query *q);
+int write_htmljson(int fd, JOBLIST *joblist, ottohtml_query *q);
 int write_htmlsum(int fd, JOBLIST *joblist, ottohtml_query *q);
 int write_htmlversion(int fd);
 

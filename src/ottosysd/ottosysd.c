@@ -2583,6 +2583,12 @@ handle_http(RECVBUF *recvbuf)
                // /status?name=string = jr string
                type = OTTO_EXPORT_CSV;
             }
+            if(strcmp(q.endpoint, "json") == 0)
+            {
+               // /status             = jr %
+               // /status?name=string = jr string
+               type = OTTO_EXPORT_JSON;
+            }
             if(strcmp(q.endpoint, "version") == 0)
             {
                // /status             = jr %
@@ -2597,6 +2603,7 @@ handle_http(RECVBUF *recvbuf)
                case OTTO_SUMMARY:
                case OTTO_EXPORT_MSP:
                case OTTO_EXPORT_CSV:
+               case OTTO_EXPORT_JSON:
                case OTTO_VERSION:
                   // a known endpoint was found
                   // generate endpoint output
@@ -2621,6 +2628,7 @@ handle_http(RECVBUF *recvbuf)
                      case OTTO_QUERY:       write_htmljil    (recvbuf->fd, &hjoblist, &q); break;
                      case OTTO_SUMMARY:     write_htmlsum    (recvbuf->fd, &hjoblist, &q); break;
                      case OTTO_EXPORT_MSP:  write_htmlmspdi  (recvbuf->fd, &hjoblist, &q); break;
+                     case OTTO_EXPORT_JSON: write_htmljson   (recvbuf->fd, &hjoblist, &q); break;
                      case OTTO_EXPORT_CSV:  write_htmlcsv    (recvbuf->fd, &hjoblist, &q); break;
                      case OTTO_VERSION:     write_htmlversion(recvbuf->fd);                break;
                   }

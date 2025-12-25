@@ -1,0 +1,496 @@
+/* ----------------- CNV_MOCK1 ----------------- */
+
+insert_job:      CNV_MOCK1
+job_type:        b
+description:     "Runs the CNV_MOCK1"
+
+ /* ----------------- CNV_PRELOAD ----------------- */
+
+ insert_job:      CNV_PRELOAD
+ job_type:        b
+ box_name:        CNV_MOCK1
+ description:     "The CNV_PRELOAD BOX"
+
+  /* ----------------- CNV_DROPFKEY_PDP ----------------- */
+
+  insert_job:      CNV_DROPFKEY_PDP
+  job_type:        c
+  box_name:        CNV_PRELOAD
+  command:         cnv_ottojob.sh run_ddl.sh -F TGT -d Plandata_Parallel -s dbo -q DROP_FKEY
+  description:     "Drop FK's on the PDP DB"
+
+  /* ----------------- CNV_DROPINDEX_PDP ----------------- */
+
+  insert_job:      CNV_DROPINDEX_PDP
+  job_type:        c
+  box_name:        CNV_PRELOAD
+  command:         cnv_ottojob.sh run_ddl.sh -F TGT -d Plandata_Parallel -s dbo -q DROP_INDEX
+  description:     "Drop Indexes on the PDP DB"
+
+ /* ----------------- CNV_UNLOAD ----------------- */
+
+ insert_job:      CNV_UNLOAD
+ job_type:        b
+ box_name:        CNV_MOCK1
+ condition:       s(CNV_PRELOAD)
+ description:     "The CNV_UNLOAD BOX"
+
+  /* ----------------- CNV_SYS_MEMO_S ----------------- */
+
+  insert_job:      CNV_SYS_MEMO_S
+  job_type:        c
+  box_name:        CNV_UNLOAD
+  command:         cnv_ottojob.sh cnvs
+  description:     "Run the PRV_MAIN unload"
+
+  /* ----------------- CNV_SYS_ENTITY_S ----------------- */
+
+  insert_job:      CNV_SYS_ENTITY_S
+  job_type:        c
+  box_name:        CNV_UNLOAD
+  command:         cnv_ottojob.sh cnvs
+  description:     "Run the PRV_MAIN unload"
+
+  /* ----------------- CNV_PRV_MAIN_S ----------------- */
+
+  insert_job:      CNV_PRV_MAIN_S
+  job_type:        c
+  box_name:        CNV_UNLOAD
+  command:         cnv_ottojob.sh cnvs
+  description:     "Run the PRV_MAIN unload"
+
+  /* ----------------- CNV_PRV_AFFILIATIONS_S ----------------- */
+
+  insert_job:      CNV_PRV_AFFILIATIONS_S
+  job_type:        c
+  box_name:        CNV_UNLOAD
+  command:         cnv_ottojob.sh cnvs
+  description:     "Unload the Claims to the driver file"
+
+  /* ----------------- CNV_MBR_MAIN_S ----------------- */
+
+  insert_job:      CNV_MBR_MAIN_S
+  job_type:        c
+  box_name:        CNV_UNLOAD
+  command:         cnv_ottojob.sh cnvs
+  description:     "Unload the Claims to the driver file"
+
+  /* ----------------- CNV_MBR_ENROLLMENTS_S ----------------- */
+
+  insert_job:      CNV_MBR_ENROLLMENTS_S
+  job_type:        c
+  box_name:        CNV_UNLOAD
+  command:         cnv_ottojob.sh cnvs
+  description:     "Run the MBR_MAIN unload"
+
+  /* ----------------- CNV_CLM_MAIN_S ----------------- */
+
+  insert_job:      CNV_CLM_MAIN_S
+  job_type:        c
+  box_name:        CNV_UNLOAD
+  command:         cnv_ottojob.sh cnvs
+  condition:       s(CNV_PRV_MAIN_S) & s(CNV_PRV_AFFILIATIONS_S) & s(CNV_MBR_MAIN_S) & s(CNV_MBR_ENROLLMENTS_S) & s(CNV_SYS_ENTITY_S) & s(CNV_SYS_MEMO_S)
+  description:     "Unload the Claims to the driver file"
+
+ /* ----------------- CNV_CONVERT ----------------- */
+
+ insert_job:      CNV_CONVERT
+ job_type:        b
+ box_name:        CNV_MOCK1
+ description:     "The CNV_CONVERT BOX"
+
+  /* ----------------- CNV_SYS_MEMO ----------------- */
+
+  insert_job:      CNV_SYS_MEMO
+  job_type:        b
+  box_name:        CNV_CONVERT
+  condition:       s(CNV_SYS_MEMO_S)
+  description:     "The PRV_MAIN BOX"
+
+   /* ----------------- CNV_SYS_MEMO_J ----------------- */
+
+   insert_job:      CNV_SYS_MEMO_J
+   job_type:        c
+   box_name:        CNV_SYS_MEMO
+   command:         cnv_ottojob.sh cnvj --runid $RUNID
+   description:     "Run the PRV_MAIN conversion job"
+
+   /* ----------------- CNV_SYS_MEMO_O_PDP ----------------- */
+
+   insert_job:      CNV_SYS_MEMO_O_PDP
+   job_type:        c
+   box_name:        CNV_SYS_MEMO
+   command:         cnv_ottojob.sh cnvo --env PDP --runid $RUNID
+   condition:       s(CNV_SYS_MEMO_J)
+   description:     "Run the PRV_MAIN outs creation job"
+
+   /* ----------------- CNV_SYS_MEMO_N_PDP ----------------- */
+
+   insert_job:      CNV_SYS_MEMO_N_PDP
+   job_type:        c
+   box_name:        CNV_SYS_MEMO
+   command:         cnv_ottojob.sh cnvn --runid $RUNID --env PDP
+   condition:       s(CNV_SYS_MEMO_O_PDP)
+   description:     "Run the PRV_MAIN ninja file creation"
+
+   /* ----------------- CNV_SYS_MEMO_F ----------------- */
+
+   insert_job:      CNV_SYS_MEMO_F
+   job_type:        c
+   box_name:        CNV_SYS_MEMO
+   command:         cnv_ottojob.sh cnvf --runid $RUNID
+   condition:       s(CNV_SYS_MEMO_N_PDP)
+   description:     "Run the PRV_MAIN outs creation job"
+
+  /* ----------------- CNV_SYS_ENTITY ----------------- */
+
+  insert_job:      CNV_SYS_ENTITY
+  job_type:        b
+  box_name:        CNV_CONVERT
+  condition:       s(CNV_SYS_ENTITY_S)
+  description:     "The PRV_MAIN BOX"
+
+   /* ----------------- CNV_SYS_ENTITY_J ----------------- */
+
+   insert_job:      CNV_SYS_ENTITY_J
+   job_type:        c
+   box_name:        CNV_SYS_ENTITY
+   command:         cnv_ottojob.sh cnvj --runid $RUNID
+   description:     "Run the PRV_MAIN conversion job"
+
+   /* ----------------- CNV_SYS_ENTITY_O_PDP ----------------- */
+
+   insert_job:      CNV_SYS_ENTITY_O_PDP
+   job_type:        c
+   box_name:        CNV_SYS_ENTITY
+   command:         cnv_ottojob.sh cnvo --env PDP --runid $RUNID
+   condition:       s(CNV_SYS_ENTITY_J)
+   description:     "Run the PRV_MAIN outs creation job"
+
+   /* ----------------- CNV_SYS_ENTITY_N_PDP ----------------- */
+
+   insert_job:      CNV_SYS_ENTITY_N_PDP
+   job_type:        c
+   box_name:        CNV_SYS_ENTITY
+   command:         cnv_ottojob.sh cnvn --runid $RUNID --env PDP
+   condition:       s(CNV_SYS_ENTITY_O_PDP)
+   description:     "Run the PRV_MAIN ninja file creation"
+
+   /* ----------------- CNV_SYS_ENTITY_F ----------------- */
+
+   insert_job:      CNV_SYS_ENTITY_F
+   job_type:        c
+   box_name:        CNV_SYS_ENTITY
+   command:         cnv_ottojob.sh cnvf --runid $RUNID
+   condition:       s(CNV_SYS_ENTITY_N_PDP)
+   description:     "Run the PRV_MAIN outs creation job"
+
+  /* ----------------- CNV_PRV_MAIN ----------------- */
+
+  insert_job:      CNV_PRV_MAIN
+  job_type:        b
+  box_name:        CNV_CONVERT
+  condition:       s(CNV_SYS_MEMO) & s(CNV_SYS_ENTITY) & s(CNV_PRV_MAIN_S)
+  description:     "The PRV_MAIN BOX"
+
+   /* ----------------- CNV_PRV_MAIN_J ----------------- */
+
+   insert_job:      CNV_PRV_MAIN_J
+   job_type:        c
+   box_name:        CNV_PRV_MAIN
+   command:         cnv_ottojob.sh cnvj --runid $RUNID
+   description:     "Run the PRV_MAIN conversion job"
+
+   /* ----------------- CNV_PRV_MAIN_O_PDP ----------------- */
+
+   insert_job:      CNV_PRV_MAIN_O_PDP
+   job_type:        c
+   box_name:        CNV_PRV_MAIN
+   command:         cnv_ottojob.sh cnvo --env PDP --runid $RUNID
+   condition:       s(CNV_PRV_MAIN_J)
+   description:     "Run the PRV_MAIN outs creation job"
+
+   /* ----------------- CNV_PRV_MAIN_N_PDP ----------------- */
+
+   insert_job:      CNV_PRV_MAIN_N_PDP
+   job_type:        c
+   box_name:        CNV_PRV_MAIN
+   command:         cnv_ottojob.sh cnvn --runid $RUNID --env PDP
+   condition:       s(CNV_PRV_MAIN_O_PDP)
+   description:     "Run the PRV_MAIN ninja file creation"
+
+   /* ----------------- CNV_PRV_MAIN_F ----------------- */
+
+   insert_job:      CNV_PRV_MAIN_F
+   job_type:        c
+   box_name:        CNV_PRV_MAIN
+   command:         cnv_ottojob.sh cnvf --runid $RUNID
+   condition:       s(CNV_PRV_MAIN_N_PDP)
+   description:     "Run the PRV_MAIN outs creation job"
+
+  /* ----------------- CNV_PRV_AFFILIATIONS ----------------- */
+
+  insert_job:      CNV_PRV_AFFILIATIONS
+  job_type:        b
+  box_name:        CNV_CONVERT
+  condition:       s(CNV_PRV_MAIN) & s(CNV_PRV_AFFILIATIONS_S)
+  description:     "The PRV_MAIN BOX"
+
+   /* ----------------- CNV_PRV_AFFILIATIONS_J ----------------- */
+
+   insert_job:      CNV_PRV_AFFILIATIONS_J
+   job_type:        c
+   box_name:        CNV_PRV_AFFILIATIONS
+   command:         cnv_ottojob.sh cnvj --runid $RUNID
+   description:     "Run the PRV_MAIN conversion job"
+
+   /* ----------------- CNV_PRV_AFFILIATIONS_O_PDP ----------------- */
+
+   insert_job:      CNV_PRV_AFFILIATIONS_O_PDP
+   job_type:        c
+   box_name:        CNV_PRV_AFFILIATIONS
+   command:         cnv_ottojob.sh cnvo --env PDP --runid $RUNID
+   condition:       s(CNV_PRV_AFFILIATIONS_J)
+   description:     "Run the PRV_MAIN outs creation job"
+
+   /* ----------------- CNV_PRV_AFFILIATIONS_N_PDP ----------------- */
+
+   insert_job:      CNV_PRV_AFFILIATIONS_N_PDP
+   job_type:        c
+   box_name:        CNV_PRV_AFFILIATIONS
+   command:         cnv_ottojob.sh cnvn --runid $RUNID --env PDP
+   condition:       s(CNV_PRV_AFFILIATIONS_O_PDP)
+   description:     "Run the PRV_MAIN ninja file creation"
+
+   /* ----------------- CNV_PRV_AFFILIATIONS_F ----------------- */
+
+   insert_job:      CNV_PRV_AFFILIATIONS_F
+   job_type:        c
+   box_name:        CNV_PRV_AFFILIATIONS
+   command:         cnv_ottojob.sh cnvf --runid $RUNID
+   condition:       s(CNV_PRV_AFFILIATIONS_N_PDP)
+   description:     "Run the PRV_MAIN outs creation job"
+
+  /* ----------------- CNV_MBR_MAIN ----------------- */
+
+  insert_job:      CNV_MBR_MAIN
+  job_type:        b
+  box_name:        CNV_CONVERT
+  condition:       s(CNV_SYS_MEMO) & s(CNV_SYS_ENTITY) & s(CNV_MBR_MAIN_S)
+  description:     "The MBR_MAIN BOX"
+
+   /* ----------------- CNV_MBR_MAIN_J ----------------- */
+
+   insert_job:      CNV_MBR_MAIN_J
+   job_type:        c
+   box_name:        CNV_MBR_MAIN
+   command:         cnv_ottojob.sh cnvj --runid $RUNID
+   description:     "Run the MBR_MAIN conversion job"
+
+   /* ----------------- CNV_MBR_MAIN_O_PDP ----------------- */
+
+   insert_job:      CNV_MBR_MAIN_O_PDP
+   job_type:        c
+   box_name:        CNV_MBR_MAIN
+   command:         cnv_ottojob.sh cnvo --env PDP --runid $RUNID
+   condition:       s(CNV_MBR_MAIN_J)
+   description:     "Run the MBR_MAIN outs creation job"
+
+   /* ----------------- CNV_MBR_MAIN_N_PDP ----------------- */
+
+   insert_job:      CNV_MBR_MAIN_N_PDP
+   job_type:        c
+   box_name:        CNV_MBR_MAIN
+   command:         cnv_ottojob.sh cnvn --runid $RUNID --env PDP
+   condition:       s(CNV_MBR_MAIN_O_PDP)
+   description:     "Run the MBR_MAIN ninja file creation"
+
+   /* ----------------- CNV_MBR_MAIN_F ----------------- */
+
+   insert_job:      CNV_MBR_MAIN_F
+   job_type:        c
+   box_name:        CNV_MBR_MAIN
+   command:         cnv_ottojob.sh cnvf --runid $RUNID
+   condition:       s(CNV_MBR_MAIN_N_PDP)
+   description:     "Run the MBR_MAIN outs creation job"
+
+  /* ----------------- CNV_MBR_ENROLLMENTS ----------------- */
+
+  insert_job:      CNV_MBR_ENROLLMENTS
+  job_type:        b
+  box_name:        CNV_CONVERT
+  condition:       s(CNV_MBR_MAIN) & s(CNV_PRV_AFFILIATIONS) & s(CNV_MBR_ENROLLMENTS_S)
+  description:     "The PRV_MAIN BOX"
+
+   /* ----------------- CNV_MBR_ENROLLMENTS_J ----------------- */
+
+   insert_job:      CNV_MBR_ENROLLMENTS_J
+   job_type:        c
+   box_name:        CNV_MBR_ENROLLMENTS
+   command:         cnv_ottojob.sh cnvj --runid $RUNID
+   description:     "Run the PRV_MAIN conversion job"
+
+   /* ----------------- CNV_MBR_ENROLLMENTS_O_PDP ----------------- */
+
+   insert_job:      CNV_MBR_ENROLLMENTS_O_PDP
+   job_type:        c
+   box_name:        CNV_MBR_ENROLLMENTS
+   command:         cnv_ottojob.sh cnvo --env PDP --runid $RUNID
+   condition:       s(CNV_MBR_ENROLLMENTS_J)
+   description:     "Run the PRV_MAIN outs creation job"
+
+   /* ----------------- CNV_MBR_ENROLLMENTS_N_PDP ----------------- */
+
+   insert_job:      CNV_MBR_ENROLLMENTS_N_PDP
+   job_type:        c
+   box_name:        CNV_MBR_ENROLLMENTS
+   command:         cnv_ottojob.sh cnvn --runid $RUNID --env PDP
+   condition:       s(CNV_MBR_ENROLLMENTS_O_PDP)
+   description:     "Run the PRV_MAIN ninja file creation"
+
+   /* ----------------- CNV_MBR_ENROLLMENTS_F ----------------- */
+
+   insert_job:      CNV_MBR_ENROLLMENTS_F
+   job_type:        c
+   box_name:        CNV_MBR_ENROLLMENTS
+   command:         cnv_ottojob.sh cnvf --runid $RUNID
+   condition:       s(CNV_MBR_ENROLLMENTS_N_PDP)
+   description:     "Run the PRV_MAIN outs creation job"
+
+  /* ----------------- CNV_CLM_MAIN ----------------- */
+
+  insert_job:      CNV_CLM_MAIN
+  job_type:        b
+  box_name:        CNV_CONVERT
+  condition:       s(CNV_PRV_MAIN) & s(CNV_PRV_AFFILIATIONS) & s(CNV_MBR_MAIN) & s(CNV_MBR_ENROLLMENTS) & s(CNV_CLM_MAIN_S)
+  description:     "The CLM_MAIN BOX"
+
+   /* ----------------- CNV_CLM_MAIN_J ----------------- */
+
+   insert_job:      CNV_CLM_MAIN_J
+   job_type:        c
+   box_name:        CNV_CLM_MAIN
+   command:         cnv_ottojob.sh cnvj --runid $RUNID
+   condition:       s(CNV_MBR_MAIN_N_PDP)
+   description:     "Run the CLM_MAIN conversion job"
+
+   /* ----------------- CNV_CLM_MAIN_O_PDP ----------------- */
+
+   insert_job:      CNV_CLM_MAIN_O_PDP
+   job_type:        c
+   box_name:        CNV_CLM_MAIN
+   command:         cnv_ottojob.sh cnvo --env PDP --runid $RUNID
+   condition:       s(CNV_CLM_MAIN_J)
+   description:     "Run the CLM_MAIN outs creation job"
+
+   /* ----------------- CNV_CLM_MAIN_N_PDP ----------------- */
+
+   insert_job:      CNV_CLM_MAIN_N_PDP
+   job_type:        c
+   box_name:        CNV_CLM_MAIN
+   command:         cnv_ottojob.sh cnvn --runid $RUNID --env PDP
+   condition:       s(CNV_CLM_MAIN_O_PDP)
+   description:     "Run the CLM_MAIN ninja file creation"
+
+   /* ----------------- CNV_CLM_MAIN_F ----------------- */
+
+   insert_job:      CNV_CLM_MAIN_F
+   job_type:        c
+   box_name:        CNV_CLM_MAIN
+   command:         cnv_ottojob.sh cnvf --runid $RUNID
+   condition:       s(CNV_CLM_MAIN_N_PDP)
+   description:     "Run the CLM_MAIN outs creation job"
+
+ /* ----------------- CNV_LOAD ----------------- */
+
+ insert_job:      CNV_LOAD
+ job_type:        b
+ box_name:        CNV_MOCK1
+ description:     "The CNV_POSTLOAD BOX"
+
+  /* ----------------- CNV_SYS_MEMO_L_PDP ----------------- */
+
+  insert_job:      CNV_SYS_MEMO_L_PDP
+  job_type:        c
+  box_name:        CNV_LOAD
+  command:         cnv_ottojob.sh cnvl --runid $RUNID --env PDP
+  condition:       s(CNV_SYS_MEMO_N_PDP)
+  description:     "Run the PRV_MAIN Load job"
+
+  /* ----------------- CNV_SYS_ENTITY_L_PDP ----------------- */
+
+  insert_job:      CNV_SYS_ENTITY_L_PDP
+  job_type:        c
+  box_name:        CNV_LOAD
+  command:         cnv_ottojob.sh cnvl --runid $RUNID --env PDP
+  condition:       s(CNV_SYS_ENTITY_N_PDP)
+  description:     "Run the PRV_MAIN Load job"
+
+  /* ----------------- CNV_PRV_MAIN_L_PDP ----------------- */
+
+  insert_job:      CNV_PRV_MAIN_L_PDP
+  job_type:        c
+  box_name:        CNV_LOAD
+  command:         cnv_ottojob.sh cnvl --runid $RUNID --env PDP
+  condition:       s(CNV_PRV_MAIN_N_PDP)
+  description:     "Run the PRV_MAIN Load job"
+
+  /* ----------------- CNV_PRV_AFFILIATIONS_L_PDP ----------------- */
+
+  insert_job:      CNV_PRV_AFFILIATIONS_L_PDP
+  job_type:        c
+  box_name:        CNV_LOAD
+  command:         cnv_ottojob.sh cnvl --runid $RUNID --env PDP
+  condition:       s(CNV_PRV_AFFILIATIONS_N_PDP)
+  description:     "Run the PRV_MAIN Load job"
+
+  /* ----------------- CNV_MBR_MAIN_L_PDP ----------------- */
+
+  insert_job:      CNV_MBR_MAIN_L_PDP
+  job_type:        c
+  box_name:        CNV_LOAD
+  command:         cnv_ottojob.sh cnvl --runid $RUNID --env PDP
+  condition:       s(CNV_MBR_MAIN_N_PDP)
+  description:     "Run the MBR_MAIN Load job"
+
+  /* ----------------- CNV_MBR_ENROLLMENTS_L_PDP ----------------- */
+
+  insert_job:      CNV_MBR_ENROLLMENTS_L_PDP
+  job_type:        c
+  box_name:        CNV_LOAD
+  command:         cnv_ottojob.sh cnvl --runid $RUNID --env PDP
+  condition:       s(CNV_MBR_ENROLLMENTS_N_PDP)
+  description:     "Run the MBR_MAIN Load job"
+
+  /* ----------------- CNV_CLM_MAIN_L_PDP ----------------- */
+
+  insert_job:      CNV_CLM_MAIN_L_PDP
+  job_type:        c
+  box_name:        CNV_LOAD
+  command:         cnv_ottojob.sh cnvl --runid $RUNID --env PDP
+  condition:       s(CNV_CLM_MAIN_N_PDP)
+  description:     "Run the CLM_MAIN Load job"
+
+ /* ----------------- CNV_POSTLOAD ----------------- */
+
+ insert_job:      CNV_POSTLOAD
+ job_type:        b
+ box_name:        CNV_MOCK1
+ condition:       s(CNV_LOAD)
+ description:     "The CNV_POSTLOAD BOX"
+
+  /* ----------------- CNV_CREATEFKEY_PDP ----------------- */
+
+  insert_job:      CNV_CREATEFKEY_PDP
+  job_type:        c
+  box_name:        CNV_POSTLOAD
+  command:         cnv_ottojob.sh run_ddl.sh -F TGT -d Plandata_Parallel -s dbo -q CREATE_FKEY
+  description:     "CREATE FK's on the PDP DB"
+
+  /* ----------------- CNV_CREATEINDEX_PDP ----------------- */
+
+  insert_job:      CNV_CREATEINDEX_PDP
+  job_type:        c
+  box_name:        CNV_POSTLOAD
+  command:         cnv_ottojob.sh run_ddl.sh -F TGT -d Plandata_Parallel -s dbo -q CREATE_INDEX -p 10
+  description:     "CREATE Indexes on the PDP DB"

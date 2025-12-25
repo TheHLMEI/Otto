@@ -1,4 +1,5 @@
 <html>
+
 <head>
    <meta charset="UTF-8">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -6,57 +7,73 @@
    <link rel="stylesheet" href="otto.css" type="text/css">
    <title>Otto HTTP</title>
    <script>
-     function resizeIframe(obj) {
-        obj.style.height = 0;
+      function resizeIframe(obj) {
+         obj.style.height = 0;
          obj.style.height = obj.contentWindow.document.documentElement.scrollHeight + 'px';
-     }
+      }
    </script>
 </head>
+
 <body>
-<div class="box">
-   <div class="row header">
-      <table width="100%">
-      <tr><td width="25%" align="left">
-      <img src="Otto.png" height="75px"> 
-      </td><td width="50%">
-      <center>
-      <form name="specform" id="specform" action="/otto/summary" method="get" target="content_frame" autocomplete="off">
-         <label for="jobname">Job Name:</label>
-         <input type="text" id="jobname" name="jobname">
-         <input type="submit" value="Submit"><br>
-         <input type="radio" name="radiofmt" onclick="document.getElementById('specform').action='/otto/summary';" checked="checked"/>Summary
-         <input type="radio" name="radiofmt" onclick="document.getElementById('specform').action='/otto/query';"/>Query
-         <input type="radio" name="radiofmt" onclick="document.getElementById('specform').action='/otto/detail';"/>Detail
-         <input type="radio" name="radiofmt" onclick="document.getElementById('specform').action='/otto/mspdi';"/>MS Project
-         <input type="radio" name="radiofmt" onclick="document.getElementById('specform').action='/otto/csv';"/>CSV
-         <br>
-         <input type="checkbox" name="IN" id="IN" value="1" checked="checked">
-         <label for="IN">IN</label>
-         <input type="checkbox" name="AC" id="AC" value="1" checked="checked">
-         <label for="AC">AC</label>
-         <input type="checkbox" name="OH" id="OH" value="1" checked="checked">
-         <label for="OH">OH</label>
-         <input type="checkbox" name="RU" id="RU" value="1" checked="checked">
-         <label for="RU">RU</label>
-         <input type="checkbox" name="SU" id="SU" value="1" checked="checked">
-         <label for="SU">SU</label>
-         <input type="checkbox" name="FA" id="FA" value="1" checked="checked">
-         <label for="FA">FA</label>
-         <input type="checkbox" name="TE" id="TE" value="1" checked="checked">
-         <label for="TE">TE</label>
-      </center>
-      </td><td width="25%" align="right">
-      <table>
-      <tr><td><a href="/dotto">dotto</a></td></tr>
-      <tr><td><a href="/totto">totto</a></td></tr>
-      </table>
-      </td></tr></table>
+   <div class="box">
+      <div class="row header">
+         <table width="100%">
+            <tr>
+               <td width="25%" align="left">
+                  <img src="Otto.png" height="75px">
+               </td>
+               <td width="50%">
+                  <center>
+                     <form name="specform" id="specform" action="/dotto/summary" method="get" target="content_frame"
+                        autocomplete="off">
+                        <label for="jobname">Job Name:</label>
+                        <input type="text" id="jobname" name="jobname">
+                        <input type="submit" value="Submit"><br>
+                        <input type="radio" name="radiofmt"
+                           onclick="document.getElementById('specform').action='/otto/summary';"
+                           checked="checked">Summary</input>
+                        <input type="radio" name="radiofmt"
+                           onclick="document.getElementById('specform').action='/otto/query';">Query</input>
+                        <input type="radio" name="radiofmt"
+                           onclick="document.getElementById('specform').action='/otto/detail';">Detail</input>
+                        <input type="radio" name="radiofmt"
+                           onclick="document.getElementById('specform').action='/otto/mspdi';">MS Project</input>
+                        <input type="radio" name="radiofmt"
+                           onclick="document.getElementById('specform').action='/otto/csv';">CSV</input>
+                        <input type="radio" name="radiofmt"
+                           onclick="document.getElementById('specform').action='/otto/json';">JSON</input>
+                        <br />
+                        <input type="checkbox" name="IN" id="IN" value="1" checked="checked" />
+                        <label for="IN">IN</label>
+                        <input type="checkbox" name="AC" id="AC" value="1" checked="checked" />
+                        <label for="AC">AC</label>
+                        <input type="checkbox" name="OH" id="OH" value="1" checked="checked" />
+                        <label for="OH">OH</label>
+                        <input type="checkbox" name="RU" id="RU" value="1" checked="checked" />
+                        <label for="RU">RU</label>
+                        <input type="checkbox" name="SU" id="SU" value="1" checked="checked" />
+                        <label for="SU">SU</label>
+                        <input type="checkbox" name="FA" id="FA" value="1" checked="checked" />
+                        <label for="FA">FA</label>
+                        <input type="checkbox" name="TE" id="TE" value="1" checked="checked" />
+                        <label for="TE">TE</label>
+                  </center>
+               </td>
+               <td width="25%" align="right"></td>
+            </tr>
+         </table>
+         </td>
+         </tr>
+         </table>
+      </div>
+      <div class="row content">
+         <iframe src="/otto/summary" name="content_frame" id="content_frame"></iframe>
+      </div>
+      <div class="row footer">
+         <iframe src="/otto/version" name="footer_frame" id="footer_frame" scrolling="no"
+            onload="resizeIframe(this);"></iframe>
+      </div>
    </div>
-   <div class="row content">
-      <iframe src="/otto/summary" name="content_frame" id="content_frame"></iframe>
-   </div>
-   <div class="row footer">
-      <iframe src="/otto/version" name="footer_frame" id="footer_frame" scrolling="no" onload="resizeIframe(this);"></iframe>
-   </div>
-</div>
-</body></html>
+</body>
+
+</html>

@@ -14,6 +14,7 @@ typedef struct
 mime_map mime_types [] =
 {
    {".css",  "text/css"},
+   {".json", "application/json"},
    {".gif",  "image/gif"},
    {".htm",  "text/html"},
    {".html", "text/html"},
