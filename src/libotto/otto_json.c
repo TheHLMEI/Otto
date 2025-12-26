@@ -338,6 +338,7 @@ static int json_write_array_long_item(DYNBUF *b, int64_t value, st_JSON_WRITER_S
 int buffer_json(DYNBUF *b, JOBLIST *joblist)
 {
     int ret = OTTO_SUCCESS;
+    JOB *job;
 
     if (joblist == NULL)
         ret = OTTO_FAIL;
